@@ -12,10 +12,11 @@
     "start": "tsx server/index.ts --production",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
-    "verify": "npm run format:check && npm run typecheck && npm test && npm run build",
+    "verify": "npm run format:check && npm run typecheck && npm run relate:context && npm test && npm run build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "doctor": "tsx scripts/doctor.ts",
+    "relate:context": "tsx scripts/relate-context.ts",
     "reproduce": "tsx scripts/reproduce.ts",
     "ai": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-astra.ps1",
     "ai:check": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-astra.ps1 -Check"

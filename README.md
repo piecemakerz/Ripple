@@ -77,11 +77,12 @@ npm start
 ## Astra로 개발 이어가기
 
 ```powershell
+npm run relate:context
 npm run ai:check
 npm run ai
 ```
 
-`-Check`는 로컬 CLI와 로그인 상태만 확인하며 모델을 호출하지 않습니다. 기본 실행은 현재 프로젝트에서 `gpt-6-astra`, reasoning `high`를 명시해 Codex를 시작하고 프로젝트 지침·진행 기록을 읽게 합니다. Codex 설치 및 로그인은 필요합니다. 실제 모델 사용 가능 여부는 계정/실행 환경에 따릅니다.
+`relate:context`는 설치된 Relate 버전·공식 Node 스킬·타입 정의를 확인하고 메모리 DB에서 매개변수 조회를 실행합니다. 라이브 DB는 열지 않습니다. `ai:check`는 같은 검사와 로컬 Codex CLI·로그인 상태를 확인하며 모델을 호출하지 않습니다. 기본 실행은 현재 프로젝트에서 `gpt-6-astra`, reasoning `high`를 명시해 Codex를 시작하고 프로젝트 지침·진행 기록·공식 Relate 스킬을 읽게 합니다. Codex 설치 및 로그인은 필요합니다. 실제 모델 사용 가능 여부는 계정/실행 환경에 따릅니다.
 
 `.codex/config.toml`에도 같은 기본 모델을 선언했습니다. 프로젝트 설정은 신뢰된 프로젝트에서 적용되며, 실행 중인 데스크톱 대화의 모델은 설정 파일을 쓴 것만으로 바뀌지 않습니다. 데스크톱에서 이어갈 때는 모델 선택기에서 Astra를 선택하세요. 전역 Codex 설정·인증·승인 정책은 변경하지 않습니다.
 
@@ -131,6 +132,9 @@ npm run dev
 
 ## 공식 자료
 
+- [주최 측이 연결한 네 자료와 구현 대조](docs/RELATE_RESOURCES.md): 공식 스킬, 설치 방식, 버전 기준과 아이디어 적용 결정
+- [Relate 홈페이지](https://relatedb.ai/), [설치 안내](https://relatedb.ai/docs/get-started/install/)
+- [Relate 소스 저장소](https://github.com/relatedb/relate), [Relate Ideas](https://github.com/jexp/relate-ideas)
 - [Relate Node API와 설치](https://github.com/relatedb/relate/tree/v1.0.1/clients/javascript)
 - [Relate 1.0.1 릴리스](https://github.com/relatedb/relate/releases/tag/v1.0.1)
 - [Relate 제약사항](https://github.com/relatedb/relate/blob/v1.0.1/docs/limitations.md)

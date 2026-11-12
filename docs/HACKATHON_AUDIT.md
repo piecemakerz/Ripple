@@ -10,6 +10,8 @@ M0/M1 완료와 대회 제출 완료는 다르다. 이번 요청은 검증이므
 
 ## 공식 안내 확인
 
+구현 참고 자료 네 곳에 대한 2026-11-13 후속 검토와 공식 Node 스킬 연결은 [RELATE_RESOURCES.md](RELATE_RESOURCES.md)에 기록했다. 설치/설계 참고 자료와 대회의 필수 제출 조건을 구분한다.
+
 직접 열린 [Devpost 본문](https://relate.devpost.com/), [현재 Official Rules](https://relate.devpost.com/rules), [일정](https://relate.devpost.com/details/dates), [Resources](https://relate.devpost.com/resources), [Neo4j 발표 글](https://neo4j.com/blog/graph-database/announcing-the-relate-by-neo4j-hackathon-2026-build-ai-agents-on-an-embedded-graph-database/)을 대조했다. Rules는 2026-11-12 갱신 표시가 있는 본문을 사용했다. 검색 결과에는 대괄호 미확정 문구가 있는 이전 초안이 남아 있어 근거에서 제외했다.
 
 접수는 **2026-11-12 11:00 ~ 2026-12-12 11:00 KST**다. PST에 17시간을 더한 시각이다. [공식 일정](https://relate.devpost.com/details/dates)

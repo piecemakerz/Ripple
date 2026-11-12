@@ -8,6 +8,8 @@
 
 새 세션은 순서대로 `AGENTS.md` → `docs/STATUS.md` → `docs/PLAN.md` → `docs/ARCHITECTURE.md`를 읽고 필요한 범위만 원본 명세에서 찾는다. 명세/코드/테스트가 어긋나면 실제 현황과 미해결 차이를 기록한다.
 
+Relate 작업 전에는 `npm run relate:context`를 실행하고 출력된 공식 Node/TypeScript 스킬과 설치된 타입 정의를 읽는다. Astra 런처는 이 사전 검사를 자동 실행하고 해당 스킬을 읽도록 시작 프롬프트에 포함한다. 이 명령은 일회성 메모리 DB의 매개변수 조회만 수행하며 라이브 DB나 모델을 호출하지 않는다. 공식 CLI의 `relate agent-context`와는 다른 프로젝트 명령이다. 네 공식 참고 자료의 적용 결정은 [RELATE_RESOURCES.md](RELATE_RESOURCES.md)에 있다.
+
 ## 작업 루프
 
 1. 사용자 요청을 현재 승인된 범위와 연결하고 완료 기준을 3~5개로 구체화한다. 핵심 데이터 변경은 실패·재시작 기준도 포함한다.

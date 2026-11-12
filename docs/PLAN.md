@@ -16,3 +16,9 @@ Next milestones (not implicitly implemented): M2 document ingestion and verified
 - [complete] Publish the source to the existing public `piecemakerz/Ripple` repository; preserve its MIT license and initial commit, sanitize local paths, document setup/AI use, and verify GitHub Actions. First implementation run passed: see `docs/STATUS.md`.
 - [not started] Remaining submission preparation: inspectable sample store, demo, final distribution notices and Devpost submission. These gaps are separate from M2 feature development; repository publication does not mark submission readiness complete.
 - [unresolved] Overview and Official Rules disagree on scoring weights and existing-project eligibility. Preserve the discrepancy in planning until clarified by the organizer.
+
+## Official Relate resources
+
+- [complete] Review the four organizer-linked resources against the installed Node binding and Ripple's graph/evidence design.
+- [complete] Connect the package's official Node/TypeScript skill to the Astra startup instructions and add a version-aware development preflight.
+- [complete] Run the preflight, launcher check and completion gate; record the adoption decisions. Changes are covered by the same GitHub Actions workflow when published.

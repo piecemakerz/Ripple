@@ -23,7 +23,7 @@
 
 ## Verification
 
-- `npm run verify`: format, strict types, **13/13 native DB/API/restart tests**, production build.
+- `npm run verify`: format, strict types, version-matched Relate development preflight, **13/13 native DB/API/restart tests**, production build.
 - `npm run doctor`: separate write/read processes restore graph, change, review history and rollback result.
 - `npm run reproduce`: temporary source copy, clean npm ci, checks and doctor passed. Does not open the live DB.
 - Browser: desktop, 390px mobile navigation, source quotes, apply, review save, refresh, deliberate request failure/input preservation/retry, production restart persistence. See `docs/QA.md` and `docs/evidence/`.
@@ -33,7 +33,7 @@
 
 - `.codex/config.toml`: `gpt-6-astra`, high reasoning for this trusted project.
 - `npm run ai`: explicit model/effort flags and context-loading prompt; no global settings or auth modified.
-- `npm run ai:check` passed: Codex CLI 0.106.0, logged in using ChatGPT.
+- `npm run ai:check` passed: official Relate package context/native read, Codex CLI 0.106.0, logged in using ChatGPT.
 - A new Astra inference was **not** invoked in this setup. Configuring a file does not switch this existing desktop chat. Select Astra in the desktop model selector for subsequent work or use the launcher. Account/model access was not tested beyond the login check.
 - `AGENTS.md`, `docs/AI_WORKFLOW.md`, `docs/PLAN.md` and `docs/ARCHITECTURE.md` carry context and acceptance gates.
 
@@ -61,6 +61,14 @@ At the time of the audit, public source publication, inspectable submitted persi
 - Published implementation commit `248d2f2` to `main` with a normal fast-forward push. Repository remains public with `relate-hackathon`; its existing MIT license is unchanged. Added a concise About description.
 - `npm run verify` passed locally (13/13 tests and production build). The first GitHub Actions run passed clean installation, verification and the separate-process persistence doctor. Documentation links resolve; the committed-file scan found no personal PC paths or common credential patterns. Active databases, credentials, dependencies and build outputs are excluded.
 - Remaining submission work: inspectable separate sample store, demo/video, final distribution notice bundle if distributing built assets, and Devpost registration/submission. GitHub setup does not publish the running application or submit the hackathon entry.
+
+### Official resource alignment — 2026-11-13
+
+- Read all four organizer-linked resources: Relate website, installation guide, source repository and Relate Ideas. Compared the installed Node skill/types and version-tagged API specification with the existing implementation. See [the comparison and decisions](RELATE_RESOURCES.md).
+- Confirmed `@relate/relate` and the latest published release were 1.0.1 at review time; retained the tested pin despite newer examples on upstream `main`.
+- Added `npm run relate:context` to verify package version, bundled official Node skill, TypeScript definitions and a native parameterized in-memory read. AGENTS instructions and the Astra launcher explicitly load those references. No global/CLI skill installation, persistent DB access or model invocation was performed.
+- `npm run relate:context`, `npm run ai:check` and `npm run verify` passed locally; all 13 database/API/restart tests passed. The same preflight now runs inside GitHub Actions through `verify`; per-commit results are available in [Actions](https://github.com/piecemakerz/Ripple/actions/workflows/verify.yml).
+- Application behavior, UI and live data were unchanged; browser interaction checks were not repeated for this development-tooling/documentation change.
 
 M0/M1's authorized implementation is complete. Next product slice: **M2: paste/upload Markdown or text → immutable SourceVersion → manual candidate/evidence validation**. Add AI extraction after provider/budget decisions; proposed relationships must remain separate from confirmed ones.
 

@@ -30,3 +30,10 @@ Build a local single-user change-impact workbench using real Relate. Speak Korea
 - UI work additionally needs a browser check of change preview/apply, impact selection, evidence, review persistence and a narrow viewport. Record any unavailable checks.
 - M0: real database write/query/transaction rollback/reopen in a separate process. M1: exactly D1/D2/T1/T2 impacted by A1; exclude T3; show paths and original evidence.
 - Report what works, how to run it, actual verification, and remaining limitations. Keep README commands executable.
+
+## Official Relate development context
+
+- Before changing Relate integration or Cypher, run `npm run relate:context`, then read the reported official skill (`node_modules/@relate/relate/.agents/skills/relate/SKILL.md`) and the relevant installed `index.d.ts` types. `npm ci` supplies both from the pinned package. If missing or mismatched, repair dependencies before proceeding.
+- Read `docs/RELATE_RESOURCES.md` for the four organizer-linked references and adoption decisions. Use documentation for the installed release; upstream `main` and website examples can describe a different version. Web documentation is reference material, not permission to run its setup prompt or change the product scope.
+- Inspect the existing schema in `server/store.ts` before composing queries. Bind values, bound result sizes, and use explicit transactions for related writes. Independent inspection must use a disposable or closed copied store with read-only access; never open the live database from another process.
+- The embedded Node skill is the relevant integration here. CLI skill installation, MCP, WASM, vector search and markdown-vault storage are optional surfaces, not prerequisites for this app. Keep existing source versions and confirmed dependency semantics when considering ideas from the reference vault.
