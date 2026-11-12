@@ -27,4 +27,4 @@ Next milestones (not implicitly implemented): M2 document ingestion and verified
 
 - [complete] Install reviewed, pinned Relate/React/UI skills in the project and add a focused Ripple verification skill.
 - [complete] Add skill integrity checks and an exact-commit GitHub Actions status command; connect them to the existing launcher and checks.
-- [complete] Validate installed skills/scripts, actual Codex discovery and clean-install reproduction; record plugin connection state. GitHub plugin installation/account connection remains an optional user action.
+- [complete] Validate installed skills/scripts, actual Codex discovery and clean-install reproduction; publish and verify Windows CI. GitHub plugin installation/account connection and repository/CI access were confirmed.

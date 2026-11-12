@@ -37,7 +37,7 @@ npm run ci:status
 
 ## Plugins and existing capabilities
 
-- **GitHub:** selected for repository/PR/CI work; offered for installation, but the last confirmed state is **not installed or connected**. The user must complete the plugin's installation/account connection. Existing Git publication and the public CI status command already work independently of this optional connection. Recheck availability before using a plugin or repeating a connection limitation.
+- **GitHub:** **installed and connected**. The plugin confirmed the authenticated `piecemakerz` account, access to `piecemakerz/Ripple`, and successful Windows CI steps for the tooling commit. Use it for repository/PR/CI inspection; existing Git publication and the public CI status command remain available. Connection is not blanket authorization to post comments or perform unrelated mutations.
 - **Browser/computer use:** already available in this Codex environment and previously used for Ripple's desktop/mobile acceptance. No second browser automation stack was installed.
 - **OpenAI Docs:** already installed as a system skill; used for current Codex guidance. A second documentation plugin is unnecessary for the current task. No OpenAI product API key was added.
 - **Deferred:** Figma without a design source, issue trackers without a team workflow, hosting plugins, model extraction APIs and autonomous multi-agent orchestration. These are not required for the current local MVP.
