@@ -1,6 +1,6 @@
 # Current status
 
-**2026-11-13 KST · M0/M1 implemented and verified; GitHub publication in progress.**
+**2026-11-13 KST · M0/M1 published to GitHub; local and remote verification passed.**
 
 ## What exists
 
@@ -27,7 +27,7 @@
 - `npm run doctor`: separate write/read processes restore graph, change, review history and rollback result.
 - `npm run reproduce`: temporary source copy, clean npm ci, checks and doctor passed. Does not open the live DB.
 - Browser: desktop, 390px mobile navigation, source quotes, apply, review save, refresh, deliberate request failure/input preservation/retry, production restart persistence. See `docs/QA.md` and `docs/evidence/`.
-- GitHub Actions workflow runs install, verify and doctor on Windows for pushes and pull requests. First remote run is pending publication.
+- GitHub Actions workflow runs install, verify and doctor on Windows for pushes and pull requests. [First published implementation run](https://github.com/piecemakerz/Ripple/actions/runs/43309102774) passed on commit `248d2f2`.
 
 ## Astra setup and its verified boundary
 
@@ -58,7 +58,8 @@ At the time of the audit, public source publication, inspectable submitted persi
 - Repository was already public, with `relate-hackathon` and MIT. Local source is based on its initial commit; no history replacement is needed.
 - Added English setup, graph/storage explanation, screenshots, [AI disclosure](AI_DISCLOSURE.md) and [dependency inventory](../THIRD_PARTY.md). Actual Astra inference remains unverified.
 - Personal PC paths were removed from the public handoff and two evidence logs. Original files are retained locally under ignored `.runtime/private-publish-backup/`; verification outcomes were not altered.
-- Publication and the first remote CI result are pending. Active databases, credentials, dependencies and build outputs are excluded from the commit.
+- Published implementation commit `248d2f2` to `main` with a normal fast-forward push. Repository remains public with `relate-hackathon`; its existing MIT license is unchanged. Added a concise About description.
+- `npm run verify` passed locally (13/13 tests and production build). The first GitHub Actions run passed clean installation, verification and the separate-process persistence doctor. Documentation links resolve; the committed-file scan found no personal PC paths or common credential patterns. Active databases, credentials, dependencies and build outputs are excluded.
 - Remaining submission work: inspectable separate sample store, demo/video, final distribution notice bundle if distributing built assets, and Devpost registration/submission. GitHub setup does not publish the running application or submit the hackathon entry.
 
 M0/M1's authorized implementation is complete. Next product slice: **M2: paste/upload Markdown or text → immutable SourceVersion → manual candidate/evidence validation**. Add AI extraction after provider/budget decisions; proposed relationships must remain separate from confirmed ones.

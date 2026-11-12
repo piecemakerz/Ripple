@@ -13,6 +13,6 @@ Next milestones (not implicitly implemented): M2 document ingestion and verified
 ## Hackathon audit
 
 - [complete] Compare updated official requirements/Rules with the current implementation, rerun native checks, and record findings in `docs/HACKATHON_AUDIT.md`.
-- [in progress] Publish the source to the existing public `piecemakerz/Ripple` repository; preserve its MIT license and initial commit, sanitize local paths, document setup/AI use, and verify GitHub Actions.
+- [complete] Publish the source to the existing public `piecemakerz/Ripple` repository; preserve its MIT license and initial commit, sanitize local paths, document setup/AI use, and verify GitHub Actions. First implementation run passed: see `docs/STATUS.md`.
 - [not started] Remaining submission preparation: inspectable sample store, demo, final distribution notices and Devpost submission. These gaps are separate from M2 feature development; repository publication does not mark submission readiness complete.
 - [unresolved] Overview and Official Rules disagree on scoring weights and existing-project eligibility. Preserve the discrepancy in planning until clarified by the organizer.

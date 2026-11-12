@@ -4,6 +4,8 @@
 
 **판정: 해커톤 취지와 핵심 기술 요건에 부합하는 작동 가능한 MVP. 제출 준비는 미완료.**
 
+**2026-11-13 후속 반영:** [공개 GitHub 저장소](https://github.com/piecemakerz/Ripple)의 `main`에 구현을 업로드했고, `relate-hackathon` Topic과 기존 MIT 라이선스를 확인했다. 영문 실행 안내와 [AI 사용 공개문](AI_DISCLOSURE.md), [직접 의존성 고지](../THIRD_PARTY.md)를 추가했으며 [첫 원격 CI](https://github.com/piecemakerz/Ripple/actions/runs/43309102774)도 통과했다. 아래 표는 11월 12일 감사 당시 상태를 보존한 기록이다. 현재 남은 일은 심사용 영구 DB·영상/데모·최종 배포 고지·Devpost 제출이다.
+
 M0/M1 완료와 대회 제출 완료는 다르다. 이번 요청은 검증이므로 앱 기능·데이터를 수정하거나 공개 저장소/Devpost 제출을 생성하지 않았다. 참가자의 자격이나 주최 측의 최종 수락을 보증하는 판정도 아니다.
 
 ## 공식 안내 확인
