@@ -1,0 +1,4 @@
+# Project defaults; loaded by Codex for trusted projects.
+# An existing chat's selected model is not changed by this file.
+model = "gpt-6-astra"
+model_reasoning_effort = "high"

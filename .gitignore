@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.runtime/
+*.log
+coverage/
+test-results/
+playwright-report/
+*.rl
+*.rl.lock

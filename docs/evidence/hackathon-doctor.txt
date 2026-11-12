@@ -1,0 +1,9 @@
+[Publication note: local temporary-directory prefix replaced with %TEMP%; command results unchanged.]
+
+> ripple@0.1.0 doctor
+> tsx scripts/doctor.ts
+
+Node v22.17.1 · win32/x64 · Relate 1.0.1
+{"mode":"write","ok":true,"engine":"Relate","version":"1.0.1","impactIds":["D1","D2","T1","T2"],"excluded":"T3","path":"%TEMP%\\ripple-doctor-0Gui0n\\db"}
+{"mode":"read","ok":true,"engine":"Relate","version":"1.0.1","impactIds":["D1","D2","T1","T2"],"excluded":"T3","path":"%TEMP%\\ripple-doctor-0Gui0n\\db"}
+PASS: native database, parameterized traversal, transaction rollback, process restart, preserved change and review history.
