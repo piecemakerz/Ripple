@@ -12,6 +12,8 @@ Relate 작업 전에는 `npm run relate:context`를 실행하고 출력된 공�
 
 ## 작업 루프
 
+관련 작업에만 프로젝트 스킬을 사용한다: DB/Cypher는 `relate`, React는 `vercel-react-best-practices`, UI 검토는 `web-design-guidelines`, 중요한 변경의 검증은 `ripple-verify`. 전체 스킬 본문을 매번 읽지 않는다. `npm run ai:doctor`로 설치 상태를 확인하고, 공개 후에는 `npm run ci:status`로 정확한 커밋의 결과를 확인한다. [설치 출처와 도구 상태](AI_TOOLING.md)
+
 1. 사용자 요청을 현재 승인된 범위와 연결하고 완료 기준을 3~5개로 구체화한다. 핵심 데이터 변경은 실패·재시작 기준도 포함한다.
 2. Git 상태와 영향을 받는 코드를 읽는다. 사용자 변경과 현재 DB를 보존한다.
 3. 설계 선택의 이유와 불변 조건을 짧게 기록한다. API·DB·UI가 이어지는 한 흐름을 구현한다.

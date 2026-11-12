@@ -23,7 +23,7 @@
 
 ## Verification
 
-- `npm run verify`: format, strict types, version-matched Relate development preflight, **13/13 native DB/API/restart tests**, production build.
+- `npm run verify`: format, strict types, pinned skill integrity, version-matched Relate development preflight, **13/13 native DB/API/restart tests**, production build.
 - `npm run doctor`: separate write/read processes restore graph, change, review history and rollback result.
 - `npm run reproduce`: temporary source copy, clean npm ci, checks and doctor passed. Does not open the live DB.
 - Browser: desktop, 390px mobile navigation, source quotes, apply, review save, refresh, deliberate request failure/input preservation/retry, production restart persistence. See `docs/QA.md` and `docs/evidence/`.
@@ -71,5 +71,15 @@ At the time of the audit, public source publication, inspectable submitted persi
 - Application behavior, UI and live data were unchanged; browser interaction checks were not repeated for this development-tooling/documentation change.
 
 M0/M1's authorized implementation is complete. Next product slice: **M2: paste/upload Markdown or text → immutable SourceVersion → manual candidate/evidence validation**. Add AI extraction after provider/budget decisions; proposed relationships must remain separate from confirmed ones.
+
+### AI skills and tooling — 2026-11-13
+
+- Installed four project-scoped skills: `relate`, `vercel-react-best-practices`, `web-design-guidelines`, `ripple-verify`. Upstream snapshots are pinned and checked by `.agents/skills-lock.json`; no global skill/config or model selection was changed. See [AI_TOOLING.md](AI_TOOLING.md).
+- Codex CLI 0.106.0 app-server `skills/list` discovered all four with `scope: repo`, `enabled: true`, and zero loader errors. Only initialization and skill listing were invoked; no chat, inference or extra agent was started.
+- All four skills passed the bundled skill validator. The first Relate validation hit Windows' cp949 decoding default; rerunning with `python -X utf8` passed. Its installed content matches the npm package after line-ending normalization.
+- `npm run ai:doctor`, `npm run ai:check`, `npm run verify` and `npm run reproduce` passed. The clean temporary checkout installed dependencies, verified the skill snapshots, passed 13 tests/build and the separate-process DB doctor.
+- Added `npm run ci:status` for the exact committed HEAD. Confirmed it reports the existing green run and separately marks uncommitted edits as not covered. GitHub Actions runs the new skill check as part of `verify` on publication.
+- GitHub plugin was selected and offered for installation. The latest checked state is not installed/connected; user account connection remains optional. Existing Git publication and public CI inspection work. The already available browser tools and OpenAI Docs skill were retained.
+- Application behavior/UI and live data were unchanged. No browser regression or new Astra inference is claimed for this tooling setup.
 
 Still outside this implementation: generic ingestion, AI extraction, relationship editor, collaboration, large graph layout, public sample DB export, hosted demo and submission assets. No benchmark claims on real customer data.

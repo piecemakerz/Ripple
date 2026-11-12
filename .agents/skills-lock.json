@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "hashFormat": "SHA-256 of sorted relative paths, NUL, UTF-8 text normalized to LF, NUL; all files in each skill directory",
+  "snapshots": [
+    {
+      "name": "relate",
+      "repo": "relatedb/relate",
+      "ref": "v1.0.1",
+      "path": "clients/javascript/.agents/skills/relate",
+      "license": "Apache-2.0",
+      "sha256": "f113f66706a7ddd3518fc623986ddf37ba8816cb4a85e3a5f6fa9fce12b68adb",
+      "files": 1
+    },
+    {
+      "name": "vercel-react-best-practices",
+      "repo": "vercel-labs/agent-skills",
+      "ref": "1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62",
+      "path": "skills/react-best-practices",
+      "license": "MIT",
+      "sha256": "e3f2294574b469c7c198373a443a86571012769d0bbeed68854bd55642ec0d7b",
+      "files": 76
+    },
+    {
+      "name": "web-design-guidelines",
+      "repo": "vercel-labs/agent-skills",
+      "ref": "1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62",
+      "path": "skills/web-design-guidelines",
+      "license": "MIT",
+      "sha256": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474",
+      "files": 1
+    }
+  ]
+}

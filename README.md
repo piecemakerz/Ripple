@@ -77,10 +77,13 @@ npm start
 ## Astra로 개발 이어가기
 
 ```powershell
+npm run ai:doctor
 npm run relate:context
 npm run ai:check
 npm run ai
 ```
+
+프로젝트에는 Relate, React, UI·접근성 검토, Ripple 검증 스킬이 설치되어 있습니다. `ai:doctor`는 고정된 스킬 원본과 무결성을 검사하며 Astra 런처와 `verify`에서도 실행됩니다. 사용 범위와 플러그인 상태는 [AI 도구 구성](docs/AI_TOOLING.md)에 있습니다. `npm run ci:status`로 현재 커밋의 GitHub Actions 결과를 조회할 수 있습니다.
 
 `relate:context`는 설치된 Relate 버전·공식 Node 스킬·타입 정의를 확인하고 메모리 DB에서 매개변수 조회를 실행합니다. 라이브 DB는 열지 않습니다. `ai:check`는 같은 검사와 로컬 Codex CLI·로그인 상태를 확인하며 모델을 호출하지 않습니다. 기본 실행은 현재 프로젝트에서 `gpt-6-astra`, reasoning `high`를 명시해 Codex를 시작하고 프로젝트 지침·진행 기록·공식 Relate 스킬을 읽게 합니다. Codex 설치 및 로그인은 필요합니다. 실제 모델 사용 가능 여부는 계정/실행 환경에 따릅니다.
 

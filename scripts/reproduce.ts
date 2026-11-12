@@ -18,6 +18,7 @@ try {
   for (const path of [
     '.prettierrc.json',
     '.prettierignore',
+    '.agents',
     'package.json',
     'package-lock.json',
     'tsconfig.json',

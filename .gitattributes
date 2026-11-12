@@ -1,2 +1,4 @@
 * text=auto eol=lf
 *.ps1 text eol=crlf
+# Preserve reviewed upstream Markdown, including its original whitespace.
+.agents/skills/vercel-react-best-practices/** -whitespace

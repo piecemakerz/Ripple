@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Ripple Verification'
+  short_description: 'Verify Ripple changes, evidence and CI status'
+  default_prompt: 'Use $ripple-verify to validate the current Ripple change and report the evidence.'

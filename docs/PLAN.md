@@ -22,3 +22,9 @@ Next milestones (not implicitly implemented): M2 document ingestion and verified
 - [complete] Review the four organizer-linked resources against the installed Node binding and Ripple's graph/evidence design.
 - [complete] Connect the package's official Node/TypeScript skill to the Astra startup instructions and add a version-aware development preflight.
 - [complete] Run the preflight, launcher check and completion gate; record the adoption decisions. Changes are covered by the same GitHub Actions workflow when published.
+
+## AI development tooling
+
+- [complete] Install reviewed, pinned Relate/React/UI skills in the project and add a focused Ripple verification skill.
+- [complete] Add skill integrity checks and an exact-commit GitHub Actions status command; connect them to the existing launcher and checks.
+- [complete] Validate installed skills/scripts, actual Codex discovery and clean-install reproduction; record plugin connection state. GitHub plugin installation/account connection remains an optional user action.

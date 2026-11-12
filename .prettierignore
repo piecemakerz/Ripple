@@ -4,3 +4,7 @@ dist/
 package-lock.json
 docs/RIPPLE_HANDOFF.md
 docs/evidence/
+.agents/skills/relate/
+.agents/skills/vercel-react-best-practices/
+.agents/skills/web-design-guidelines/
+.agents/licenses/
