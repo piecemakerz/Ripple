@@ -23,13 +23,15 @@ npm run dev
 
 Open **http://127.0.0.1:4317**. In the synthetic inventory example, A1 changes from real-time inventory to daily updates. Explore **D1/D2 directly and T1/T2 indirectly**; unrelated T3 is excluded. Select T1, inspect both dependency evidence links, apply the change, then save **Keep / Revise / Defer** with a reason. Restart the server to inspect persisted reviews. A review decision does not mean its implementation is complete.
 
-For a production build, stop the development server, then run `npm run build` and `npm start`. `npm run verify` checks formatting, strict types, 37 tests including real-database integration and the build. `npm run doctor` checks persistence across separate processes; `npm run reproduce` repeats installation and checks in a temporary copy.
+For a production build, stop the development server, then run `npm run build` and `npm start`. `npm run verify` checks formatting, strict types, real-database integration tests and the build. `npm run doctor` checks persistence across separate processes; `npm run reproduce` repeats installation and checks in a temporary copy.
 
-## Evaluate a real-document case
+## Evaluate public-document cases
 
-Run `npm run evaluate` to import frozen public Ripple document excerpts into a fresh temporary native database and score expected impacts, paths, exact quotes and process-restart persistence. Run `npm run evaluate:demo` to build and inspect the same case at **http://127.0.0.1:4322**, in a new retained store outside the repository. Select **Synchronous database owner · proposed update**. Neither command opens your existing workspace.
+Run `npm run evaluate` to score **both** frozen document cases in separate temporary native databases, including impacts, paths, exact quotes and process-restart persistence. Use `npm run evaluate:semver` or `npm run evaluate:owner` for just one.
 
-This is one AI-curated graph with three queries, a hypothetical migration and two synthetic candidate controls; it has not received human semantic review. It measures graph regression, not customer accuracy or extraction quality. [Inputs, expected results, commands and limitations](docs/EVALUATION.md).
+Run `npm run evaluate:semver:demo` for the external **SemVer 2.0.0** case at **http://127.0.0.1:4323**. Select **Public API deprecation plan · proposed update**: five impacted items, seven paths, five reviews. The original `npm run evaluate:demo` still opens the Ripple ownership case at port **4322**. Each demo builds the UI and creates a new retained store outside the repository; neither opens your existing workspace.
+
+These are two separately sourced AI-curated graphs with three queries each, hypothetical changes and synthetic candidate controls. They have not received independent human semantic review. They measure graph regression, not customer accuracy or extraction quality. SemVer excerpts retain [CC BY 3.0 attribution](THIRD_PARTY.md). [Inputs, expected results, commands and limitations](docs/EVALUATION.md).
 
 ## How it uses Relate
 

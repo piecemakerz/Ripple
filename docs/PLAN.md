@@ -1,5 +1,14 @@
 # Ripple execution plan
 
+## Second independent public-document evaluation — 2026-11-14
+
+1. [complete] Freeze four attributed SemVer 2.0.0 excerpts, nine items and six confirmed edges, with explicit paths/exclusions and disclosed hypothetical release decisions.
+2. [complete] Run both cases separately or as a suite without changing the first fixture; test multi-path deduplication, alternate-path omissions and case/hash isolation through HTTP/native Relate and separate processes.
+3. [complete] Pass verify (41 tests/build), doctor and clean-install reproduce; inspect preview/apply, evidence, reviews, restart and measured desktop/390px screens. Record attribution, results and limits.
+4. [in progress] Publish the second evaluation case to `main` and confirm the exact implementation commit's Windows CI, then record publication evidence.
+
+Next: human semantic review of both gold graphs (especially ATOMIC → OWNER and MAJOR → DEPRECATE), then a scoped manual-workflow comparison. Current implementation is local and uncommitted; prior HEAD's green CI does not cover it. Scalability, extraction and submission assets remain separate work.
+
 ## Real-document evaluation — 2026-11-14
 
 1. [complete] Freeze four public Ripple document excerpts and independently listed expected paths/exclusions for a hypothetical asynchronous-store migration; label all curation as not human-reviewed.
@@ -8,7 +17,7 @@
 4. [complete] Record provenance, score denominators, semantic-review limits, command instructions and CI scope in EVALUATION/QA/STATUS/ARCHITECTURE.
 5. [complete] Publish implementation commit `684362d` to `main` and confirm its Windows installation, verify and doctor CI passed. See STATUS.md for the run link.
 
-Next: human semantic review of the inferred ATOMIC → OWNER edge and a second independent public-document case. Large-workspace scan/traversal/detail measurements and a pending-review work queue remain separate slices. No AI-provider or submission-publication decision was made.
+The second public-document case is now complete above. Human semantic review remains pending. Large-workspace scan/traversal/detail measurements and a pending-review work queue remain separate slices. No AI-provider or submission-publication decision was made.
 
 ## Bounded change loading — 2026-11-14
 

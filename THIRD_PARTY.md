@@ -16,7 +16,13 @@ Ripple's own source is covered by [LICENSE](LICENSE). Dependencies retain their 
 
 Versions are pinned in `package.json` and `package-lock.json`. For exact copyright and license text, read each installed package's `LICENSE`, `LICENSE.txt`, `OFL.txt` or `NOTICE` files, including transitive dependencies and the native Relate package. This table is a direct-dependency inventory, not an exhaustive audit of a future binary distribution. A release that distributes built bundles or dependencies must retain all applicable upstream license and notice texts.
 
-The sample text, names, graph and application screenshots are synthetic project materials. No customer documents are included. Relate and Neo4j names identify the technology and hackathon; no endorsement is claimed.
+The inventory sample text, names and graph are synthetic project materials. Evaluation screenshots can also show the attributed public-document excerpts below. No customer documents are included. Relate and Neo4j names identify the technology and hackathon; no endorsement is claimed.
+
+## Public evaluation excerpts
+
+`evaluation/semver-deprecation.json` contains four unmodified excerpts of **Semantic Versioning 2.0.0**, originally authored by **Tom Preston-Werner**, with **the SemVer Team**. Source: [`semver.md` at commit `f99d5485190a47c0863949e7da810a5553e0ed4d`](https://github.com/semver/semver/blob/f99d5485190a47c0863949e7da810a5553e0ed4d/semver.md), under [Creative Commons Attribution 3.0 Unported (CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/) ([legal code](https://creativecommons.org/licenses/by/3.0/legalcode)). The upstream document retains its own license; Ripple's MIT license does not relicense these excerpts. Each source records its URL, attribution, original range and hash. Ripple added hypothetical descriptions, release plans, graph relationships and expected results. No endorsement by the authors is implied. Source text in evaluation screen captures has the same attribution and license.
+
+`evaluation/async-owner.json` contains excerpts from Ripple's own MIT-licensed published documents. Both evaluations are AI-curated and not human-validated; see [scope and provenance](docs/EVALUATION.md).
 
 ## Agent skills
 

@@ -2,26 +2,25 @@ import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { runEvaluation, runPhase } from './evaluation/run.js';
+import { runEvaluation, runPhase, runSuite } from './evaluation/run.js';
+import { loadCase } from './evaluation/case.js';
+import { parseEvaluationArgs } from './evaluation/cli.js';
 
-const args = process.argv.slice(2);
-if (args.length && (args.length !== 1 || args[0] !== '--demo'))
-  throw new Error('Usage: npm run evaluate [-- --demo]');
-if (!args.length) {
-  console.log(JSON.stringify(runEvaluation(), null, 2));
+const { demo, caseName } = parseEvaluationArgs(process.argv.slice(2));
+if (!demo) {
+  console.log(JSON.stringify(caseName ? runEvaluation(caseName) : runSuite(), null, 2));
 } else {
+  const { fixture } = loadCase(caseName);
   if (!existsSync(resolve('dist/index.html')))
     throw new Error('Run npm run build or npm run evaluate:demo first');
   const base = join(process.env.LOCALAPPDATA || join(homedir(), '.local', 'share'), 'Ripple');
   mkdirSync(base, { recursive: true });
   const directory = mkdtempSync(join(base, 'ripple-evaluation-'));
-  runPhase('prepare', directory);
-  console.log(
-    'Prepared real-document evaluation; hypothetical migration and AI-curated labels, not human-reviewed.',
-  );
+  runPhase('prepare', directory, caseName);
+  console.log(`Prepared ${fixture.id}: ${fixture.provenance}`);
   console.log(`Preserved evaluation directory: ${directory}`);
   console.log(
-    'Select the Synchronous database owner proposal in Change to explore. Ctrl+C stops this owner; the evaluation store is retained.',
+    `Select ${fixture.items.find((i) => i.key === fixture.proposal.target)!.title} in Change to explore. Ctrl+C stops this owner; the evaluation store is retained.`,
   );
   const child = spawn(
     process.execPath,
@@ -31,7 +30,7 @@ if (!args.length) {
       env: {
         ...process.env,
         RIPPLE_DB_PATH: join(directory, 'db'),
-        PORT: process.env.PORT || '4322',
+        PORT: process.env.PORT || (caseName === 'semver-deprecation' ? '4323' : '4322'),
       },
     },
   );

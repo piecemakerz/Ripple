@@ -10,12 +10,14 @@ import type {
   SourceVersion,
   Workspace,
 } from '../../shared/types.js';
-import { evaluationCase as fixture, fixtureHash } from './case.js';
+import { loadCase } from './case.js';
 import { openApi } from './http.js';
 import { prepareCase, type PreparedCase } from './prepare.js';
 import { scoreImpact } from './score.js';
 
-const [mode, directory] = process.argv.slice(2);
+const [mode, directory, caseName] = process.argv.slice(2);
+const { fixture, fixtureHash } = loadCase(caseName);
+const proposalQuery = fixture.queries.find((q) => q.target === fixture.proposal.target)!;
 if (
   !['write', 'read', 'prepare'].includes(mode) ||
   !directory ||
@@ -27,22 +29,28 @@ const dbPath = join(root, 'db');
 if (mode !== 'read' && existsSync(dbPath))
   throw new Error('Refusing to overwrite an existing evaluation store');
 if (mode === 'read' && !existsSync(dbPath)) throw new Error('Missing evaluation store');
+type Manifest = PreparedCase & { caseId: string; fixtureSha256: string };
+type State = Manifest & { changeId: string; version2Id: string };
+const statePath = join(root, 'state.json');
+const restored =
+  mode === 'read' ? (JSON.parse(readFileSync(statePath, 'utf8')) as State) : undefined;
+if (restored && (restored.caseId !== fixture.id || restored.fixtureSha256 !== fixtureHash))
+  throw new Error('Evaluation manifest case or fixture hash mismatch');
 const store = new RippleStore(dbPath);
 store.seed();
 const api = await openApi(store);
-type State = PreparedCase & { changeId: string; version2Id: string };
-const statePath = join(root, 'state.json');
 try {
-  const prepared: PreparedCase =
-    mode === 'read'
-      ? (JSON.parse(readFileSync(statePath, 'utf8')) as State)
-      : await prepareCase(api);
+  const prepared: Manifest = restored ?? {
+    ...(await prepareCase(api, fixture)),
+    caseId: fixture.id,
+    fixtureSha256: fixtureHash,
+  };
   const scores = [];
   for (const query of fixture.queries) {
     const result = await api.request<ImpactResult>(
       `/api/items/${prepared.items[query.target]}/impact`,
     );
-    scores.push(scoreImpact(result, query, prepared));
+    scores.push(scoreImpact(result, query, prepared, fixture));
   }
   assert.ok(
     scores.every((s) => s.passed),
@@ -62,13 +70,15 @@ try {
       };
       const saved = await api.request<ChangeDetail>('/api/changes', 'POST', input);
       assert.deepEqual(await api.request('/api/changes', 'POST', input), saved);
-      assert.equal(saved.reviews.length, 4);
+      assert.equal(saved.reviews.length, new Set(proposalQuery.paths.map((p) => p[0])).size);
       const reviewPath = `/api/changes/${saved.change.id}/reviews/${prepared.items[fixture.review.item]}`;
       const reviewInput = { status: fixture.review.status, reason: fixture.review.reason };
       await api.request<Review>(reviewPath, 'PUT', reviewInput);
       await api.request<Review>(reviewPath, 'PUT', reviewInput);
       const workspace = await api.request<Workspace>('/api/workspace');
-      const original = workspace.sources.find((s) => s.id === prepared.sources.ownership)!;
+      const original = workspace.sources.find(
+        (s) => s.id === prepared.sources[fixture.proposal.evidence.source],
+      )!;
       const next = await api.request<SourceVersion>('/api/sources', 'POST', {
         requestId: randomUUID(),
         documentId: original.documentId,
@@ -94,12 +104,12 @@ try {
     }
     assert.equal(workspace.sources.find((s) => s.id === state.version2Id)?.version, '2');
     const detail = await api.request<ChangeDetail>(`/api/changes/${state.changeId}`);
-    const savedScore = scoreImpact(detail.change.snapshot, fixture.queries[0], state);
+    const savedScore = scoreImpact(detail.change.snapshot, proposalQuery, state, fixture);
     assert.ok(savedScore.passed, JSON.stringify(savedScore));
     assert.equal(detail.change.snapshot.target.revision, 1);
     assert.equal(
       detail.change.snapshot.target.body,
-      fixture.items.find((i) => i.key === 'OWNER')!.body,
+      fixture.items.find((i) => i.key === fixture.proposal.target)!.body,
     );
     assert.deepEqual(
       detail.reviews.map((r) => r.itemId).sort(),
@@ -117,7 +127,7 @@ try {
   console.log(
     JSON.stringify({
       ok: true,
-      schemaVersion: 1,
+      schemaVersion: 2,
       fixtureSha256: fixtureHash,
       case: fixture.id,
       phase: mode,

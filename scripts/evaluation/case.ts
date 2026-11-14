@@ -12,7 +12,9 @@ const schema = z.object({
       title: z.string(),
       path: z.string(),
       commit: z.string().regex(/^[a-f0-9]{40}$/),
-      license: z.literal('MIT'),
+      license: z.enum(['MIT', 'CC-BY-3.0']),
+      url: z.url().optional(),
+      attribution: z.string().min(1).optional(),
       start: z.number().int().nonnegative(),
       end: z.number().int(),
       hash: z.string(),
@@ -34,6 +36,8 @@ const schema = z.object({
       to: z.string(),
       status: z.enum(['confirmed', 'proposed', 'rejected']),
       evidence,
+      basis: z.enum(['direct', 'inferred', 'synthetic']).optional(),
+      rationale: z.string().min(1).optional(),
     }),
   ),
   queries: z.array(
@@ -60,9 +64,12 @@ export function validateCase(input: unknown): EvaluationCase {
   unique(value.sources.map((s) => s.key));
   unique(value.items.map((i) => i.key));
   unique(value.relations.map((r) => `${r.from}>${r.to}`));
+  unique(value.queries.map((q) => q.target));
   for (const source of value.sources) {
     if (digest(source.text) !== source.hash || source.end - source.start !== source.text.length)
       throw new Error(`Source integrity failed: ${source.key}`);
+    if (source.license === 'CC-BY-3.0' && (!source.url || !source.attribution))
+      throw new Error('CC BY sources require an original URL and attribution');
   }
   const itemKeys = new Set(value.items.map((i) => i.key));
   for (const key of [
@@ -92,6 +99,13 @@ export function validateCase(input: unknown): EvaluationCase {
       unique(path);
       if (path.at(-1) !== query.target || path.some((key) => !itemKeys.has(key)))
         throw new Error('Invalid gold path');
+      for (let i = 0; i < path.length - 1; i++)
+        if (
+          !value.relations.some(
+            (r) => r.from === path[i] && r.to === path[i + 1] && r.status === 'confirmed',
+          )
+        )
+          throw new Error('Gold path must use confirmed fixture relations');
     }
     const impacted = new Set(query.paths.map((p) => p[0]));
     const partition = new Set([query.target, ...impacted, ...query.excluded]);
@@ -102,11 +116,19 @@ export function validateCase(input: unknown): EvaluationCase {
     )
       throw new Error('Gold expectations must classify every fixture item');
   }
+  const proposalQuery = value.queries.find((q) => q.target === value.proposal.target);
+  if (!proposalQuery?.paths.some((p) => p[0] === value.review.item))
+    throw new Error('Proposal needs a gold query containing the review item');
   return value;
 }
-const fixtureText = readFileSync(
-  new URL('../../evaluation/async-owner.json', import.meta.url),
-  'utf8',
-);
-export const fixtureHash = digest(fixtureText);
-export const evaluationCase = validateCase(JSON.parse(fixtureText));
+export const caseNames = ['async-owner', 'semver-deprecation'] as const;
+export type CaseName = (typeof caseNames)[number];
+export function loadCase(name: string = 'async-owner') {
+  if (!caseNames.includes(name as CaseName)) throw new Error(`Unknown evaluation case: ${name}`);
+  const fixtureText = readFileSync(
+    new URL(`../../evaluation/${name}.json`, import.meta.url),
+    'utf8',
+  );
+  return { fixture: validateCase(JSON.parse(fixtureText)), fixtureHash: digest(fixtureText) };
+}
+export const { fixture: evaluationCase, fixtureHash } = loadCase();

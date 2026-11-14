@@ -1,12 +1,18 @@
 # Real-document evaluation
 
+There are now **two separately sourced curated graphs**, each with three queries. `async-owner` uses Ripple documents; [`semver-deprecation`](EVALUATION_SEMVER.md) uses the external Semantic Versioning 2.0.0 specification. Independence refers to source and scenario, **not independent annotation or human validation**. Both scenarios and gold labels are AI-curated. No customer or extraction accuracy is measured.
+
+`npm run evaluate` runs both cases sequentially in separate temporary stores and returns `{ ok, caseCount, cases }`. Select one with `npm run evaluate:owner` or `npm run evaluate:semver`; its report retains `{ ok, caseName, phases, ... }`. Phase report schema version is 2, separate from database schema. Scores stay per query rather than pooling repeated items into an independent-sample accuracy metric. Reopening rejects a manifest for a different case or fixture hash before opening the store. All evaluation inputs are local; no network or API key is needed after installation.
+
+`npm run evaluate:semver:demo` opens the new case at port **4323**. The original demo command and port **4322** remain unchanged. Details below describe the first case; see [the second case](EVALUATION_SEMVER.md) for its sources, paths, scores and screen flow.
+
 The first case uses frozen excerpts from Ripple's own published project documents. The proposed asynchronous-store migration is hypothetical. Item descriptions, dependency choices and expected results were curated with AI assistance and **have not been reviewed by a human domain expert**. The two candidate controls are synthetic. This is a reproducible document-grounded graph regression, not a customer study, automatic extraction benchmark or a claim that the migration has been implemented.
 
 ## Run it
 
 ```powershell
 npm ci
-npm run evaluate
+npm run evaluate:owner
 ```
 
 The command creates a fresh temporary native Relate store, imports every source/item/candidate through the loopback HTTP API, confirms or rejects the intended candidates, and compares three impact queries with explicitly listed expected paths. It applies the hypothetical change, repeats the same request to check idempotency, saves the same review twice, appends a second source version, and verifies the original snapshot and review. The writer checkpoints and exits before a second owner process opens the same store and repeats the checks. The temporary directory is then removed. `RIPPLE_DB_PATH` and `.env` are ignored; no existing workspace is opened.
@@ -63,4 +69,4 @@ Gold paths/exclusions are listed in the fixture independently of the query imple
 
 Both the original owner and the reopened process produced these results. Applied-change retry created one change/four reviews. Repeating the same review produced one review event. Appending ownership source version 2 retained all four original version-1 source texts, hashes and saved path quotes. The browser demo separately exercised actual UI apply/selection/evidence/review/reload on desktop and 390px. See [QA](QA.md) for screen evidence and [STATUS](STATUS.md) for the final completion gate and CI scope.
 
-There is no measurement of extraction quality, time saved, user comprehension, latency at scale or independent customer accuracy. Human semantic review, a second unrelated public-document case and comparison with a manual workflow remain next steps. Review ATOMIC → OWNER explicitly before treating the golden graph as human-validated. Never overwrite v1 gold labels to conceal a failed regression; introduce a reviewed fixture revision with rationale when meaning changes.
+There is no measurement of extraction quality, time saved, user comprehension, latency at scale or independent customer accuracy. Human semantic review of both cases and comparison with a manual workflow remain next steps. Review ATOMIC → OWNER and the second case's MAJOR → DEPRECATE explicitly before treating either golden graph as human-validated. Never overwrite v1 gold labels to conceal a failed regression; introduce a reviewed fixture revision with rationale when meaning changes.

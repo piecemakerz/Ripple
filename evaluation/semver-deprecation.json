@@ -1,0 +1,291 @@
+{
+  "id": "semver-deprecation-v1",
+  "provenance": "Independent external public specification (SemVer 2.0.0), not Ripple documents. Hypothetical library and release schedule; AI-curated graph and gold labels, not independently human-reviewed. MAJOR -> DEPRECATE is a disclosed planning inference. Two synthetic candidate controls. Not a customer case or extraction benchmark.",
+  "sources": [
+    {
+      "key": "deprecation",
+      "title": "SemVer 2.0.0 · deprecation FAQ",
+      "path": "semver.md",
+      "commit": "f99d5485190a47c0863949e7da810a5553e0ed4d",
+      "license": "CC-BY-3.0",
+      "url": "https://github.com/semver/semver/blob/f99d5485190a47c0863949e7da810a5553e0ed4d/semver.md",
+      "attribution": "Semantic Versioning 2.0.0 — Tom Preston-Werner and the SemVer Team. CC BY 3.0. Verbatim excerpt; scenario and graph labels added by Ripple.",
+      "start": 14882,
+      "end": 15451,
+      "hash": "256c8627f2068ec3f627594269c009b7443d79c1da520a617da9b8aa544950cf",
+      "text": "### How should I handle deprecating functionality?\n\nDeprecating existing functionality is a normal part of software development and\nis often required to make forward progress. When you deprecate part of your\npublic API, you should do two things: (1) update your documentation to let\nusers know about the change, (2) issue a new minor release with the deprecation\nin place. Before you completely remove the functionality in a new major release\nthere should be at least one minor release that contains the deprecation so\nthat users can smoothly transition to the new API."
+    },
+    {
+      "key": "minor",
+      "title": "SemVer 2.0.0 · minor releases",
+      "path": "semver.md",
+      "commit": "f99d5485190a47c0863949e7da810a5553e0ed4d",
+      "license": "CC-BY-3.0",
+      "url": "https://github.com/semver/semver/blob/f99d5485190a47c0863949e7da810a5553e0ed4d/semver.md",
+      "attribution": "Semantic Versioning 2.0.0 — Tom Preston-Werner and the SemVer Team. CC BY 3.0. Verbatim excerpt; scenario and graph labels added by Ripple.",
+      "start": 3837,
+      "end": 4261,
+      "hash": "e0e3ed0bcfb75ba2f1bc082782cadd42e3385bf7d1c51b380d08ddf82a4280c0",
+      "text": "1. Minor version Y (x.Y.z | x > 0) MUST be incremented if new, backward\ncompatible functionality is introduced to the public API. It MUST be\nincremented if any public API functionality is marked as deprecated. It MAY be\nincremented if substantial new functionality or improvements are introduced\nwithin the private code. It MAY include patch level changes. Patch version\nMUST be reset to 0 when minor version is incremented."
+    },
+    {
+      "key": "major",
+      "title": "SemVer 2.0.0 · major releases",
+      "path": "semver.md",
+      "commit": "f99d5485190a47c0863949e7da810a5553e0ed4d",
+      "license": "CC-BY-3.0",
+      "url": "https://github.com/semver/semver/blob/f99d5485190a47c0863949e7da810a5553e0ed4d/semver.md",
+      "attribution": "Semantic Versioning 2.0.0 — Tom Preston-Werner and the SemVer Team. CC BY 3.0. Verbatim excerpt; scenario and graph labels added by Ripple.",
+      "start": 4263,
+      "end": 4518,
+      "hash": "9afdcfc066fc34bf5da2da30f468aa604d5b5701cabe42c003695159c18ce6a0",
+      "text": "1. Major version X (X.y.z | X > 0) MUST be incremented if any backward\nincompatible changes are introduced to the public API. It MAY also include minor\nand patch level changes. Patch and minor versions MUST be reset to 0 when major\nversion is incremented."
+    },
+    {
+      "key": "metadata",
+      "title": "SemVer 2.0.0 · build metadata",
+      "path": "semver.md",
+      "commit": "f99d5485190a47c0863949e7da810a5553e0ed4d",
+      "license": "CC-BY-3.0",
+      "url": "https://github.com/semver/semver/blob/f99d5485190a47c0863949e7da810a5553e0ed4d/semver.md",
+      "attribution": "Semantic Versioning 2.0.0 — Tom Preston-Werner and the SemVer Team. CC BY 3.0. Verbatim excerpt; scenario and graph labels added by Ripple.",
+      "start": 5161,
+      "end": 5689,
+      "hash": "3fa5ec431c51fc018271853c33eec0b5c19b46f5bb677f9ae12326ac9da9f84a",
+      "text": "1. Build metadata MAY be denoted by appending a plus sign and a series of dot\nseparated identifiers immediately following the patch or pre-release version.\nIdentifiers MUST comprise only ASCII alphanumerics and hyphens [0-9A-Za-z-].\nIdentifiers MUST NOT be empty. Build metadata MUST be ignored when determining\nversion precedence. Thus two versions that differ only in the build metadata,\nhave the same precedence. Examples: 1.0.0-alpha+001, 1.0.0+20130313144700,\n1.0.0-beta+exp.sha.5114f85, 1.0.0+21AF26D3\\-\\-\\-\\-117B344092BD."
+    }
+  ],
+  "items": [
+    {
+      "key": "DEPRECATE",
+      "kind": "Assumption",
+      "title": "Public API deprecation plan",
+      "body": "Hypothetical stable library: deprecate legacy parse() in 1.4.0 before removing it in 2.0.0.",
+      "evidence": {
+        "source": "deprecation",
+        "quote": "Deprecating existing functionality is a normal part of software development and\nis often required to make forward progress. When you deprecate part of your\npublic API, you should do two things: (1) update your documentation to let\nusers know about the change, (2) issue a new minor release with the deprecation\nin place. Before you completely remove the functionality in a new major release\nthere should be at least one minor release that contains the deprecation so\nthat users can smoothly transition to the new API."
+      }
+    },
+    {
+      "key": "DOCS",
+      "kind": "Task",
+      "title": "Update deprecation documentation",
+      "body": "Hypothetical release task: tell users when legacy parse() is deprecated and how to migrate.",
+      "evidence": {
+        "source": "deprecation",
+        "quote": "When you deprecate part of your\npublic API, you should do two things: (1) update your documentation to let\nusers know about the change, (2) issue a new minor release with the deprecation\nin place."
+      }
+    },
+    {
+      "key": "MINOR",
+      "kind": "Decision",
+      "title": "Ship a deprecation minor release",
+      "body": "Hypothetical release decision: publish the deprecation in 1.4.0.",
+      "evidence": {
+        "source": "minor",
+        "quote": "It MUST be\nincremented if any public API functionality is marked as deprecated."
+      }
+    },
+    {
+      "key": "PATCH_RESET",
+      "kind": "Task",
+      "title": "Reset patch for the minor release",
+      "body": "Prepare x.Y.0 when the chosen minor version increments.",
+      "evidence": {
+        "source": "minor",
+        "quote": "Patch version\nMUST be reset to 0 when minor version is incremented."
+      }
+    },
+    {
+      "key": "MAJOR",
+      "kind": "Decision",
+      "title": "Remove the API in a major release",
+      "body": "Hypothetical release decision: remove legacy parse() in 2.0.0 only after a minor release with its deprecation.",
+      "evidence": {
+        "source": "deprecation",
+        "quote": "Before you completely remove the functionality in a new major release\nthere should be at least one minor release that contains the deprecation so\nthat users can smoothly transition to the new API."
+      }
+    },
+    {
+      "key": "CORE_RESET",
+      "kind": "Task",
+      "title": "Reset minor and patch for removal",
+      "body": "Prepare X.0.0 when the removal's major version increments.",
+      "evidence": {
+        "source": "major",
+        "quote": "Patch and minor versions MUST be reset to 0 when major\nversion is incremented."
+      }
+    },
+    {
+      "key": "METADATA",
+      "kind": "Decision",
+      "title": "Ignore build metadata in precedence",
+      "body": "Keep build metadata outside version precedence; this rule does not depend on the deprecation schedule.",
+      "evidence": {
+        "source": "metadata",
+        "quote": "Build metadata MUST be ignored when determining\nversion precedence."
+      }
+    },
+    {
+      "key": "PROPOSED",
+      "kind": "Task",
+      "title": "Unconfirmed deprecation audit",
+      "body": "Synthetic candidate control, not a task specified by SemVer. Leave its relationship unconfirmed.",
+      "evidence": {
+        "source": "deprecation",
+        "quote": "When you deprecate part of your\npublic API, you should do two things: (1) update your documentation to let\nusers know about the change, (2) issue a new minor release with the deprecation\nin place."
+      }
+    },
+    {
+      "key": "REJECTED",
+      "kind": "Task",
+      "title": "Rejected metadata dependency",
+      "body": "Synthetic negative control: reject the claim that metadata precedence depends on the deprecation plan.",
+      "evidence": {
+        "source": "metadata",
+        "quote": "Build metadata MUST be ignored when determining\nversion precedence."
+      }
+    }
+  ],
+  "relations": [
+    {
+      "from": "DOCS",
+      "to": "DEPRECATE",
+      "status": "confirmed",
+      "evidence": {
+        "source": "deprecation",
+        "quote": "When you deprecate part of your\npublic API, you should do two things: (1) update your documentation to let\nusers know about the change, (2) issue a new minor release with the deprecation\nin place."
+      },
+      "basis": "direct",
+      "rationale": "The FAQ explicitly couples deprecating public API with documentation updates."
+    },
+    {
+      "from": "MINOR",
+      "to": "DEPRECATE",
+      "status": "confirmed",
+      "evidence": {
+        "source": "minor",
+        "quote": "It MUST be\nincremented if any public API functionality is marked as deprecated."
+      },
+      "basis": "direct",
+      "rationale": "The specification requires a minor increment when public API functionality is marked deprecated."
+    },
+    {
+      "from": "PATCH_RESET",
+      "to": "MINOR",
+      "status": "confirmed",
+      "evidence": {
+        "source": "minor",
+        "quote": "Patch version\nMUST be reset to 0 when minor version is incremented."
+      },
+      "basis": "direct",
+      "rationale": "The specification requires a patch reset when the minor version increments."
+    },
+    {
+      "from": "MAJOR",
+      "to": "DEPRECATE",
+      "status": "confirmed",
+      "evidence": {
+        "source": "deprecation",
+        "quote": "Before you completely remove the functionality in a new major release\nthere should be at least one minor release that contains the deprecation so\nthat users can smoothly transition to the new API."
+      },
+      "basis": "inferred",
+      "rationale": "Curated release-planning dependency: the future removal plan must be reviewed when the deprecation plan changes. The FAQ gives sequencing guidance, not a guarantee that the major release date changes."
+    },
+    {
+      "from": "MAJOR",
+      "to": "MINOR",
+      "status": "confirmed",
+      "evidence": {
+        "source": "deprecation",
+        "quote": "Before you completely remove the functionality in a new major release\nthere should be at least one minor release that contains the deprecation so\nthat users can smoothly transition to the new API."
+      },
+      "basis": "direct",
+      "rationale": "The FAQ says a minor release containing deprecation should precede complete removal in a major release."
+    },
+    {
+      "from": "CORE_RESET",
+      "to": "MAJOR",
+      "status": "confirmed",
+      "evidence": {
+        "source": "major",
+        "quote": "Patch and minor versions MUST be reset to 0 when major\nversion is incremented."
+      },
+      "basis": "direct",
+      "rationale": "The specification requires minor and patch resets when the major version increments."
+    },
+    {
+      "from": "PROPOSED",
+      "to": "DEPRECATE",
+      "status": "proposed",
+      "evidence": {
+        "source": "deprecation",
+        "quote": "When you deprecate part of your\npublic API, you should do two things: (1) update your documentation to let\nusers know about the change, (2) issue a new minor release with the deprecation\nin place."
+      },
+      "basis": "synthetic",
+      "rationale": "Deliberate unconfirmed control; a matching quote alone does not confirm a dependency."
+    },
+    {
+      "from": "REJECTED",
+      "to": "DEPRECATE",
+      "status": "rejected",
+      "evidence": {
+        "source": "metadata",
+        "quote": "Build metadata MUST be ignored when determining\nversion precedence."
+      },
+      "basis": "synthetic",
+      "rationale": "Deliberate rejected control; shared version vocabulary does not imply a dependency."
+    }
+  ],
+  "queries": [
+    {
+      "target": "DEPRECATE",
+      "paths": [
+        ["DOCS", "DEPRECATE"],
+        ["MINOR", "DEPRECATE"],
+        ["PATCH_RESET", "MINOR", "DEPRECATE"],
+        ["MAJOR", "DEPRECATE"],
+        ["MAJOR", "MINOR", "DEPRECATE"],
+        ["CORE_RESET", "MAJOR", "DEPRECATE"],
+        ["CORE_RESET", "MAJOR", "MINOR", "DEPRECATE"]
+      ],
+      "excluded": ["METADATA", "PROPOSED", "REJECTED"]
+    },
+    {
+      "target": "MINOR",
+      "paths": [
+        ["PATCH_RESET", "MINOR"],
+        ["MAJOR", "MINOR"],
+        ["CORE_RESET", "MAJOR", "MINOR"]
+      ],
+      "excluded": ["DEPRECATE", "DOCS", "METADATA", "PROPOSED", "REJECTED"]
+    },
+    {
+      "target": "METADATA",
+      "paths": [],
+      "excluded": [
+        "DEPRECATE",
+        "DOCS",
+        "MINOR",
+        "PATCH_RESET",
+        "MAJOR",
+        "CORE_RESET",
+        "PROPOSED",
+        "REJECTED"
+      ]
+    }
+  ],
+  "proposal": {
+    "target": "DEPRECATE",
+    "after": "Hypothetical revision: delay legacy parse() deprecation from 1.4.0 to 1.5.0. Recheck documentation, the deprecation minor release and the later 2.0.0 removal prerequisites.",
+    "evidence": {
+      "source": "deprecation",
+      "quote": "Deprecating existing functionality is a normal part of software development and\nis often required to make forward progress. When you deprecate part of your\npublic API, you should do two things: (1) update your documentation to let\nusers know about the change, (2) issue a new minor release with the deprecation\nin place. Before you completely remove the functionality in a new major release\nthere should be at least one minor release that contains the deprecation so\nthat users can smoothly transition to the new API."
+    }
+  },
+  "review": {
+    "item": "CORE_RESET",
+    "status": "defer",
+    "reason": "Recheck the removal release after the delayed deprecation minor ships; keep both original dependency paths. This records a review decision, not completed implementation."
+  }
+}

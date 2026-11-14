@@ -1,13 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import type { Candidate, Item, Proposal, SourceVersion } from '../../shared/types.js';
-import { evaluationCase as fixture } from './case.js';
+import { evaluationCase, type EvaluationCase } from './case.js';
 import type { EvaluationApi } from './http.js';
 import type { IdentityMap } from './score.js';
 
 export interface PreparedCase extends IdentityMap {
   proposal: Proposal;
 }
-export async function prepareCase(api: EvaluationApi): Promise<PreparedCase> {
+export async function prepareCase(
+  api: EvaluationApi,
+  fixture: EvaluationCase = evaluationCase,
+): Promise<PreparedCase> {
   const ids: IdentityMap = { items: {}, sources: {} };
   for (const source of fixture.sources) {
     const saved = await api.request<SourceVersion>('/api/sources', 'POST', {

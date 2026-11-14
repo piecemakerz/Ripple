@@ -1,4 +1,29 @@
-# M0/M1 verification record
+# Verification record
+
+## Second public-document case — 2026-11-14 KST
+
+Final `npm run verify`: **41 passed, 0 failed** plus format/types/skills/native context/build. `npm run doctor` and final clean-install `npm run reproduce` passed. `npm run evaluate` passed both cases in separate temporary stores; the first fixture is unchanged. Four new tests exercise the external case and reopening, CLI selection errors, cross-case/hash manifest rejection before opening the store, and loss of an alternate path even when the item set is still correct. Fixture validation additionally rejects missing CC attribution, unconfirmed gold edges and a non-impacted review target.
+
+SemVer case results in write and reopened read processes: DEPRECATE **5 items / 7 paths / 6 distinct edge evidence**, MINOR **3 / 3 / 3**, METADATA **0 / 0 / 0**, all exactly matching gold. Nonempty precision/recall 1.0; empty denominators null. One repeated apply, five reviews, one deduplicated review event and original v1 excerpts/snapshot restored after appending v2. Evidence counts are per edge, not distinct quoted claims. Source/scenario independence does not imply human-reviewed labels; see [provenance and inferred edge](EVALUATION_SEMVER.md).
+
+Production acceptance used `npm run evaluate:semver:demo` at port **4323**, with a new LocalAppData evaluation store. The original live database was never opened. No UI or production API code changed.
+
+| Browser check    | Observed result                                                                                                                           |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Preview          | Public API deprecation plan: 3 direct + 2 indirect; metadata, candidate controls and inventory sample excluded                            |
+| Impact selection | CORE_RESET selected in graph; two-hop and three-hop paths exposed separately                                                              |
+| Exact evidence   | Major-release quote 177–255 and FAQ quote 373–569 highlighted in preserved version 1                                                      |
+| Apply/review     | One change, five review rows; CORE_RESET Defer saved with reason and one history event                                                    |
+| Reload/restart   | Reload and scoped stop/restart of only the port-4323 production owner restored original paths, review reason/status and one history event |
+| Desktop          | Measured 1440×1000, document 1430px; three panels and all graph levels inspected                                                          |
+| Mobile           | Measured 390×844, document 380px; Change/Impact path/Review navigation, graph selection/horizontal scrolling and source dialog inspected  |
+| Console/cleanup  | Final warnings/errors empty; temporary viewport/CDP metrics overrides cleared; marked demo tab retained                                   |
+
+Screenshots: [desktop after restart](evidence/semver-evaluation-desktop.jpg), [390px original source](evidence/semver-evaluation-mobile-source.jpg). Public excerpts retain [CC BY 3.0 attribution](../THIRD_PARTY.md). These are manual connected-browser checks, not an automated browser suite or a customer study.
+
+The initial `npm run evaluate:demo -- --case ...` attempt failed because this PowerShell/npm environment stripped the option; dedicated npm aliases fixed the executable instructions. One review-history role locator timed out; fresh DOM inspection and exact text opened the control. Existing browser zoom scaled/cropped early captures; final dimensions were measured and explicit capture bounds restored complete screenshots. These failed attempts are not passing evidence. A documentation patch context mismatch was corrected before formatting; no test failure was concealed.
+
+CI currently covers only previous HEAD `5ed66d1`, with a dirty worktree. This second case has local verification/reproduction evidence and has not been committed or published.
 
 ## Real-document evaluation — 2026-11-14
 
