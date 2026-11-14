@@ -1,6 +1,6 @@
 # Architecture and decisions
 
-2026-11-12 KST · M0/M1
+2026-11-14 KST · M0/M1 + manual M2 ingestion
 
 ## Boundaries
 
@@ -10,6 +10,7 @@
 - `shared/types.ts`: response types, graph/evidence/change/review contracts.
 - `server/app.ts`: HTTP validation, local Host/Origin checks, errors.
 - `server/store.ts`: parameterized Cypher, graph traversal, atomic changes, immutable snapshots, reviews.
+- `server/ingestion.ts`: validated source versions, evidenced items, dependency candidates, confirmation and generic proposals; all mutations share the store's serialized transaction owner.
 - `server/sample.ts`: clearly synthetic source versions and expected seed graph; not runtime AI output.
 - `scripts/doctor.ts` and `tests/`: disposable DB verification, never a second owner for the live DB.
 
@@ -33,7 +34,19 @@
 
 ## Data and API
 
-Nodes: Item, Person, SourceVersion, Evidence, Proposal, Change, Review, ReviewEvent, RippleMeta. Stable node IDs have unique constraints. Current schema version: 1. Unknown non-empty stores are refused instead of seeded. Migrations must be explicit in future versions.
+Nodes: Item, Person, SourceVersion, Evidence, Proposal, Change, Review, ReviewEvent, RippleMeta, Mutation. Stable node IDs have unique constraints. Current schema version: 2. Opening a version-1 store performs one explicit transaction to add the Mutation ID constraint and advance metadata; all existing graph, source and review records remain intact. Unknown versions and non-empty unrecognized stores are refused.
+
+## Manual M2 ingestion
+
+- Sources are append-only. New documents get a server UUID and integer version 1; subsequent versions require the current version number. Sample documents with decimal versions cannot be used as import targets. Original text (including uploaded BOM/CRLF), SHA-256 and evidence slices remain immutable.
+- The UI accepts UTF-8 `.md`, `.markdown`, `.txt` files up to 80 KB or pasted text. Server validation caps each source at 20,000 UTF-16 code units, 50 source versions, 100 items, 200 dependency records and 100 proposals per workspace. JSON bodies are limited to 256 KB. Limits include sample data and rejected candidates. There is no deletion/reset UI in this slice.
+- Users create evidenced items, then proposed `DEPENDS_ON` edges. Candidate revision and both endpoint item revisions are recorded; confirmation revalidates those revisions and the evidence. Rejection remains possible for an outdated candidate. Decisions are terminal; an amended relationship requires rejecting the old candidate and creating a new one. The graph query still follows confirmed edges only.
+- Duplicate proposed/confirmed directed pairs and self-dependencies are refused. Cycles across different items remain supported by the existing bounded traversal. These limits do not guarantee bounded query runtime for dense graphs.
+- Each ingestion mutation validates input, checks a UUID request receipt and payload fingerprint, and atomically saves data/evidence plus a Mutation receipt. Identical retries return the original response; reuse with different input conflicts. Receipts preserve the manual candidate decision record. All Cypher values are bound.
+- Generic proposals preserve the item's expected revision and evidence. They open the existing change/impact/review UI. Applying still recomputes and snapshots current confirmed paths atomically. A stale proposal must be recreated; it cannot silently update a newer item.
+- Evidence selection maps textarea-normalized line endings back to the exact original UTF-16 slice. Repeated quotes require explicit occurrence selection (first 100 shown; a longer quote narrows the list). Text/Markdown is rendered as plain text, never executable HTML.
+- Dense levels use a horizontally scrollable graph; the complete path list remains available. This is a small-workspace layout, not a large-graph layout engine.
+- No AI extraction, external provider, paid call or collaboration was added. Manual confirmation asserts the user's semantic judgment; the server checks quote integrity, not whether the text logically proves the dependency.
 
 Relationships: DEPENDS_ON, OWNED_BY, EVIDENCED_BY, FROM_SOURCE, CHANGES, FOR_CHANGE, FOR_ITEM, FOR_REVIEW. DEPENDS_ON properties include ID/status/evidenceId/from/to. The authoritative direction is the actual graph edge; rendering derives endpoints from returned paths.
 
@@ -50,8 +63,8 @@ Relationships: DEPENDS_ON, OWNED_BY, EVIDENCED_BY, FROM_SOURCE, CHANGES, FOR_CHA
 ## Known limits and next design choices
 
 - Store APIs are synchronous and can block the event loop on larger graphs. The depth/row cap is an output bound, not a strict query execution-time/memory bound. M2 should set domain ingestion limits before accepting arbitrary large input.
-- One built-in change proposal is exposed. The backend supports independent subsequent changes, tested at the API/store level; generic change creation UI belongs with M2.
+- Built-in and manually created change proposals are selectable. Imported items can be both the changed item and impacted items.
 - Review updates use last-write-wins within the single-user app. Multi-tab conflicting review drafts are not revision-checked yet. Change requests are revision-checked.
-- Saved review drafts survive panel switches and failed requests only in the current browser page. They are not offline drafts.
+- Review and document drafts survive panel switches and failed requests only in the current browser page. Reloading loses unsaved input; saved source versions, candidates, proposals and reviews persist.
 - Raw direct access to Relate can bypass application invariants. Only the backend should write the live store.
 - Public demo database export and reopening of a consistent exported copy are M4 work. GitHub origin is configured; public application hosting is not.

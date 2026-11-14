@@ -23,7 +23,7 @@ npm run dev
 
 Open **http://127.0.0.1:4317**. In the synthetic inventory example, A1 changes from real-time inventory to daily updates. Explore **D1/D2 directly and T1/T2 indirectly**; unrelated T3 is excluded. Select T1, inspect both dependency evidence links, apply the change, then save **Keep / Revise / Defer** with a reason. Restart the server to inspect persisted reviews. A review decision does not mean its implementation is complete.
 
-For a production build, stop the development server, then run `npm run build` and `npm start`. `npm run verify` checks formatting, strict types, 13 real-database tests and the build. `npm run doctor` checks persistence across separate processes; `npm run reproduce` repeats installation and checks in a temporary copy.
+For a production build, stop the development server, then run `npm run build` and `npm start`. `npm run verify` checks formatting, strict types, 21 tests including real-database integration and the build. `npm run doctor` checks persistence across separate processes; `npm run reproduce` repeats installation and checks in a temporary copy.
 
 ## How it uses Relate
 
@@ -33,7 +33,17 @@ For a production build, stop the development server, then run `npm run build` an
 - **Data location:** `%LOCALAPPDATA%/Ripple/demo-v1` by default on Windows, outside this repository and OneDrive. `RIPPLE_DB_PATH` overrides it. Only one backend process may open a database. The first start creates synthetic seed data; subsequent starts preserve it.
 - **Submission status:** the source is public with the `relate-hackathon` topic. A separate inspectable submission store and public demo/video are still pending. The active local database is excluded from Git.
 
-This M0/M1 release implements one complete sample workflow. Arbitrary document ingestion, AI extraction and relationship editing are not implemented. See [the audit](docs/HACKATHON_AUDIT.md), [verification evidence](docs/QA.md) and [AI/tool-use disclosure](docs/AI_DISCLOSURE.md).
+This release includes the M0/M1 sample workflow and manual M2 document ingestion. AI extraction and editing already-confirmed relationships are not implemented. See [the audit](docs/HACKATHON_AUDIT.md), [verification evidence](docs/QA.md) and [AI/tool-use disclosure](docs/AI_DISCLOSURE.md).
+
+## Import your own context (manual M2)
+
+1. Open **Documents & relationships**. Paste text or upload a UTF-8 `.md`, `.markdown` or `.txt` file, name the document, then **Save source version**. Select an existing imported document to append a version; previous versions are preserved.
+2. Select a saved source and copy a passage into **Exact evidence quote**. If repeated, choose its occurrence. The application preserves the exact original slice, including Windows line endings.
+3. Add an assumption, decision or task with its title, description and owner. Each item records the selected evidence.
+4. Choose **Dependent item → Prerequisite item** and save a relationship candidate. Inspect **View original evidence**, then confirm or reject it. Only confirmed relationships enter impact analysis.
+5. Select evidence for an update, choose **Item to change**, write its updated description and **Preview impact**. The existing workbench shows direct/indirect impacts and original evidence. Apply the change and record per-item reviews.
+
+Limits: 20,000 characters per source; upload size 80 KB; 50 saved source versions, 100 items, 200 dependency records and 100 proposals per workspace, including sample records. There is no AI extraction. Unsaved drafts survive panel navigation and failed requests, but not a full page reload. Source and candidate history is retained; confirmed relationships cannot yet be edited. A stale candidate/proposal must be recreated from current item revisions. Existing version-1 stores upgrade additively to schema 2 on startup.
 
 ## License and development tools
 
@@ -41,7 +51,7 @@ Ripple uses the repository owner's existing [MIT license](LICENSE). Dependencies
 
 ## 한국어 안내
 
-Ripple은 전제가 바뀌었을 때 다시 검토할 결정과 작업을 찾고, 실제 의존 경로와 원문 근거를 보여주는 로컬 웹앱입니다. M0·M1 구현이며 샘플은 가상의 재고 관리 제품을 위한 합성 자료입니다. 실제 고객 문서나 AI가 실시간 추출한 결과가 아닙니다.
+Ripple은 전제가 바뀌었을 때 다시 검토할 결정과 작업을 찾고, 실제 의존 경로와 원문 근거를 보여주는 로컬 웹앱입니다. M0·M1과 수동 M2 문서 입력 흐름을 구현했습니다. 샘플은 가상의 재고 관리 제품을 위한 합성 자료입니다. 실제 고객 문서나 AI가 실시간 추출한 결과가 아닙니다.
 
 ## 실행
 

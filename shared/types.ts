@@ -93,12 +93,19 @@ export interface Proposal {
   title: string;
   after: string;
   evidenceId: string;
+  expectedRevision?: number;
+}
+export interface Candidate extends Dependency {
+  revision: number;
+  fromRevision: number;
+  toRevision: number;
 }
 export interface Workspace {
   items: Item[];
   sources: SourceVersion[];
   proposals: Proposal[];
   changes: Change[];
+  candidates: Candidate[];
   database: { engine: string; version: string; path: string; storage: string };
-  synthetic: true;
+  synthetic: boolean;
 }

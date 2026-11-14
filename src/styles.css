@@ -5,6 +5,144 @@
 @import '@fontsource/manrope/latin-600.css';
 @import '@fontsource/manrope/latin-800.css';
 
+[hidden] {
+  display: none !important;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.view-tabs {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+.view-tabs button,
+.documents button:not(.primary) {
+  padding: 10px 14px;
+  border: 1px solid #ccd4cc;
+  border-radius: 8px;
+  background: white;
+}
+.view-tabs button[aria-pressed='true'] {
+  background: #214d42;
+  color: white;
+}
+.documents-intro {
+  margin: 24px 0;
+  max-width: 720px;
+}
+.documents p {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.document-controls {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.document-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.document-card {
+  background: white;
+  border: 1px solid #dce1d8;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 0;
+}
+.document-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-weight: 600;
+}
+.document-card input,
+.document-card select,
+.document-card textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #bac7be;
+  border-radius: 6px;
+  padding: 10px;
+  background: white;
+  color: #25382f;
+}
+.document-card input:focus-visible {
+  outline: 3px solid #b69545;
+  outline-offset: 3px;
+}
+.document-card textarea {
+  resize: vertical;
+}
+.graph-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.graph-hint {
+  padding: 0 20px 8px;
+}
+.graph-node strong {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.document-card .primary {
+  padding: 12px;
+}
+.preserved-source {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 240px;
+  overflow: auto;
+  margin: 0;
+  background: #f6f7f2;
+  padding: 16px;
+  border-radius: 6px;
+  line-height: 1.6;
+}
+.direction-label {
+  color: #39705f;
+  font-weight: 600;
+}
+.candidates,
+.proposal-editor {
+  margin-top: 20px;
+}
+.candidate-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  border-top: 1px solid #dce1d8;
+  padding-top: 15px;
+}
+.candidate-row > div {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+.proposal-editor {
+  max-width: 780px;
+}
+@media (max-width: 700px) {
+  .document-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .document-card {
+    padding: 16px;
+  }
+}
+
 :root {
   font-family:
     'DM Sans',
@@ -1383,6 +1521,15 @@ mark {
 /* Keep secondary instructions readable on the warm background. */
 .graph-canvas {
   width: calc(100% - 20px);
+}
+.graph-node {
+  height: 80px;
+}
+.graph-node strong {
+  flex-shrink: 0;
+}
+.trace-ids {
+  flex-wrap: wrap;
 }
 .field-label,
 .helper,

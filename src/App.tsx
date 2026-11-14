@@ -25,6 +25,7 @@ import type {
   Workspace,
 } from '../shared/types.js';
 import { api } from './api.js';
+import { Documents } from './Documents.js';
 
 const labels: Record<ReviewStatus, string> = {
   pending: 'Needs review',
@@ -104,6 +105,11 @@ function Graph({
     ...result.impacts.map((i) => [i.item.id, i.depth] as [string, number]),
   ]);
   const maxDepth = Math.max(1, ...depth.values());
+  const maxPeers = Math.max(
+    ...[...new Set(depth.values())].map(
+      (level) => allNodes.filter((n) => depth.get(n.id) === level).length,
+    ),
+  );
   const positions = new Map(
     allNodes.map((node) => {
       const level = depth.get(node.id)!;
@@ -134,72 +140,83 @@ function Graph({
         </span>
         <span>{allNodes.length} connected items</span>
       </div>
-      <div className="graph-canvas">
-        <svg
-          viewBox="0 0 560 350"
-          preserveAspectRatio="none"
-          role="img"
-          aria-label="Dependency arrows point toward A1"
+      {maxPeers > 2 && (
+        <p className="helper graph-hint">Scroll the graph horizontally to explore all items.</p>
+      )}
+      <div className="graph-scroll" tabIndex={0} aria-label="Scrollable dependency graph">
+        <div
+          className="graph-canvas"
+          style={{
+            minWidth: maxPeers > 2 ? (maxPeers + 1) * 190 : undefined,
+            height: maxDepth > 2 ? (maxDepth + 1) * 110 : undefined,
+          }}
         >
-          <defs>
-            <marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
-              <path d="M0,0 L6,3 L0,6" fill="none" stroke="#9baaa0" strokeWidth="1.4" />
-            </marker>
-            <marker
-              id="arrow-active"
-              markerWidth="7"
-              markerHeight="7"
-              refX="5"
-              refY="3"
-              orient="auto"
-            >
-              <path d="M0,0 L6,3 L0,6" fill="none" stroke="#39705f" strokeWidth="1.4" />
-            </marker>
-          </defs>
-          {edges.map((e) => {
-            const from = positions.get(e.from)!,
-              to = positions.get(e.to)!;
-            const isActive = active.has(e.from) && active.has(e.to);
+          <svg
+            viewBox="0 0 560 350"
+            preserveAspectRatio="none"
+            role="img"
+            aria-label={`Dependency arrows point toward ${result.target.id}`}
+          >
+            <defs>
+              <marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6" fill="none" stroke="#9baaa0" strokeWidth="1.4" />
+              </marker>
+              <marker
+                id="arrow-active"
+                markerWidth="7"
+                markerHeight="7"
+                refX="5"
+                refY="3"
+                orient="auto"
+              >
+                <path d="M0,0 L6,3 L0,6" fill="none" stroke="#39705f" strokeWidth="1.4" />
+              </marker>
+            </defs>
+            {edges.map((e) => {
+              const from = positions.get(e.from)!,
+                to = positions.get(e.to)!;
+              const isActive = active.has(e.from) && active.has(e.to);
+              return (
+                <path
+                  key={e.id}
+                  d={`M ${from.x} ${from.y - 29} C ${from.x} ${from.y - 65}, ${to.x} ${to.y + 65}, ${to.x} ${to.y + 33}`}
+                  fill="none"
+                  stroke={isActive ? '#39705f' : '#ccd4cc'}
+                  strokeWidth={isActive ? 2 : 1.5}
+                  markerEnd={`url(#${isActive ? 'arrow-active' : 'arrow'})`}
+                />
+              );
+            })}
+          </svg>
+          {allNodes.map((node) => {
+            const p = positions.get(node.id)!;
             return (
-              <path
-                key={e.id}
-                d={`M ${from.x} ${from.y - 29} C ${from.x} ${from.y - 65}, ${to.x} ${to.y + 65}, ${to.x} ${to.y + 33}`}
-                fill="none"
-                stroke={isActive ? '#39705f' : '#ccd4cc'}
-                strokeWidth={isActive ? 2 : 1.5}
-                markerEnd={`url(#${isActive ? 'arrow-active' : 'arrow'})`}
-              />
+              <button
+                key={node.id}
+                style={{ left: `${p.x / 5.6}%`, top: `${p.y / 3.5}%` }}
+                className={`graph-node ${node.kind.toLowerCase()} ${node.id === selected?.item.id ? 'selected' : ''} ${active.has(node.id) ? 'on-path' : ''}`}
+                onClick={() => {
+                  if (node.id !== result.target.id) onSelect(node.id);
+                }}
+                aria-label={`${node.id} ${node.title}`}
+                aria-pressed={node.id === selected?.item.id}
+                disabled={node.id === result.target.id}
+              >
+                <span className="node-type">
+                  {node.id === result.target.id ? (
+                    <CircleDot size={12} />
+                  ) : node.kind === 'Decision' ? (
+                    <GitBranch size={12} />
+                  ) : (
+                    <CheckCircle2 size={12} />
+                  )}
+                  {node.id} · {node.kind}
+                </span>
+                <strong>{node.title}</strong>
+              </button>
             );
           })}
-        </svg>
-        {allNodes.map((node) => {
-          const p = positions.get(node.id)!;
-          return (
-            <button
-              key={node.id}
-              style={{ left: `${p.x / 5.6}%`, top: `${p.y / 3.5}%` }}
-              className={`graph-node ${node.kind.toLowerCase()} ${node.id === selected?.item.id ? 'selected' : ''} ${active.has(node.id) ? 'on-path' : ''}`}
-              onClick={() => {
-                if (node.id !== result.target.id) onSelect(node.id);
-              }}
-              aria-label={`${node.id} ${node.title}`}
-              aria-pressed={node.id === selected?.item.id}
-              disabled={node.id === result.target.id}
-            >
-              <span className="node-type">
-                {node.id === result.target.id ? (
-                  <CircleDot size={12} />
-                ) : node.kind === 'Decision' ? (
-                  <GitBranch size={12} />
-                ) : (
-                  <CheckCircle2 size={12} />
-                )}
-                {node.id} · {node.kind}
-              </span>
-              <strong>{node.title}</strong>
-            </button>
-          );
-        })}
+        </div>
       </div>
       <div className="graph-bottom">
         <span>
@@ -254,7 +271,7 @@ export function App() {
   const [workspace, setWorkspace] = useState<Workspace>();
   const [result, setResult] = useState<ImpactResult>();
   const [detail, setDetail] = useState<ChangeDetail>();
-  const [selection, setSelection] = useState('proposal');
+  const [selection, setSelection] = useState('proposal:supplier-daily');
   const [selectedId, setSelectedId] = useState('T1');
   const [evidence, setEvidence] = useState<EvidenceDetail | null>(null);
   const [error, setError] = useState('');
@@ -262,6 +279,7 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [retry, setRetry] = useState(0);
+  const [view, setView] = useState('review');
   const [panel, setPanel] = useState('change');
   const [drafts, setDrafts] = useState<
     Record<string, { status: 'keep' | 'revise' | 'defer'; reason: string }>
@@ -274,7 +292,7 @@ export function App() {
     api<Workspace>('/api/workspace', { signal: abort.signal })
       .then((data) => {
         setWorkspace(data);
-        setSelection(data.changes[0]?.id ?? 'proposal');
+        setSelection(data.changes[0]?.id ?? 'proposal:supplier-daily');
         setError('');
       })
       .catch((e) => {
@@ -293,8 +311,10 @@ export function App() {
     setResult(undefined);
     setDetail(undefined);
     const load = async () => {
-      if (selection === 'proposal') {
-        const next = await api<ImpactResult>(`/api/items/${workspace.proposals[0].itemId}/impact`, {
+      if (selection.startsWith('proposal:')) {
+        const chosen = workspace.proposals.find((p) => p.id === selection.slice(9));
+        if (!chosen) throw new Error('Proposal not found. Reload the workspace.');
+        const next = await api<ImpactResult>(`/api/items/${chosen.itemId}/impact`, {
           signal: abort.signal,
         });
         if (abort.signal.aborted) return;
@@ -324,7 +344,7 @@ export function App() {
     status: review?.status === 'pending' || !review ? 'revise' : review.status,
     reason: review?.reason ?? '',
   };
-  const proposal = workspace?.proposals[0];
+  const proposal = workspace?.proposals.find((p) => p.id === selection.slice(9));
   const current = workspace?.items.find((i) => i.id === proposal?.itemId);
   const applied = !!detail;
   const reviewed = detail?.reviews.filter((r) => r.status !== 'pending').length ?? 0;
@@ -348,7 +368,7 @@ export function App() {
         body: JSON.stringify({
           requestId: requestId.current,
           itemId: proposal.itemId,
-          expectedRevision: result.target.revision,
+          expectedRevision: proposal.expectedRevision ?? result.target.revision,
           after: proposal.after,
           evidenceId: proposal.evidenceId,
         }),
@@ -403,8 +423,10 @@ export function App() {
             ripple<span className="brand-dot">.</span>
           </a>
           <span className="topbar-divider" />
-          <span className="workspace-name">Inventory workspace</span>
-          <span className="demo-label">SYNTHETIC DEMO</span>
+          <span className="workspace-name">Local workspace</span>
+          <span className="demo-label">
+            {workspace?.synthetic ? 'SYNTHETIC DEMO' : 'MANUAL CONTEXT'}
+          </span>
           <span className="local-status">
             <span className="small-dot" />
             Local workspace
@@ -422,357 +444,399 @@ export function App() {
               <p>Follow a changed assumption to the decisions and work that need another look.</p>
             </div>
             <span className="workspace-tag">
-              <Layers3 size={16} /> Inventory experience
+              <Layers3 size={16} />{' '}
+              {workspace?.synthetic ? 'Inventory experience' : 'Document workspace'}
             </span>
           </div>
-          <div className="workflow">
-            <span className="step done">
-              <b>1</b> Understand the change
-            </span>
-            <ChevronRight size={16} />
-            <span className={`step ${applied ? 'done' : 'active'}`}>
-              <b>2</b> Trace the impact
-            </span>
-            <ChevronRight size={16} />
-            <span className={`step ${applied ? 'active' : ''}`}>
-              <b>3</b> Make a decision
-            </span>
-          </div>
-          {error && (
-            <div role="alert" className="banner error">
-              <span>{error}</span>
-              <button onClick={() => setRetry((r) => r + 1)} disabled={busy}>
-                <RotateCcw size={14} /> Reload
-              </button>
+          <nav className="view-tabs" aria-label="Workspace views">
+            <button aria-pressed={view === 'review'} onClick={() => setView('review')}>
+              Change review
+            </button>
+            <button aria-pressed={view === 'documents'} onClick={() => setView('documents')}>
+              Documents & relationships
+            </button>
+          </nav>
+          {workspace && (
+            <div hidden={view !== 'documents'}>
+              <Documents
+                workspace={workspace}
+                onWorkspace={setWorkspace}
+                onEvidence={async (id) =>
+                  setEvidence(await api<EvidenceDetail>(`/api/evidence/${id}`))
+                }
+                onPreview={(p) => {
+                  setSelection(`proposal:${p.id}`);
+                  requestId.current = crypto.randomUUID();
+                  setPanel('change');
+                  setView('review');
+                }}
+              />
             </div>
           )}
-          {notice && (
-            <div role="status" className="banner success">
-              <Check size={16} />
-              {notice}
-              <button aria-label="Dismiss message" onClick={() => setNotice('')}>
-                <X size={16} />
-              </button>
+          <div hidden={view !== 'review'}>
+            <div className="workflow">
+              <span className="step done">
+                <b>1</b> Understand the change
+              </span>
+              <ChevronRight size={16} />
+              <span className={`step ${applied ? 'done' : 'active'}`}>
+                <b>2</b> Trace the impact
+              </span>
+              <ChevronRight size={16} />
+              <span className={`step ${applied ? 'active' : ''}`}>
+                <b>3</b> Make a decision
+              </span>
             </div>
-          )}
-          <div className="mobile-tabs" aria-label="Workspace panels">
-            {['change', 'path', 'review'].map((p) => (
-              <button key={p} className={panel === p ? 'active' : ''} onClick={() => setPanel(p)}>
-                {p === 'change' ? '01 Change' : p === 'path' ? '02 Impact path' : '03 Review'}
-              </button>
-            ))}
-          </div>
-          {!workspace || !result ? (
-            <div className="empty-state">
-              {loading ? (
-                <>
-                  <LoaderCircle className="spin" />
-                  Opening your workspace…
-                </>
-              ) : (
-                <>
-                  <FileText />
-                  Unable to open the workspace. Use Reload to try again.
-                </>
-              )}
+            {error && (
+              <div role="alert" className="banner error">
+                <span>{error}</span>
+                <button onClick={() => setRetry((r) => r + 1)} disabled={busy}>
+                  <RotateCcw size={14} /> Reload
+                </button>
+              </div>
+            )}
+            {notice && (
+              <div role="status" className="banner success">
+                <Check size={16} />
+                {notice}
+                <button aria-label="Dismiss message" onClick={() => setNotice('')}>
+                  <X size={16} />
+                </button>
+              </div>
+            )}
+            <div className="mobile-tabs" aria-label="Workspace panels">
+              {['change', 'path', 'review'].map((p) => (
+                <button key={p} className={panel === p ? 'active' : ''} onClick={() => setPanel(p)}>
+                  {p === 'change' ? '01 Change' : p === 'path' ? '02 Impact path' : '03 Review'}
+                </button>
+              ))}
             </div>
-          ) : (
-            <div className={`workbench ${loading ? 'is-loading' : ''}`} aria-busy={loading}>
-              <section
-                className={`panel change-panel ${panel === 'change' ? 'mobile-visible' : ''}`}
-              >
-                <div className="panel-title">
-                  <span className="panel-number">01</span>
-                  <h2>The change</h2>
-                  <span className={`pill ${applied ? 'green' : 'amber'}`}>
-                    {applied ? 'Applied' : 'Preview'}
-                  </span>
-                </div>
-                <div className="panel-body">
-                  <label className="field-label" htmlFor="change-select">
-                    CHANGE TO EXPLORE
-                  </label>
-                  <select
-                    id="change-select"
-                    value={selection}
-                    disabled={busy || loading}
-                    onChange={(e) => {
-                      setSelection(e.target.value);
-                      setNotice('');
-                    }}
-                  >
-                    <option value="proposal">Supplier inventory refresh</option>
-                    {workspace.changes.map((c, i) => (
-                      <option key={c.id} value={c.id}>
-                        Applied change · revision {c.afterRevision}
-                        {i === 0 ? ' · latest' : ''}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="assumption-label">
-                    <CircleDot size={15} />
-                    <span>A1 · Assumption</span>
-                    <span>v{result.target.revision}</span>
-                  </div>
-                  <h3>Real-time inventory updates</h3>
-                  <div className="diff-card before">
-                    <span className="diff-label">BEFORE</span>
-                    <p>{detail?.change.before ?? result.target.body}</p>
-                  </div>
-                  <div className="change-arrow">
-                    <ArrowDown size={17} />
-                  </div>
-                  <div className="diff-card after">
-                    <span className="diff-label">
-                      {applied ? 'CONFIRMED UPDATE' : 'PROPOSED UPDATE'}
-                    </span>
-                    <p>{detail?.change.after ?? proposal?.after}</p>
-                    <span className="change-chip">Real-time → Daily snapshot</span>
-                  </div>
-                  <button
-                    className="source-card"
-                    onClick={() =>
-                      void openEvidence(detail?.change.evidenceId ?? proposal!.evidenceId)
-                    }
-                  >
-                    <span className="file-icon">
-                      <FileText size={19} />
-                    </span>
-                    <span>
-                      <strong>Supplier API specification</strong>
-                      <small>Version 2.0 · Original source</small>
-                    </span>
-                    <ChevronRight size={16} />
-                  </button>
-                  <div className="context-note">
-                    <ShieldCheck size={16} />
-                    <p>
-                      Only confirmed dependencies are followed. Every connection links back to its
-                      source.
-                    </p>
-                  </div>
-                  {applied ? (
-                    <div className="applied-stamp">
-                      <CheckCircle2 size={17} />
-                      Change saved · revision {detail.change.afterRevision}
-                    </div>
-                  ) : (
-                    <button
-                      className="primary apply-button"
-                      onClick={() => void apply()}
-                      disabled={
-                        busy ||
-                        loading ||
-                        current?.body === proposal?.after ||
-                        !!result.warnings.length
-                      }
-                    >
-                      {busy ? <LoaderCircle className="spin" size={17} /> : <Check size={17} />}
-                      {current?.body === proposal?.after
-                        ? 'Update already applied'
-                        : 'Apply change & start review'}
-                    </button>
-                  )}
-                  <p className="helper">
-                    {applied
-                      ? 'Original evidence and dependency paths are preserved.'
-                      : 'Applying creates a review for each affected item.'}
-                  </p>
-                </div>
-              </section>
-              <section className={`panel path-panel ${panel === 'path' ? 'mobile-visible' : ''}`}>
-                <div className="panel-title">
-                  <span className="panel-number">02</span>
-                  <h2>Follow the impact</h2>
-                  <span className="pill neutral">{applied ? 'Saved paths' : 'Live preview'}</span>
-                </div>
-                <div className="impact-summary">
-                  <div>
-                    <strong>{result.impacts.length}</strong>
-                    <span>items to revisit</span>
-                  </div>
-                  <span className="summary-separator" />
-                  <p>
-                    <b>{result.impacts.filter((i) => i.depth === 1).length}</b> direct{' '}
-                    <span>·</span> <b>{result.impacts.filter((i) => i.depth > 1).length}</b>{' '}
-                    indirect
-                  </p>
-                  <GitBranch size={25} />
-                </div>
-                {result.warnings.map((w) => (
-                  <div className="inline-warning" key={w}>
-                    {w}
-                  </div>
-                ))}
-                {result.impacts.length ? (
-                  <Graph
-                    result={result}
-                    selected={selected}
-                    onSelect={setSelectedId}
-                    onEvidence={setEvidence}
-                  />
+            {!workspace || !result ? (
+              <div className="empty-state">
+                {loading ? (
+                  <>
+                    <LoaderCircle className="spin" />
+                    Opening your workspace…
+                  </>
                 ) : (
-                  <div className="empty-state">
-                    <ShieldCheck />
-                    No confirmed dependencies lead to this item.
-                  </div>
+                  <>
+                    <FileText />
+                    Unable to open the workspace. Use Reload to try again.
+                  </>
                 )}
-                <div className="unaffected">
-                  <ShieldCheck size={17} />
-                  <div>
-                    <strong>
-                      {result.limited ? 'Outside these results' : 'Outside this ripple'}
-                    </strong>
-                    <p>
-                      {result.excluded.map((i) => `${i.id} · ${i.title}`).join(', ') ||
-                        'All other items are connected.'}
-                    </p>
-                    <small>
-                      {result.limited
-                        ? 'No conclusion about excluded items until traversal is complete.'
-                        : 'No confirmed dependency path to the changed assumption.'}
-                    </small>
+              </div>
+            ) : (
+              <div className={`workbench ${loading ? 'is-loading' : ''}`} aria-busy={loading}>
+                <section
+                  className={`panel change-panel ${panel === 'change' ? 'mobile-visible' : ''}`}
+                >
+                  <div className="panel-title">
+                    <span className="panel-number">01</span>
+                    <h2>The change</h2>
+                    <span className={`pill ${applied ? 'green' : 'amber'}`}>
+                      {applied ? 'Applied' : 'Preview'}
+                    </span>
                   </div>
-                </div>
-              </section>
-              <section
-                className={`panel review-panel ${panel === 'review' ? 'mobile-visible' : ''}`}
-              >
-                <div className="panel-title">
-                  <span className="panel-number">03</span>
-                  <h2>Review the work</h2>
-                  <span className="count-pill">
-                    {reviewed}/{result.impacts.length}
-                  </span>
-                </div>
-                <div className="impact-list" aria-label="Affected items">
-                  {result.impacts.map((i) => {
-                    const r = detail?.reviews.find((r) => r.itemId === i.item.id);
-                    return (
-                      <button
-                        key={i.item.id}
-                        className={`impact-row ${i.item.id === selected?.item.id ? 'selected' : ''}`}
-                        onClick={() => setSelectedId(i.item.id)}
-                        aria-pressed={i.item.id === selected?.item.id}
-                      >
-                        <span className={`item-symbol ${i.item.kind.toLowerCase()}`}>
-                          {i.item.kind === 'Decision' ? (
-                            <GitBranch size={15} />
-                          ) : (
-                            <CheckCircle2 size={15} />
-                          )}
-                        </span>
-                        <span>
-                          <small>
-                            {i.item.id} · {i.depth === 1 ? 'Direct' : 'Indirect'} impact
-                          </small>
-                          <strong>{i.item.title}</strong>
-                        </span>
-                        {r && r.status !== 'pending' ? (
-                          <CheckCircle2 size={16} className="reviewed-icon" />
-                        ) : (
-                          <ChevronRight size={15} />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-                {selected && (
-                  <div className="review-detail">
-                    <div className="detail-kicker">
-                      <span className="eyebrow">
-                        {selected.item.id} · {selected.item.kind.toUpperCase()}
-                      </span>
-                      <span
-                        className={`pill ${review?.status && review.status !== 'pending' ? 'green' : 'amber'}`}
-                      >
-                        {labels[review?.status ?? 'pending']}
-                      </span>
-                    </div>
-                    <h3>{selected.item.title}</h3>
-                    <p className="item-body">{selected.item.body}</p>
-                    <div className="owner">
-                      <span className="avatar small">{initials(selected.item.owner)}</span>
-                      {selected.item.owner}
-                      <span>Owner</span>
-                    </div>
-                    <div className="review-divider" />
-                    <label className="field-label">YOUR DECISION</label>
-                    <div className="review-options">
-                      {(['keep', 'revise', 'defer'] as const).map((s) => (
-                        <button
-                          key={s}
-                          className={draft.status === s ? 'selected' : ''}
-                          disabled={!applied || busy || loading}
-                          onClick={() => setDraft({ status: s })}
-                          aria-pressed={draft.status === s}
-                        >
-                          {labels[s]}
-                        </button>
-                      ))}
-                    </div>
-                    <p className="decision-help">
-                      {draft.status === 'keep'
-                        ? 'Keep this item as it is for this change.'
-                        : draft.status === 'revise'
-                          ? 'Record a plan to adapt this item. Implementation remains open.'
-                          : 'Defer the decision until more context is available.'}
-                    </p>
-                    <label htmlFor="review-reason" className="field-label">
-                      REASON
+                  <div className="panel-body">
+                    <label className="field-label" htmlFor="change-select">
+                      CHANGE TO EXPLORE
                     </label>
-                    <textarea
-                      id="review-reason"
-                      value={draft.reason}
-                      disabled={!applied || busy || loading}
-                      maxLength={4000}
-                      onChange={(e) => setDraft({ reason: e.target.value })}
-                      placeholder={
-                        applied
-                          ? 'What should happen, and why?'
-                          : 'Apply the change to start reviewing…'
-                      }
-                      rows={3}
-                    />
-                    <button
-                      className="primary save-button"
-                      disabled={!applied || busy || loading || !draft.reason.trim()}
-                      onClick={() => void saveReview()}
+                    <select
+                      id="change-select"
+                      value={selection}
+                      disabled={busy || loading}
+                      onChange={(e) => {
+                        setSelection(e.target.value);
+                        requestId.current = crypto.randomUUID();
+                        setNotice('');
+                      }}
                     >
-                      {busy ? <LoaderCircle className="spin" size={16} /> : <Check size={16} />}Save
-                      review
+                      {workspace.proposals.map((p) => (
+                        <option key={p.id} value={`proposal:${p.id}`}>
+                          {p.title} · proposed update
+                        </option>
+                      ))}
+                      {workspace.changes.map((c, i) => (
+                        <option key={c.id} value={c.id}>
+                          Applied change · revision {c.afterRevision}
+                          {i === 0 ? ' · latest' : ''}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="assumption-label">
+                      <CircleDot size={15} />
+                      <span>
+                        {result.target.id} · {result.target.kind}
+                      </span>
+                      <span>v{result.target.revision}</span>
+                    </div>
+                    <h3>{result.target.title}</h3>
+                    <div className="diff-card before">
+                      <span className="diff-label">BEFORE</span>
+                      <p>{detail?.change.before ?? result.target.body}</p>
+                    </div>
+                    <div className="change-arrow">
+                      <ArrowDown size={17} />
+                    </div>
+                    <div className="diff-card after">
+                      <span className="diff-label">
+                        {applied ? 'CONFIRMED UPDATE' : 'PROPOSED UPDATE'}
+                      </span>
+                      <p>{detail?.change.after ?? proposal?.after}</p>
+                    </div>
+                    <button
+                      className="source-card"
+                      onClick={() =>
+                        void openEvidence(detail?.change.evidenceId ?? proposal!.evidenceId)
+                      }
+                    >
+                      <span className="file-icon">
+                        <FileText size={19} />
+                      </span>
+                      <span>
+                        <strong>Update evidence</strong>
+                        <small>Preserved source version · Exact quote</small>
+                      </span>
+                      <ChevronRight size={16} />
                     </button>
-                    {!applied && (
-                      <p className="helper">Start with “Apply change” in the first panel.</p>
+                    <div className="context-note">
+                      <ShieldCheck size={16} />
+                      <p>
+                        Only confirmed dependencies are followed. Every connection links back to its
+                        source.
+                      </p>
+                    </div>
+                    {applied ? (
+                      <div className="applied-stamp">
+                        <CheckCircle2 size={17} />
+                        Change saved · revision {detail.change.afterRevision}
+                      </div>
+                    ) : (
+                      <button
+                        className="primary apply-button"
+                        onClick={() => void apply()}
+                        disabled={
+                          busy ||
+                          loading ||
+                          current?.body === proposal?.after ||
+                          (proposal?.expectedRevision !== undefined &&
+                            proposal.expectedRevision !== current?.revision) ||
+                          !!result.warnings.length
+                        }
+                      >
+                        {busy ? <LoaderCircle className="spin" size={17} /> : <Check size={17} />}
+                        {current?.body === proposal?.after
+                          ? 'Update already applied'
+                          : proposal?.expectedRevision !== undefined &&
+                              proposal.expectedRevision !== current?.revision
+                            ? 'Outdated proposal · create a new one'
+                            : 'Apply change & start review'}
+                      </button>
                     )}
-                    {!!review?.history.length && (
-                      <details className="review-history">
-                        <summary>Review history · {review.history.length}</summary>
-                        {review.history.map((h) => (
-                          <div key={h.id}>
-                            <b>{labels[h.status]}</b>
-                            <time>{new Date(h.createdAt).toLocaleString()}</time>
-                            <p>{h.reason}</p>
-                          </div>
+                    <p className="helper">
+                      {applied
+                        ? 'Original evidence and dependency paths are preserved.'
+                        : 'Applying creates a review for each affected item.'}
+                    </p>
+                  </div>
+                </section>
+                <section className={`panel path-panel ${panel === 'path' ? 'mobile-visible' : ''}`}>
+                  <div className="panel-title">
+                    <span className="panel-number">02</span>
+                    <h2>Follow the impact</h2>
+                    <span className="pill neutral">{applied ? 'Saved paths' : 'Live preview'}</span>
+                  </div>
+                  <div className="impact-summary">
+                    <div>
+                      <strong>{result.impacts.length}</strong>
+                      <span>items to revisit</span>
+                    </div>
+                    <span className="summary-separator" />
+                    <p>
+                      <b>{result.impacts.filter((i) => i.depth === 1).length}</b> direct{' '}
+                      <span>·</span> <b>{result.impacts.filter((i) => i.depth > 1).length}</b>{' '}
+                      indirect
+                    </p>
+                    <GitBranch size={25} />
+                  </div>
+                  {result.warnings.map((w) => (
+                    <div className="inline-warning" key={w}>
+                      {w}
+                    </div>
+                  ))}
+                  {result.impacts.length ? (
+                    <Graph
+                      result={result}
+                      selected={selected}
+                      onSelect={setSelectedId}
+                      onEvidence={setEvidence}
+                    />
+                  ) : (
+                    <div className="empty-state">
+                      <ShieldCheck />
+                      No confirmed dependencies lead to this item.
+                    </div>
+                  )}
+                  <div className="unaffected">
+                    <ShieldCheck size={17} />
+                    <div>
+                      <strong>
+                        {result.limited ? 'Outside these results' : 'Outside this ripple'}
+                      </strong>
+                      <p>
+                        {result.excluded.map((i) => `${i.id} · ${i.title}`).join(', ') ||
+                          'All other items are connected.'}
+                      </p>
+                      <small>
+                        {result.limited
+                          ? 'No conclusion about excluded items until traversal is complete.'
+                          : 'No confirmed dependency path to the changed assumption.'}
+                      </small>
+                    </div>
+                  </div>
+                </section>
+                <section
+                  className={`panel review-panel ${panel === 'review' ? 'mobile-visible' : ''}`}
+                >
+                  <div className="panel-title">
+                    <span className="panel-number">03</span>
+                    <h2>Review the work</h2>
+                    <span className="count-pill">
+                      {reviewed}/{result.impacts.length}
+                    </span>
+                  </div>
+                  <div className="impact-list" aria-label="Affected items">
+                    {result.impacts.map((i) => {
+                      const r = detail?.reviews.find((r) => r.itemId === i.item.id);
+                      return (
+                        <button
+                          key={i.item.id}
+                          className={`impact-row ${i.item.id === selected?.item.id ? 'selected' : ''}`}
+                          onClick={() => setSelectedId(i.item.id)}
+                          aria-pressed={i.item.id === selected?.item.id}
+                        >
+                          <span className={`item-symbol ${i.item.kind.toLowerCase()}`}>
+                            {i.item.kind === 'Decision' ? (
+                              <GitBranch size={15} />
+                            ) : (
+                              <CheckCircle2 size={15} />
+                            )}
+                          </span>
+                          <span>
+                            <small>
+                              {i.item.id} · {i.depth === 1 ? 'Direct' : 'Indirect'} impact
+                            </small>
+                            <strong>{i.item.title}</strong>
+                          </span>
+                          {r && r.status !== 'pending' ? (
+                            <CheckCircle2 size={16} className="reviewed-icon" />
+                          ) : (
+                            <ChevronRight size={15} />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selected && (
+                    <div className="review-detail">
+                      <div className="detail-kicker">
+                        <span className="eyebrow">
+                          {selected.item.id} · {selected.item.kind.toUpperCase()}
+                        </span>
+                        <span
+                          className={`pill ${review?.status && review.status !== 'pending' ? 'green' : 'amber'}`}
+                        >
+                          {labels[review?.status ?? 'pending']}
+                        </span>
+                      </div>
+                      <h3>{selected.item.title}</h3>
+                      <p className="item-body">{selected.item.body}</p>
+                      <div className="owner">
+                        <span className="avatar small">{initials(selected.item.owner)}</span>
+                        {selected.item.owner}
+                        <span>Owner</span>
+                      </div>
+                      <div className="review-divider" />
+                      <label className="field-label">YOUR DECISION</label>
+                      <div className="review-options">
+                        {(['keep', 'revise', 'defer'] as const).map((s) => (
+                          <button
+                            key={s}
+                            className={draft.status === s ? 'selected' : ''}
+                            disabled={!applied || busy || loading}
+                            onClick={() => setDraft({ status: s })}
+                            aria-pressed={draft.status === s}
+                          >
+                            {labels[s]}
+                          </button>
                         ))}
-                      </details>
-                    )}
-                  </div>
-                )}
-                {applied && reviewed === result.impacts.length && (
-                  <div className="review-complete">
-                    <CheckCircle2 size={18} />
-                    All review decisions are recorded.
-                  </div>
-                )}
-              </section>
-            </div>
-          )}
+                      </div>
+                      <p className="decision-help">
+                        {draft.status === 'keep'
+                          ? 'Keep this item as it is for this change.'
+                          : draft.status === 'revise'
+                            ? 'Record a plan to adapt this item. Implementation remains open.'
+                            : 'Defer the decision until more context is available.'}
+                      </p>
+                      <label htmlFor="review-reason" className="field-label">
+                        REASON
+                      </label>
+                      <textarea
+                        id="review-reason"
+                        value={draft.reason}
+                        disabled={!applied || busy || loading}
+                        maxLength={4000}
+                        onChange={(e) => setDraft({ reason: e.target.value })}
+                        placeholder={
+                          applied
+                            ? 'What should happen, and why?'
+                            : 'Apply the change to start reviewing…'
+                        }
+                        rows={3}
+                      />
+                      <button
+                        className="primary save-button"
+                        disabled={!applied || busy || loading || !draft.reason.trim()}
+                        onClick={() => void saveReview()}
+                      >
+                        {busy ? <LoaderCircle className="spin" size={16} /> : <Check size={16} />}
+                        Save review
+                      </button>
+                      {!applied && (
+                        <p className="helper">Start with “Apply change” in the first panel.</p>
+                      )}
+                      {!!review?.history.length && (
+                        <details className="review-history">
+                          <summary>Review history · {review.history.length}</summary>
+                          {review.history.map((h) => (
+                            <div key={h.id}>
+                              <b>{labels[h.status]}</b>
+                              <time>{new Date(h.createdAt).toLocaleString()}</time>
+                              <p>{h.reason}</p>
+                            </div>
+                          ))}
+                        </details>
+                      )}
+                    </div>
+                  )}
+                  {applied && reviewed === result.impacts.length && (
+                    <div className="review-complete">
+                      <CheckCircle2 size={18} />
+                      All review decisions are recorded.
+                    </div>
+                  )}
+                </section>
+              </div>
+            )}
+          </div>
           <footer>
             <span>
               <ShieldCheck size={14} /> Your context stays in this local workspace.
             </span>
-            <span>Synthetic sample · No AI extraction</span>
+            <span>
+              {workspace?.synthetic ? 'Synthetic sample' : 'Sample + imported context'} · No AI
+              extraction
+            </span>
             <details className="developer-details">
               <summary>Developer details</summary>
               <div>

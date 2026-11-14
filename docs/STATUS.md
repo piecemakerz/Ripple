@@ -1,5 +1,21 @@
 # Current status
 
+## Manual M2 slice — 2026-11-14 KST
+
+Implemented document paste/UTF-8 Markdown or text upload → immutable source versions → evidenced manual items → proposed dependency → confirm/reject → generic change proposal → existing impact, apply and review flow.
+
+- `npm run verify`: **21/21 tests**, format, strict types, pinned skills, official Relate preflight and production build passed. New tests cover source version conflicts/idempotency, exact Unicode/CRLF/repeated evidence, candidates versus confirmed impact, rejection/stale decisions, full imported-item change/review flow, rollback after evidence/item writes, additive schema migration, HTTP validation and ingestion limits.
+- `npm run doctor`: passed; checkpoint and WAL restart regression tests now also preserve imported source versions, candidate decisions and mutation receipts.
+- Browser: real production app on **http://127.0.0.1:4318** using a separate disposable `m2-qa-*` store under `%LOCALAPPDATA%/Ripple`. Original live `demo-v1` was not opened or modified. Paste, upload, repeated multiline quote choice, version-2 save with version-1 retained, candidate confirmation, 4→5 impacts, apply, review save/reload, production process restart and 390px panels verified. Deliberate network failures preserved both document and review input; retries passed. Temporary overrides removed. See [QA](QA.md).
+- Browser inspection exposed overlapping graph cards after adding a third direct dependency. Dense levels now scroll horizontally; card titles have space for two lines and paths wrap. Stored paths and the affected-item list remain complete.
+- Schema 2 adds idempotency receipts via an explicit additive migration; imported text/evidence remain immutable. No new dependencies or paid API calls.
+- Publication authorized on 2026-11-14. The existing committed HEAD `fc1a040` is green; M2 is being prepared for commit/push and its own Windows CI verification. Prior CI does not validate this slice.
+- Developer checks initially used an incorrect npm-exec formatter argument shape (printed formatted text instead of writing); corrected by `npm run format`. A browser navigation before server startup returned connection-refused, then succeeded after startup. These attempts are not counted as passing checks.
+
+Next: user evaluation with real document examples; optional AI candidate extraction after provider/budget decisions; editing/superseding confirmed relationships and fuller history UX. Remaining limits: no AI extraction, no hosted demo, no offline drafts, no confirmed-edge editor, ingestion caps (50 source versions / 100 items / 200 dependency records / 100 proposals), and dense-graph traversal runtime is not strictly bounded. Submission assets remain separate M4 work.
+
+## Historical M0/M1 handoff
+
 **2026-11-13 KST · M0/M1 published to GitHub; local and remote verification passed.**
 
 ## What exists
@@ -82,4 +98,4 @@ M0/M1's authorized implementation is complete. Next product slice: **M2: paste/u
 - GitHub plugin installation and account connection completed during setup. Its tools confirmed the `piecemakerz` identity, access to Ripple and successful CI inspection. Existing Git publication/public CI fallback also work. The already available browser tools and OpenAI Docs skill were retained.
 - Application behavior/UI and live data were unchanged. No browser regression or new Astra inference is claimed for this tooling setup.
 
-Still outside this implementation: generic ingestion, AI extraction, relationship editor, collaboration, large graph layout, public sample DB export, hosted demo and submission assets. No benchmark claims on real customer data.
+At the M0/M1 handoff, generic ingestion was still outside implementation; the manual M2 slice above now supplies it. AI extraction, editing confirmed relationships, collaboration, large graph layout, public sample DB export, hosted demo and submission assets remain outside implementation. No benchmark claims on real customer data.

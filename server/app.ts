@@ -2,6 +2,7 @@ import express, { type ErrorRequestHandler } from 'express';
 import { z, ZodError } from 'zod';
 import { AppError } from './errors.js';
 import type { RippleStore } from './store.js';
+import { Ingestion } from './ingestion.js';
 
 const id = z.string().min(1).max(150);
 export const changeInput = z
@@ -22,6 +23,7 @@ const reviewInput = z
 
 export function createApp(store: RippleStore) {
   const app = express();
+  const ingestion = new Ingestion(store);
   app.disable('x-powered-by');
   app.use((req, res, next) => {
     // Loopback binding plus Host/Origin checks prevent arbitrary sites from writing to the local app.
@@ -34,7 +36,7 @@ export function createApp(store: RippleStore) {
     if (req.path.startsWith('/api')) res.setHeader('Cache-Control', 'no-store');
     next();
   });
-  app.use(express.json({ limit: '64kb' }));
+  app.use(express.json({ limit: '256kb' }));
   app.get('/api/health', (_req, res) => {
     store.query('RETURN 1 AS ok');
     res.json({ ok: true, engine: 'Relate', version: '1.0.1' });
@@ -44,6 +46,11 @@ export function createApp(store: RippleStore) {
   app.get('/api/evidence/:id', (req, res) => res.json(store.getEvidence(req.params.id)));
   app.get('/api/changes/:id', (req, res) => res.json(store.getChange(req.params.id)));
   // All store calls are synchronous; no await may interleave a transaction on this connection.
+  app.post('/api/sources', (req, res) => res.status(201).json(ingestion.source(req.body)));
+  app.post('/api/items', (req, res) => res.status(201).json(ingestion.item(req.body)));
+  app.post('/api/candidates', (req, res) => res.status(201).json(ingestion.candidate(req.body)));
+  app.put('/api/candidates/:id', (req, res) => res.json(ingestion.decide(req.params.id, req.body)));
+  app.post('/api/proposals', (req, res) => res.status(201).json(ingestion.proposal(req.body)));
   app.post('/api/changes', (req, res) =>
     res.status(201).json(store.applyChange(changeInput.parse(req.body))),
   );

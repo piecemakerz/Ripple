@@ -10,6 +10,7 @@ import { dirname } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import type {
   Change,
+  Candidate,
   ChangeDetail,
   Evidence,
   EvidenceDetail,
@@ -75,8 +76,15 @@ export class RippleStore {
   seed() {
     const meta = this.query('MATCH (m:RippleMeta) RETURN m').rows;
     if (meta.length) {
-      if (props<{ version: number }>(meta[0].m).version !== 1)
-        throw new Error('Unsupported Ripple schema version');
+      const version = props<{ version: number }>(meta[0].m).version;
+      if (version !== 1 && version !== 2) throw new Error('Unsupported Ripple schema version');
+      if (version === 1)
+        this.transaction(() => {
+          this.query(
+            'CREATE CONSTRAINT mutation_id IF NOT EXISTS FOR (n:Mutation) REQUIRE n.id IS UNIQUE',
+          );
+          this.query('MATCH (m:RippleMeta) SET m.version=2');
+        });
       return;
     }
     if (this.query('MATCH (n) RETURN n LIMIT 1').rows.length)
@@ -91,6 +99,7 @@ export class RippleStore {
         'ReviewEvent',
         'Proposal',
         'Person',
+        'Mutation',
       ]) {
         this.query(
           `CREATE CONSTRAINT ${label.toLowerCase()}_id IF NOT EXISTS FOR (n:${label}) REQUIRE n.id IS UNIQUE`,
@@ -128,7 +137,7 @@ export class RippleStore {
         ),
       );
       this.query('CREATE (:Proposal $props)', { props: { ...proposal } });
-      this.query('CREATE (:RippleMeta {version:1, sample:true})');
+      this.query('CREATE (:RippleMeta {version:2, sample:true})');
     });
     this.checkpoint();
   }
@@ -168,13 +177,16 @@ export class RippleStore {
       changes: this.query('MATCH (c:Change) RETURN c ORDER BY c.createdAt DESC').rows.map((r) =>
         this.decodeChange(r.c),
       ),
+      candidates: this.query(
+        'MATCH ()-[r:DEPENDS_ON]->() WHERE r.revision IS NOT NULL RETURN r ORDER BY r.id LIMIT 200',
+      ).rows.map((r) => props<Candidate>(r.r)),
       database: {
         engine: 'Relate',
         version: '1.0.1',
         path: this.path,
         storage: 'Directory · WAL + Parquet checkpoint',
       },
-      synthetic: true,
+      synthetic: !this.query('MATCH (m:Mutation) RETURN m.id LIMIT 1').rows.length,
     };
   }
   impact(id: string): ImpactResult {
