@@ -9,7 +9,7 @@ Authorized: paste/upload text or Markdown, immutable source versions, manual ite
 3. [complete] Test native DB/API rollback, conflicts, original evidence and restart; run verify (21 tests) and doctor.
 4. [complete] Inspect desktop and 390px browser flows on a disposable store; record results and limits.
 
-Next: real-document user evaluation, confirmed-relationship amendment UX, then optional AI extraction after provider/budget decisions. M2 publication is authorized. Commit and push the verified slice, then inspect its exact-commit Windows CI result.
+Next: real-document user evaluation, confirmed-relationship amendment UX, then optional AI extraction after provider/budget decisions. M2 publication is complete: implementation commit `5406668` is on `main`, and its Windows CI passed installation, verify and doctor. See STATUS.md for the run link.
 
 Earlier authorized scope: Astra development setup + M0 + M1, and publication to `piecemakerz/Ripple` on GitHub. No hosted app deployment or paid extraction API.
 

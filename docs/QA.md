@@ -26,7 +26,7 @@ The earlier M0/M1 record below remains historical evidence. This iteration uses 
 | Graph                     | Third direct node originally overlapped; horizontal scrolling now separates nodes; no document overflow                                       |
 | Console                   | Final production inspection returned no warnings/errors; deliberate blocked requests were expected failures                                   |
 
-Network blocks and viewport override were removed. Browser checks are performed through the connected browser, not a committed automated E2E suite. These are synthetic acceptance examples, not real-user accuracy measurements. Before publication, `ci:status` correctly disclosed that only the prior committed HEAD passed. The M2 publication result is recorded in STATUS.md after its own run completes.
+Network blocks and viewport override were removed. Browser checks are performed through the connected browser, not a committed automated E2E suite. These are synthetic acceptance examples, not real-user accuracy measurements. Before publication, `ci:status` correctly disclosed that only the prior committed HEAD passed. M2 implementation commit `5406668` subsequently passed its own [Windows CI run](https://github.com/piecemakerz/Ripple/actions/runs/43564558780): clean installation, verify and doctor. The GitHub plugin confirmed all job steps.
 
 Captures: [Documents](evidence/m2-documents.jpg), [impact and review](evidence/m2-impact.jpg), [390px evidence selection](evidence/m2-mobile.jpg).
 
