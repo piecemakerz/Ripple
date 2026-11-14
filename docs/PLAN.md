@@ -1,5 +1,14 @@
 # Ripple execution plan
 
+## Semantic review workflow — 2026-11-14
+
+1. [complete] Build a loopback review worksheet for both frozen cases: scenario, items, every relationship and complete gold query paths/exclusions with exact source context (39 subjects).
+2. [complete] Save versioned review artifacts outside the repository; validate case/fixture/checklist identity, completeness, reasons and explicit reviewer provenance without changing gold labels.
+3. [complete] Test validation, HTTP failures and restart; pass verify (46 tests/build) and clean-install reproduce/doctor; inspect desktop/390px review/save/download flows plus the existing application change/evidence/review flow. Record results and a prospective manual-comparison protocol.
+4. [in progress] Publish the implementation to `main` as requested and verify the exact pushed commit's Windows CI. Record publication evidence after the run completes.
+
+The local implementation is complete; publication and exact-commit CI verification are in progress. The human worksheet is available at port 4324, with no QA judgments in its default directory. Actual human semantic review is still pending; automated QA cannot supply a human attestation. Manual comparison measurements follow completed semantic adjudication; no accuracy or time-saving claim is introduced. See SEMANTIC_REVIEW.md and STATUS.md.
+
 ## Second independent public-document evaluation — 2026-11-14
 
 1. [complete] Freeze four attributed SemVer 2.0.0 excerpts, nine items and six confirmed edges, with explicit paths/exclusions and disclosed hypothetical release decisions.

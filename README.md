@@ -132,6 +132,8 @@ npm run ai
 
 ## 검증
 
+공개 문서 평가의 의미를 직접 검토하려면 `npm run evaluate:review`를 실행하고 **http://127.0.0.1:4324**를 여세요. 두 사례의 원문·관계·예상 경로를 확인하고 판단과 사유를 버전별 JSON으로 저장할 수 있습니다. 자동 테스트와 사람의 검토는 구분되며, 실제 사람의 검토는 아직 남아 있습니다. [검토 방법과 수작업 비교 계획](docs/SEMANTIC_REVIEW.md)을 참고하세요.
+
 ```powershell
 npm run verify
 npm run doctor

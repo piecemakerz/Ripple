@@ -100,6 +100,16 @@ Relationships: DEPENDS_ON, OWNED_BY, EVIDENCED_BY, FROM_SOURCE, CHANGES, FOR_CHA
 
 `evaluate:demo` (original case, port 4322) and `evaluate:semver:demo` (external case, port 4323) validate and checkpoint a new evaluation store, exit that owner, then start the existing production server. Each retains its isolated directory; normal evaluation removes only its freshly allocated temporary directory. Built-in sample data stays disconnected. Application UI, production API/schema, dependencies and model configuration are unchanged. See [evaluation](EVALUATION.md) and [SemVer provenance and limits](EVALUATION_SEMVER.md).
 
+### Semantic evaluation review artifacts
+
+`evaluate:review` is a separate loopback HTML/form server on port 4324. It renders the frozen evaluation cases, not live graph data, and never opens Relate. Its 39 subjects cover each scenario, item, edge state and complete path/exclusion set. Both documented inferences are highlighted; no fixture bytes or production API/schema/UI change. A checklist hash binds review prompts as well as the fixture SHA-256. No dependency, paid call or browser script is added.
+
+The reviewer selects pending/accept/revise/uncertain with reasons and explicit provenance. Strict validation rejects cross-case/stale hashes, missing/duplicate subjects, unknown fields, unexplained answers and invalid attestation. Completeness, acceptance and human self-attestation are derived separately; identity is never authenticated. Automated QA cannot count as human acceptance. `evaluate` and CI remain independent of private human records.
+
+Numbered JSON snapshots live outside the repository under the dedicated local review directory. Synchronous writes validate the expected revision, fully write a temporary file, then publish it with an exclusive hard link, preserving older snapshots and rejecting concurrent revision collisions. A corrupt latest record fails closed. The 1,000-snapshot cap, lack of power-loss durability claim, manual directory selection after fixture/checklist changes and no import UI are explicit limits. This is artifact storage for human judgments, not a JSON substitute for the application's Relate graph. The form server checks exact loopback Host/Origin, rejects null origins, bounds URL-encoded bodies, escapes text and disables scripts/framing with CSP. Same-origin referrer policy preserves native form Origin without sending referrers to external source links.
+
+See [semantic review](SEMANTIC_REVIEW.md) for the executable worksheet/checker and the prospective manual-workflow comparison protocol. Actual human adjudication and measured comparison remain pending.
+
 ### Remaining product limits
 
 - Store APIs are synchronous and can block the event loop on larger graphs. The depth/row cap is an output bound, not a strict query execution-time/memory bound. M2 should set domain ingestion limits before accepting arbitrary large input.

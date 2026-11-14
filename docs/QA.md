@@ -1,5 +1,31 @@
 # Verification record
 
+## Semantic review worksheet — 2026-11-14 KST
+
+Final `npm run verify`: **46 passed, 0 failed** plus format/types/skills/native context/build. Clean `npm run reproduce` passed installation (zero reported vulnerabilities), the same 46-test gate/build and native process-restart doctor. Five new tests cover the complete checklist, stale/cross-case hashes, missing/duplicate subjects, unjustified answers, self-reported versus automated provenance, immutable artifact publication, stale saves, corrupt latest records, separate-process checking, HTTP escaping/origin/input bounds and maximum-length Korean reasons. Neither frozen fixture changed.
+
+| Browser check   | Observed result                                                                                                                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Isolation       | Review QA on 4325 with its own local artifact directory; reviewer Automated / QA, attestation unchecked; no Relate handle                               |
+| Initial states  | 18 ownership and 21 SemVer subjects all Pending; two inference warnings, exact quotes and full path/exclusion sets                                      |
+| Missing reason  | Selected Uncertain without a reason; error preserved reviewer name and judgment; adding a reason saved successfully                                     |
+| Versioned saves | Ownership revisions 1, 2, 3 and SemVer revisions 1, 2; saved decisions are QA uncertainties, not semantic acceptance                                    |
+| Stale tab       | Submitted revision 2 after another tab saved revision 3; conflict preserved the stale reason and left the saved version unchanged                       |
+| Download        | Browser downloaded ownership revision 2; CLI reported automated/incomplete, `humanAttestedAcceptance: false`; its nonzero incomplete status is expected |
+| Restart         | Stopped only the identified review QA owner, restarted same directory; browser restored ownership revision 3 and SemVer revision 2 with exact reasons   |
+| Desktop         | Measured 1440×1000, document width 1425px; all seven DEPRECATE paths including both CORE_RESET paths visible/readable                                   |
+| Mobile          | Measured 390×844, document width 375px; source attribution, pinned URL, original ranges/hash and full excerpt wrap; inference reason/save works         |
+| Ready for user  | Separate default directory on 4324; both cases still revision 0 with all 39 subjects pending; marked browser tab retained                               |
+| Console/cleanup | Final clean worksheet and production-app logs had no warnings/errors; temporary viewport override removed                                               |
+
+Captures: [ready worksheet](evidence/semantic-review-ready.jpg), [desktop paths](evidence/semantic-review-desktop.jpg), [390px source](evidence/semantic-review-mobile-source.jpg). The ready screen is not a completed human assessment. QA owners on 4325/4326 were stopped after inspection with their artifacts retained; the user worksheet remains on 4324.
+
+The first browser save exposed `Origin: null` from native form POST under `Referrer-Policy: no-referrer`. The final helper uses `same-origin` referrer policy; actual browser errors, successful saves and stale conflicts were checked after restart. Null and foreign origins remain rejected in tests. A selector deadline on the original failed save was resolved by inspecting the actual rejection and request headers. The initial Host test's Node-fetch normalization and a test-only header typecheck failure were corrected before the final gates. No failed attempt is reported as a pass.
+
+The unchanged production UI was also checked using a fresh `evaluate:semver:demo` store at port 4326 (native store outside OneDrive; original live DB untouched). Selected the disconnected built-in A1 sample: preview returned exactly D1/D2/T1/T2 with T3 outside; T1 source quote opened at 49–138; applying created revision 2/four reviews. Saved T1 Defer and a QA reason; browser reload restored both and the original paths. At 390×844, selected T2 in Impact path, opened its quote at 139–235, and navigated to Review. Document width was 375px and the source dialog fit the screen. This is regression QA, not a human timing study. Native separate-process persistence remains covered by reproduce/doctor; the new review-artifact server's restart was separately inspected in the browser above.
+
+At local handoff, only prior committed HEAD `edebd0e` had passing Windows CI ([run](https://github.com/piecemakerz/Ripple/actions/runs/43595876954)), independently confirmed with the connected GitHub plugin. That older green CI was not evidence for the uncommitted semantic-review implementation. The user subsequently requested publication and exact-commit CI verification; see STATUS.md for its results. Human adjudication and manual-workflow measurements remain outstanding; see [protocol](SEMANTIC_REVIEW.md).
+
 ## Second public-document case — 2026-11-14 KST
 
 Final `npm run verify`: **41 passed, 0 failed** plus format/types/skills/native context/build. `npm run doctor` and final clean-install `npm run reproduce` passed. `npm run evaluate` passed both cases in separate temporary stores; the first fixture is unchanged. Four new tests exercise the external case and reopening, CLI selection errors, cross-case/hash manifest rejection before opening the store, and loss of an alternate path even when the item set is still correct. Fixture validation additionally rejects missing CC attribution, unconfirmed gold edges and a non-impacted review target.

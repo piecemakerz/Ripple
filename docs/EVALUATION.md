@@ -10,6 +10,8 @@ The first case uses frozen excerpts from Ripple's own published project document
 
 ## Run it
 
+Human semantic adjudication now has a local worksheet: `npm run evaluate:review` opens both cases at port 4324, with versioned review artifacts and a strict checker. See [semantic review and manual-comparison protocol](SEMANTIC_REVIEW.md). The worksheet is available; actual human judgments and comparison measurements remain pending.
+
 ```powershell
 npm ci
 npm run evaluate:owner

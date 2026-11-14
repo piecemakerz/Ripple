@@ -4,6 +4,8 @@ This second case uses an external specification rather than Ripple's own documen
 
 ## Run and inspect
 
+Use `npm run evaluate:review` for the separate human-adjudication worksheet, including the MAJOR → DEPRECATE inference and both CORE_RESET paths. See [review instructions](SEMANTIC_REVIEW.md). Tool availability does not mean a human has validated this graph.
+
 ```powershell
 npm run evaluate:semver
 npm run evaluate:semver:demo

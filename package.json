@@ -21,6 +21,7 @@
     "evaluate:semver": "tsx scripts/evaluate.ts --case semver-deprecation",
     "evaluate:demo": "npm run build && tsx scripts/evaluate.ts --demo",
     "evaluate:semver:demo": "npm run build && tsx scripts/evaluate.ts --demo --case semver-deprecation",
+    "evaluate:review": "tsx scripts/review-evaluation.ts",
     "relate:context": "tsx scripts/relate-context.ts",
     "reproduce": "tsx scripts/reproduce.ts",
     "ai": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-astra.ps1",
