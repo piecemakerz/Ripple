@@ -26,6 +26,7 @@ import type {
 } from '../shared/types.js';
 import { api } from './api.js';
 import { Documents } from './Documents.js';
+import { History } from './History.js';
 
 const labels: Record<ReviewStatus, string> = {
   pending: 'Needs review',
@@ -280,6 +281,7 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [retry, setRetry] = useState(0);
   const [view, setView] = useState('review');
+  const [historyRequest, setHistoryRequest] = useState({ itemId: '', key: 0 });
   const [panel, setPanel] = useState('change');
   const [drafts, setDrafts] = useState<
     Record<string, { status: 'keep' | 'revise' | 'defer'; reason: string }>
@@ -435,7 +437,12 @@ export function App() {
         </header>
         <main>
           <div className="breadcrumb">
-            Workspace <ChevronRight size={13} /> Change review
+            Workspace <ChevronRight size={13} />{' '}
+            {view === 'history'
+              ? 'History'
+              : view === 'documents'
+                ? 'Documents & relationships'
+                : 'Change review'}
           </div>
           <div className="page-heading">
             <div>
@@ -455,7 +462,29 @@ export function App() {
             <button aria-pressed={view === 'documents'} onClick={() => setView('documents')}>
               Documents & relationships
             </button>
+            <button aria-pressed={view === 'history'} onClick={() => setView('history')}>
+              History
+            </button>
           </nav>
+          {workspace && (
+            <div hidden={view !== 'history'}>
+              <History
+                key={historyRequest.key}
+                items={workspace.items}
+                active={view === 'history'}
+                initialItem={historyRequest.itemId}
+                refreshToken={detail}
+                onEvidence={setEvidence}
+                onOpenChange={(changeId, itemId) => {
+                  setSelection(changeId);
+                  setSelectedId(itemId ?? '');
+                  setPanel(itemId ? 'review' : 'change');
+                  setView('review');
+                  setNotice('');
+                }}
+              />
+            </div>
+          )}
           {workspace && (
             <div hidden={view !== 'documents'}>
               <Documents
@@ -558,7 +587,8 @@ export function App() {
                       ))}
                       {workspace.changes.map((c, i) => (
                         <option key={c.id} value={c.id}>
-                          Applied change · revision {c.afterRevision}
+                          {c.itemId} · revision {c.afterRevision} ·{' '}
+                          {new Date(c.createdAt).toLocaleString()}
                           {i === 0 ? ' · latest' : ''}
                         </option>
                       ))}
@@ -750,6 +780,15 @@ export function App() {
                         </span>
                       </div>
                       <h3>{selected.item.title}</h3>
+                      <button
+                        className="history-action item-history-link"
+                        onClick={() => {
+                          setHistoryRequest((r) => ({ itemId: selected.item.id, key: r.key + 1 }));
+                          setView('history');
+                        }}
+                      >
+                        View item history
+                      </button>
                       <p className="item-body">{selected.item.body}</p>
                       <div className="owner">
                         <span className="avatar small">{initials(selected.item.owner)}</span>

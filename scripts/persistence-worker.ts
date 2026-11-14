@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { RippleStore } from '../server/store.js';
 import { proposal } from '../server/sample.js';
 import { Ingestion } from '../server/ingestion.js';
+import { readHistory } from '../server/history.js';
 const [mode, path] = process.argv.slice(2);
 if (!path || !['write', 'read', 'wal-write', 'wal-read'].includes(mode))
   throw new Error('Usage: persistence-worker.ts <mode> <isolated-db-path>');
@@ -118,6 +119,14 @@ if (mode === 'write' || mode === 'wal-write') {
     'D2',
   );
   assert.equal(store.getEvidence(old.evidenceId).id, 'E-T1-D1');
+  const history = readHistory(store, { itemId: 'T1' });
+  assert.equal(history.entries.length, 3);
+  assert.deepEqual(
+    new Set(history.entries.map((e) => e.kind)),
+    new Set(['change', 'review', 'relationship']),
+  );
+  assert.equal(readHistory(store, { status: 'revise', q: 'daily snapshot' }).entries.length, 1);
+  assert.equal(readHistory(store, { kind: 'relationship', itemId: 'D1' }).entries.length, 1);
 }
 assert.deepEqual(
   store

@@ -117,3 +117,43 @@ export interface Workspace {
   database: { engine: string; version: string; path: string; storage: string };
   synthetic: boolean;
 }
+
+export type HistoryKind = 'change' | 'review' | 'relationship';
+interface HistoryBase {
+  id: string;
+  kind: HistoryKind;
+  createdAt: string;
+  itemIds: string[];
+}
+export interface ChangeHistoryEntry extends HistoryBase {
+  kind: 'change';
+  changeId: string;
+  itemId: string;
+  title: string;
+  before: string;
+  after: string;
+  beforeRevision: number;
+  afterRevision: number;
+  evidenceId: string;
+}
+export interface ReviewHistoryEntry extends HistoryBase {
+  kind: 'review';
+  changeId: string;
+  itemId: string;
+  title: string;
+  changedItemId: string;
+  status: Exclude<ReviewStatus, 'pending'>;
+  reason: string;
+}
+export interface RelationshipHistoryEntry extends HistoryBase {
+  kind: 'relationship';
+  previous: Pick<Dependency, 'id' | 'from' | 'to' | 'evidenceId'>;
+  replacement: Pick<Dependency, 'id' | 'from' | 'to' | 'evidenceId'>;
+  reason: string;
+}
+export type HistoryEntry = ChangeHistoryEntry | ReviewHistoryEntry | RelationshipHistoryEntry;
+export interface HistoryPage {
+  entries: HistoryEntry[];
+  nextCursor: string | null;
+  pageSize: number;
+}

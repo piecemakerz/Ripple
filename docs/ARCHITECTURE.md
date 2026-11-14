@@ -1,6 +1,6 @@
 # Architecture and decisions
 
-2026-11-14 KST · M0/M1 + manual M2 ingestion + confirmed relationship amendments
+2026-11-14 KST · M0/M1 + manual M2 ingestion + confirmed relationship amendments + item history
 
 ## Boundaries
 
@@ -11,6 +11,7 @@
 - `server/app.ts`: HTTP validation, local Host/Origin checks, errors.
 - `server/store.ts`: parameterized Cypher, graph traversal, atomic changes, immutable snapshots, reviews.
 - `server/ingestion.ts`: validated source versions, evidenced items, dependency candidates, confirmation and generic proposals; all mutations share the store's serialized transaction owner.
+- `server/history.ts`: read-only, validated filters and cursor pages over existing native Change, ReviewEvent and replacement relationships.
 - `server/sample.ts`: clearly synthetic source versions and expected seed graph; not runtime AI output.
 - `scripts/doctor.ts` and `tests/`: disposable DB verification, never a second owner for the live DB.
 
@@ -57,17 +58,27 @@ Relationships: DEPENDS_ON, OWNED_BY, EVIDENCED_BY, FROM_SOURCE, CHANGES, FOR_CHA
 - Schema remains 2: these are additive relationship properties with no new node type/constraint. Old sample edges expose revision 1 when the property is absent; their first replacement persists revision 2. Existing manual candidates retain their revisions. Workspace dependencies derive endpoints from the actual graph, while candidates contains only original manual proposals and their lifecycle states.
 - No Change, Review, ReviewEvent, SourceVersion or existing Evidence is rewritten. Existing change snapshots remain historical; future impact queries traverse only current confirmed edges. Relationship confirmation is a graph correction and does not increment item revisions or create implementation reviews. A future item change recomputes its impact atomically as before.
 - The editor captures endpoint revisions on opening; a workspace refresh does not silently rebase its draft. Conflicts ask users to reopen against current revisions. Identical retries within the page reuse the request ID, including after a lost response/workspace-refresh failure. Drafts remain in memory across panel switches/failures; reloading loses unsaved input. Evidence choice preserves UTF-16 offsets, CRLF and explicit repeated occurrences.
-- The 200-record cap includes all superseded generations; history is never pruned to make room. There is no retirement-only action, restore button, history search or automatic semantic evidence verifier. To correct a replacement again, create another generation and provide its reason.
+- The 200-record cap includes all superseded generations; history is never pruned to make room. There is no retirement-only action, restore button or automatic semantic evidence verifier. History search is described below. To correct a replacement again, create another generation and provide its reason.
 
-| Method | Route                                  | Purpose                                                                     |
-| ------ | -------------------------------------- | --------------------------------------------------------------------------- |
-| GET    | /api/health                            | Native DB read probe                                                        |
-| GET    | /api/workspace                         | Items, preserved sources, proposals, changes, developer storage information |
-| GET    | /api/items/:id/impact                  | Actual Relate impact query                                                  |
-| GET    | /api/evidence/:id                      | Validated original source and quote                                         |
-| POST   | /api/changes                           | Idempotent, revision-checked atomic application                             |
-| GET    | /api/changes/:id                       | Saved impact snapshot and review history                                    |
-| PUT    | /api/changes/:changeId/reviews/:itemId | Record keep/revise/defer plus non-empty reason                              |
+## Item history
+
+- `GET /api/history` uses the existing backend connection and three bounded, parameterized Relate projections: applied Change nodes; ReviewEvent → Review → Change/Item; and paired DEPENDS_ON generations linked by `supersedes`/`supersededBy`. No new schema, event copies or historical writes. It does not infer impact from the current graph.
+- Changes match their target plus the originally impacted item IDs from their saved Review records. Reviews match the reviewed item and the changed item; relationship events match both old and new endpoints, deduplicated in the response. A change with no impacts still appears. Pending reviews and identical repeated saves do not invent events. Each replacement generation remains an event even after another replacement.
+- Optional filters: `itemId`, `kind` (change/review/relationship), `status` (keep/revise/defer), case-insensitive literal substring `q` (up to 200 characters), `from` and `until` (UTC ISO timestamps with milliseconds). Status selects historical ReviewEvent status, not the latest Review status. Search includes IDs, associated item titles, changed text and reasons, not source-document contents. The UI converts inclusive local calendar dates into the API's half-open `[from, until)` range.
+- Filters precede query limits. Each selected kind reads at most `limit + 1` summaries (default 25, maximum 50), sorted by timestamp then prefixed event ID descending. The merged page uses the same ordering; a base64url cursor carries that tuple. Equal-millisecond events are deterministic, not assigned an invented intra-millisecond chronology. Newer events do not shift subsequent pages; Refresh returns to the first page. There is no total-count claim or silent history cutoff.
+- Summary responses omit saved path/source snapshots. Opening a change loads its existing saved detail; opening a review selects its item and displays the latest review plus the original paths. Exact evidence is loaded on demand through the existing validated evidence API. Abortable requests prevent obsolete filter responses from replacing newer ones; failures expose a retry and preserve filters. Forms, results, empty states and previous/next navigation work at 390px.
+- Filters and current page survive view switches only; reload resets them. No export, persisted filter URL, pending-review work queue or source-content search is included. Query result bounds do not bound engine scan/sort time. The existing workspace bootstrap still loads all saved changes/snapshots; this slice does not claim whole-app large-history scalability.
+
+| Method | Route                                  | Purpose                                                                       |
+| ------ | -------------------------------------- | ----------------------------------------------------------------------------- |
+| GET    | /api/health                            | Native DB read probe                                                          |
+| GET    | /api/workspace                         | Items, preserved sources, proposals, changes, developer storage information   |
+| GET    | /api/history                           | Filtered summaries of changes, review decisions and relationship replacements |
+| GET    | /api/items/:id/impact                  | Actual Relate impact query                                                    |
+| GET    | /api/evidence/:id                      | Validated original source and quote                                           |
+| POST   | /api/changes                           | Idempotent, revision-checked atomic application                               |
+| GET    | /api/changes/:id                       | Saved impact snapshot and review history                                      |
+| PUT    | /api/changes/:changeId/reviews/:itemId | Record keep/revise/defer plus non-empty reason                                |
 
 ## Known limits and next design choices
 

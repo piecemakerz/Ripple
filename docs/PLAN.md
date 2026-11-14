@@ -1,5 +1,15 @@
 # Ripple execution plan
 
+## Item history — 2026-11-14
+
+1. [complete] Add a read-only, filtered and paginated history API over saved changes, review events and relationship replacements.
+2. [complete] Build the History view with item/type/decision/date/text filters and links to preserved change context and evidence.
+3. [complete] Verify native DB/API semantics, the completion gate (31 tests), restart doctor and desktop/390px browser flows on a disposable store.
+4. [complete] Record observed evidence, design decisions and remaining limits.
+5. [in progress] Publish the user-authorized history changes to `main` and confirm CI for the exact published commit.
+
+Next: real-document evaluation; address workspace bootstrap size before large-history claims. The implementation is locally verified; publication and exact-commit CI are now authorized follow-up work.
+
 ## Confirmed relationship amendments — 2026-11-14
 
 1. [complete] Atomically supersede confirmed edges with revision checks, exact evidence and retry receipts; retain all historical paths and reviews.

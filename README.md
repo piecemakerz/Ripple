@@ -23,7 +23,7 @@ npm run dev
 
 Open **http://127.0.0.1:4317**. In the synthetic inventory example, A1 changes from real-time inventory to daily updates. Explore **D1/D2 directly and T1/T2 indirectly**; unrelated T3 is excluded. Select T1, inspect both dependency evidence links, apply the change, then save **Keep / Revise / Defer** with a reason. Restart the server to inspect persisted reviews. A review decision does not mean its implementation is complete.
 
-For a production build, stop the development server, then run `npm run build` and `npm start`. `npm run verify` checks formatting, strict types, 27 tests including real-database integration and the build. `npm run doctor` checks persistence across separate processes; `npm run reproduce` repeats installation and checks in a temporary copy.
+For a production build, stop the development server, then run `npm run build` and `npm start`. `npm run verify` checks formatting, strict types, 31 tests including real-database integration and the build. `npm run doctor` checks persistence across separate processes; `npm run reproduce` repeats installation and checks in a temporary copy.
 
 ## How it uses Relate
 
@@ -33,7 +33,7 @@ For a production build, stop the development server, then run `npm run build` an
 - **Data location:** `%LOCALAPPDATA%/Ripple/demo-v1` by default on Windows, outside this repository and OneDrive. `RIPPLE_DB_PATH` overrides it. Only one backend process may open a database. The first start creates synthetic seed data; subsequent starts preserve it.
 - **Submission status:** the source is public with the `relate-hackathon` topic. A separate inspectable submission store and public demo/video are still pending. The active local database is excluded from Git.
 
-This release includes the M0/M1 sample workflow, manual M2 document ingestion and confirmed relationship amendments. AI extraction is not implemented. See [the audit](docs/HACKATHON_AUDIT.md), [verification evidence](docs/QA.md) and [AI/tool-use disclosure](docs/AI_DISCLOSURE.md).
+This release includes the M0/M1 sample workflow, manual M2 document ingestion, confirmed relationship amendments and searchable item history. AI extraction is not implemented. See [the audit](docs/HACKATHON_AUDIT.md), [verification evidence](docs/QA.md) and [AI/tool-use disclosure](docs/AI_DISCLOSURE.md).
 
 ## Import your own context (manual M2)
 
@@ -50,6 +50,16 @@ Limits: 20,000 characters per source; upload size 80 KB; 50 saved source version
 Open **Documents & relationships → Confirmed relationships**, then **Edit or replace**. Keep or change either endpoint, select the saved source and exact quote (choose its occurrence if repeated), and enter a reason. **Confirm replacement** immediately updates the confirmed graph. The previous edge and its original evidence stay in **Relationship history**, alongside the replacement and reason.
 
 Current impact previews use the replacement. Previously applied changes and their reviews keep their original paths and evidence. A stale editor must be reopened against current revisions. A replacement counts toward the 200 dependency-record limit; there is no deletion or retirement-only action.
+
+## Explore item history
+
+Open **History**, or **View item history** in the review panel. Select an item, event type, review decision, text or calendar range, then **Apply filters**. **Clear filters** restores all events; **Refresh history** reloads the applied filters from the first page. Results show up to 25 events per page, newest first.
+
+- Changes match both the changed item and its originally impacted items. Compare before/after, open change evidence, or return to the saved impact snapshot.
+- Reviews include every saved decision, even if a later decision differs. The decision filter matches that historical event. Opening a review selects its item and shows its latest decision with the original paths. Pending reviews are not decision events.
+- Relationship replacements match either endpoint in either generation. Read the reason and open both preserved evidence quotes. Item chips narrow the current filters.
+
+Search covers record IDs, item IDs/titles, changed text and reasons; it does not search source-document contents. Dates include both selected calendar days in the browser's local timezone. Filters survive switching views in the current page, but reset on reload. The history screen is read-only and does not mark implementation complete. See [desktop](docs/evidence/history-desktop.jpg), [past decision search](docs/evidence/history-review.jpg) and [390px](docs/evidence/history-mobile.jpg) captures.
 
 ## License and development tools
 

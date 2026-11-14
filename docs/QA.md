@@ -1,5 +1,37 @@
 # M0/M1 verification record
 
+## Item history acceptance — 2026-11-14
+
+Final `npm run verify`: **31 passed, 0 failed**, format, strict types, pinned skills, native Relate context and production build passed. `npm run doctor` passed. Both checkpoint and WAL tests now query restored item-filtered history. Four new tests cover empty/zero-impact records, saved membership, decision/replacement generations, search/validation, dates and cursor boundaries. Native tests use disposable databases.
+
+Browser acceptance used the production bundle at **http://127.0.0.1:4320** with a new `history-qa-*` database outside OneDrive. Only that server was stopped/restarted; no second process opened the live DB.
+
+| Check                       | Observed result                                                                                                                                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Empty workspace history     | No events before any change; explicit empty state and reset controls                                                                                                                              |
+| Existing core flow          | A1 preview/apply saved four original impacts; T1 selected; source exact quote opened                                                                                                              |
+| Item shortcut               | T1 history showed the A1 change and both saved decisions                                                                                                                                          |
+| Historical decision search  | T1 + Revise + `DAILY` returned the original reason after latest decision became Defer                                                                                                             |
+| Relationship replacement    | D1→A1 replaced with D1→T3; T3 and A1 both found the event; previous PRD quote (108–203) and replacement quote (0–44) opened                                                                       |
+| Date range                  | Nov 14 through Nov 14 included the event; Nov 13 through Nov 13 excluded it (browser local time)                                                                                                  |
+| Clear/no match              | Unmatched text displayed an empty result; Show all history and Clear filters restored results                                                                                                     |
+| Paging                      | 28 persisted events (1 change, 26 decisions, 1 replacement) split into 25 + 3; Previous returned to first page; filters reset pagination                                                          |
+| History failure             | Deliberately blocked history GET; visible retry, selected filters retained; unblocked retry returned matching event                                                                               |
+| Review failure              | Deliberately blocked review PUT; reason retained; retry saved once and appeared in history                                                                                                        |
+| Change details              | Before/after expanded; navigation from the old decision selected T1 on the correct saved change, with latest decision and original T1→D1→A1 paths                                                 |
+| Persistence                 | Final production restart/reload restored 28 events and T1's 26 decisions; history queries still found old decisions/replacements                                                                  |
+| Current versus saved impact | After restart, current A1 preview had D2/T2; saved A1 change retained D1/D2/T1/T2 and original evidence                                                                                           |
+| Desktop/390px               | Actual 1440px desktop and 390×844 tested; filters/cards stacked, exact-source dialog usable, mobile Change/Impact path/Review tabs and T2 graph selection worked; no horizontal document overflow |
+| Final console/cleanup       | Fresh-load warnings/errors empty; intentional network failures were expected; network blocks and viewport override removed                                                                        |
+
+Screenshots: [desktop item history](evidence/history-desktop.jpg), [historical review search](evidence/history-review.jpg), [390px relationship history](evidence/history-mobile.jpg). Synthetic local examples, not real-user measurements. Browser tests are manual connected-browser acceptance, not a committed automated E2E suite.
+
+Initial typecheck caught a missing closing JSX button tag; fixed before the final gate. A label selector and a combined-text selector timed out; current DOM/AX inspection supplied working roles/text. The browser tool's date `fill` left values empty, so native date-field input was used and verified. Early viewport captures were affected by zoom scaling; the final widths were measured from the rendered DOM and captured again. These failed attempts are not passing checks.
+
+At the local implementation handoff, CI evidence was limited to committed HEAD `9625202`: [Windows run](https://github.com/piecemakerz/Ripple/actions/runs/43567717654) passed while `ci:status` disclosed a dirty worktree. The user subsequently authorized publication; exact-commit CI confirmation is in progress.
+
+Final API-only follow-up: full displayed record-ID search (including the event prefix) and impacted-item title search gained native assertions; the full 31-test/build gate passed again. The QA server was restarted with that final API, and HTTP checks confirmed 28 restored events, one full-ID match and one impacted-title match. UI code/bundle was unchanged from the final browser captures. A combined restart/check command was rejected by tool policy; after verifying the QA listener and exact PID, separate scoped stop/start and HTTP checks succeeded.
+
 ## Confirmed relationship amendments — 2026-11-14
 
 `npm run verify`: **27 passed, 0 failed**, strict types, format, skill integrity, native context and production build passed. `npm run doctor` passed; checkpoint and WAL tests restore replacement links/receipts, original evidence and saved review snapshots. Tests use disposable databases, never the live store.
