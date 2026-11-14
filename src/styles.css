@@ -1872,3 +1872,41 @@ footer,
     padding-right: 14px;
   }
 }
+.change-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  padding: 18px 22px;
+  margin-top: 20px;
+  border: 1px solid #d6dfd7;
+  border-radius: 12px;
+  background: #fff;
+}
+.change-picker-field {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+.change-picker select {
+  width: 100%;
+}
+.change-picker .helper {
+  margin: 8px 0 0;
+}
+.change-picker-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.change-picker-actions button,
+.change-picker .banner button {
+  padding: 9px 12px;
+  border: 1px solid #d6dfd7;
+  border-radius: 7px;
+  background: #f7f9f5;
+  font-size: 12px;
+}
+.change-picker .banner {
+  flex-basis: 100%;
+  margin: 0;
+}

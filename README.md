@@ -53,6 +53,8 @@ Current impact previews use the replacement. Previously applied changes and thei
 
 ## Explore item history
 
+**Change review → Change to explore** lists proposed updates and 25 saved changes at a time. Use **Older changes / Newer changes** to browse and **Refresh changes** to return to the newest page. Paging preserves the selected change and review draft. Saved paths, evidence and review history load when you select a change. A selection opened from History stays available even when it is outside the current page; list failures have a retry button.
+
 Open **History**, or **View item history** in the review panel. Select an item, event type, review decision, text or calendar range, then **Apply filters**. **Clear filters** restores all events; **Refresh history** reloads the applied filters from the first page. Results show up to 25 events per page, newest first.
 
 - Changes match both the changed item and its originally impacted items. Compare before/after, open change evidence, or return to the saved impact snapshot.

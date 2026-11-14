@@ -90,7 +90,7 @@ test('atomic changes, idempotent retries, revision conflicts and independent sec
   const first = change(s, { requestId });
   assert.equal(s.getItem('A1').revision, 2);
   assert.equal(change(s, { requestId }).change.id, first.change.id);
-  assert.equal(s.workspace().changes.length, 1);
+  assert.equal(s.workspace().changePage.entries.length, 1);
   assert.throws(
     () => change(s, { requestId, after: 'different request' }),
     isError('REQUEST_REUSED'),
@@ -129,7 +129,7 @@ test('engine rollback and failed mid-change write leave no partial change or rev
   assert.throws(() => change(s), /Injected failure/);
   s.query = original;
   assert.equal(s.getItem('A1').revision, 1);
-  assert.equal(s.workspace().changes.length, 0);
+  assert.equal(s.workspace().changePage.entries.length, 0);
   assert.equal(s.query('MATCH (r:Review) RETURN r').rows.length, 0);
 });
 

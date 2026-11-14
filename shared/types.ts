@@ -87,6 +87,15 @@ export interface ChangeDetail {
   change: Change;
   reviews: Review[];
 }
+export type ChangeSummary = Pick<
+  Change,
+  'id' | 'itemId' | 'beforeRevision' | 'afterRevision' | 'createdAt'
+>;
+export interface ChangePage {
+  entries: ChangeSummary[];
+  nextCursor: string | null;
+  pageSize: number;
+}
 export interface Proposal {
   id: string;
   itemId: string;
@@ -111,7 +120,7 @@ export interface Workspace {
   items: Item[];
   sources: SourceVersion[];
   proposals: Proposal[];
-  changes: Change[];
+  changePage: ChangePage;
   candidates: Candidate[];
   dependencies: DependencyRecord[];
   database: { engine: string; version: string; path: string; storage: string };

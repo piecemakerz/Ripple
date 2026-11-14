@@ -1,6 +1,6 @@
 # Architecture and decisions
 
-2026-11-14 KST · M0/M1 + manual M2 ingestion + confirmed relationship amendments + item history
+2026-11-14 KST · M0/M1 + manual M2 ingestion + confirmed relationship amendments + item history + bounded change loading
 
 ## Boundaries
 
@@ -12,6 +12,7 @@
 - `server/store.ts`: parameterized Cypher, graph traversal, atomic changes, immutable snapshots, reviews.
 - `server/ingestion.ts`: validated source versions, evidenced items, dependency candidates, confirmation and generic proposals; all mutations share the store's serialized transaction owner.
 - `server/history.ts`: read-only, validated filters and cursor pages over existing native Change, ReviewEvent and replacement relationships.
+- `server/changes.ts`: scalar change summaries and validated keyset pages, shared by bootstrap and the saved-change selector.
 - `server/sample.ts`: clearly synthetic source versions and expected seed graph; not runtime AI output.
 - `scripts/doctor.ts` and `tests/`: disposable DB verification, never a second owner for the live DB.
 
@@ -67,18 +68,27 @@ Relationships: DEPENDS_ON, OWNED_BY, EVIDENCED_BY, FROM_SOURCE, CHANGES, FOR_CHA
 - Optional filters: `itemId`, `kind` (change/review/relationship), `status` (keep/revise/defer), case-insensitive literal substring `q` (up to 200 characters), `from` and `until` (UTC ISO timestamps with milliseconds). Status selects historical ReviewEvent status, not the latest Review status. Search includes IDs, associated item titles, changed text and reasons, not source-document contents. The UI converts inclusive local calendar dates into the API's half-open `[from, until)` range.
 - Filters precede query limits. Each selected kind reads at most `limit + 1` summaries (default 25, maximum 50), sorted by timestamp then prefixed event ID descending. The merged page uses the same ordering; a base64url cursor carries that tuple. Equal-millisecond events are deterministic, not assigned an invented intra-millisecond chronology. Newer events do not shift subsequent pages; Refresh returns to the first page. There is no total-count claim or silent history cutoff.
 - Summary responses omit saved path/source snapshots. Opening a change loads its existing saved detail; opening a review selects its item and displays the latest review plus the original paths. Exact evidence is loaded on demand through the existing validated evidence API. Abortable requests prevent obsolete filter responses from replacing newer ones; failures expose a retry and preserve filters. Forms, results, empty states and previous/next navigation work at 390px.
-- Filters and current page survive view switches only; reload resets them. No export, persisted filter URL, pending-review work queue or source-content search is included. Query result bounds do not bound engine scan/sort time. The existing workspace bootstrap still loads all saved changes/snapshots; this slice does not claim whole-app large-history scalability.
+- Filters and current page survive view switches only; reload resets them. No export, persisted filter URL, pending-review work queue or source-content search is included. Query result bounds do not bound engine scan/sort time. Workspace bootstrap now uses the change summaries described below; this is not a claim of whole-app large-history scalability.
 
-| Method | Route                                  | Purpose                                                                       |
-| ------ | -------------------------------------- | ----------------------------------------------------------------------------- |
-| GET    | /api/health                            | Native DB read probe                                                          |
-| GET    | /api/workspace                         | Items, preserved sources, proposals, changes, developer storage information   |
-| GET    | /api/history                           | Filtered summaries of changes, review decisions and relationship replacements |
-| GET    | /api/items/:id/impact                  | Actual Relate impact query                                                    |
-| GET    | /api/evidence/:id                      | Validated original source and quote                                           |
-| POST   | /api/changes                           | Idempotent, revision-checked atomic application                               |
-| GET    | /api/changes/:id                       | Saved impact snapshot and review history                                      |
-| PUT    | /api/changes/:changeId/reviews/:itemId | Record keep/revise/defer plus non-empty reason                                |
+## Bounded change loading
+
+- `GET /api/workspace` replaces the old `changes: Change[]` field with `changePage: { entries, nextCursor, pageSize }`. It returns the newest 25 summaries containing only ID, target item ID, before/after revision and timestamp. `GET /api/changes` returns the same page shape; `limit` accepts a single decimal integer from 1 to 50 (default 25). Unknown/repeated parameters, malformed cursors and invalid page sizes are rejected. Client and server must be updated together; this local MVP has no versioned external API contract.
+- Relate projects scalar properties directly, never returning complete Change nodes or decoding their snapshots for the list. A bound `limit + 1` detects another page. Ordering is `createdAt DESC, id DESC`; the validated base64url cursor contains that tuple. Equal timestamps are deterministic. New records above a cursor do not move the remaining results; Refresh returns to the first page. No records are deleted or migrated; schema stays at version 2.
+- The selector reuses the bootstrap page and fetches subsequent pages only when requested. Selecting a change, including one reached from History outside the current page, fetches its original `GET /api/changes/:id` detail. The selected option remains available when paging. Paging and refreshing the list do not change the selected detail or review drafts. Failed list requests expose a local retry; detail Reload retains the requested change instead of silently selecting the newest. Abort controllers prevent obsolete reads from replacing current results.
+- Reloading the browser still opens the newest saved change and resets page navigation; unsaved drafts remain memory-only. The selector keeps one summary page plus an optional selected entry, and a cursor stack for Previous navigation. Sources/items/proposals still load within existing ingestion caps. A selected change still returns its full path/source snapshot and review history; history scan/sort cost, a single large detail and dense traversal remain separate scalability limits.
+- A controlled synthetic 55-change production fixture measured 6,950 UTF-8 JSON bytes for workspace versus 459,491 bytes for the equivalent old all-snapshot response (98.5% less). The 25-entry change page was 3,605 bytes. This measures the bootstrap response only, not total page traffic, latency, engine memory, real-document accuracy or maximum capacity. Browser network inspection confirmed bootstrap plus exactly one selected-change detail request. See QA for the method and checks.
+
+| Method | Route                                  | Purpose                                                                             |
+| ------ | -------------------------------------- | ----------------------------------------------------------------------------------- |
+| GET    | /api/health                            | Native DB read probe                                                                |
+| GET    | /api/workspace                         | Items, preserved sources, proposals, first change-summary page, storage information |
+| GET    | /api/changes                           | Cursor-paged change metadata without snapshots or source text                       |
+| GET    | /api/history                           | Filtered summaries of changes, review decisions and relationship replacements       |
+| GET    | /api/items/:id/impact                  | Actual Relate impact query                                                          |
+| GET    | /api/evidence/:id                      | Validated original source and quote                                                 |
+| POST   | /api/changes                           | Idempotent, revision-checked atomic application                                     |
+| GET    | /api/changes/:id                       | Saved impact snapshot and review history                                            |
+| PUT    | /api/changes/:changeId/reviews/:itemId | Record keep/revise/defer plus non-empty reason                                      |
 
 ## Known limits and next design choices
 

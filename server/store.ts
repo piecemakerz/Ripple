@@ -34,6 +34,7 @@ import {
   validateEvidence,
 } from './sample.js';
 import { AppError } from './errors.js';
+import { readChanges } from './changes.js';
 
 export const MAX_DEPTH = 8;
 export const MAX_PATHS = 500;
@@ -175,9 +176,7 @@ export class RippleStore {
       proposals: this.query('MATCH (p:Proposal) RETURN p').rows.map((r) =>
         props<Workspace['proposals'][number]>(r.p),
       ),
-      changes: this.query('MATCH (c:Change) RETURN c ORDER BY c.createdAt DESC').rows.map((r) =>
-        this.decodeChange(r.c),
-      ),
+      changePage: readChanges(this),
       candidates: this.query(
         'MATCH ()-[r:DEPENDS_ON]->() WHERE r.fromRevision IS NOT NULL AND r.supersedes IS NULL RETURN r ORDER BY r.id LIMIT 200',
       ).rows.map((r) => props<Candidate>(r.r)),

@@ -27,6 +27,7 @@ import type {
 import { api } from './api.js';
 import { Documents } from './Documents.js';
 import { History } from './History.js';
+import { ChangePicker } from './ChangePicker.js';
 
 const labels: Record<ReviewStatus, string> = {
   pending: 'Needs review',
@@ -287,14 +288,19 @@ export function App() {
     Record<string, { status: 'keep' | 'revise' | 'defer'; reason: string }>
   >({});
   const requestId = useRef(crypto.randomUUID());
+  const initialized = useRef(false);
 
   useEffect(() => {
     const abort = new AbortController();
     setLoading(true);
     api<Workspace>('/api/workspace', { signal: abort.signal })
       .then((data) => {
+        if (abort.signal.aborted) return;
         setWorkspace(data);
-        setSelection(data.changes[0]?.id ?? 'proposal:supplier-daily');
+        if (!initialized.current) {
+          setSelection(data.changePage.entries[0]?.id ?? 'proposal:supplier-daily');
+          initialized.current = true;
+        }
         setError('');
       })
       .catch((e) => {
@@ -503,6 +509,21 @@ export function App() {
             </div>
           )}
           <div hidden={view !== 'review'}>
+            {workspace && (
+              <ChangePicker
+                key={workspace.changePage.entries[0]?.id ?? 'empty'}
+                initialPage={workspace.changePage}
+                proposals={workspace.proposals}
+                selection={selection}
+                selectedChange={detail?.change}
+                disabled={busy || loading}
+                onSelect={(value) => {
+                  setSelection(value);
+                  requestId.current = crypto.randomUUID();
+                  setNotice('');
+                }}
+              />
+            )}
             <div className="workflow">
               <span className="step done">
                 <b>1</b> Understand the change
@@ -567,32 +588,6 @@ export function App() {
                     </span>
                   </div>
                   <div className="panel-body">
-                    <label className="field-label" htmlFor="change-select">
-                      CHANGE TO EXPLORE
-                    </label>
-                    <select
-                      id="change-select"
-                      value={selection}
-                      disabled={busy || loading}
-                      onChange={(e) => {
-                        setSelection(e.target.value);
-                        requestId.current = crypto.randomUUID();
-                        setNotice('');
-                      }}
-                    >
-                      {workspace.proposals.map((p) => (
-                        <option key={p.id} value={`proposal:${p.id}`}>
-                          {p.title} · proposed update
-                        </option>
-                      ))}
-                      {workspace.changes.map((c, i) => (
-                        <option key={c.id} value={c.id}>
-                          {c.itemId} · revision {c.afterRevision} ·{' '}
-                          {new Date(c.createdAt).toLocaleString()}
-                          {i === 0 ? ' · latest' : ''}
-                        </option>
-                      ))}
-                    </select>
                     <div className="assumption-label">
                       <CircleDot size={15} />
                       <span>

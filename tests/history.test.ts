@@ -160,7 +160,7 @@ test('cursor pages are complete and deterministic at equal timestamps; filters p
   // New events above a cursor do not shift the remaining page.
   const firstPage = readHistory(store, { limit: 2 });
   const restBefore = readHistory(store, { cursor: firstPage.nextCursor! }).entries;
-  const changeId = store.workspace().changes[0].id;
+  const changeId = store.workspace().changePage.entries[0].id;
   store.saveReview(changeId, 'D2', 'revise', 'New event after paging began');
   store.query('MATCH (h:ReviewEvent) WHERE h.reason=$reason SET h.createdAt=$time', {
     reason: 'New event after paging began',

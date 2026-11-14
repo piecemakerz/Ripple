@@ -4,6 +4,7 @@ import { AppError } from './errors.js';
 import type { RippleStore } from './store.js';
 import { Ingestion } from './ingestion.js';
 import { readHistory } from './history.js';
+import { readChanges } from './changes.js';
 
 const id = z.string().min(1).max(150);
 export const changeInput = z
@@ -46,6 +47,7 @@ export function createApp(store: RippleStore) {
   app.get('/api/history', (req, res) => res.json(readHistory(store, req.query)));
   app.get('/api/items/:id/impact', (req, res) => res.json(store.impact(req.params.id)));
   app.get('/api/evidence/:id', (req, res) => res.json(store.getEvidence(req.params.id)));
+  app.get('/api/changes', (req, res) => res.json(readChanges(store, req.query)));
   app.get('/api/changes/:id', (req, res) => res.json(store.getChange(req.params.id)));
   // All store calls are synchronous; no await may interleave a transaction on this connection.
   app.post('/api/sources', (req, res) => res.status(201).json(ingestion.source(req.body)));

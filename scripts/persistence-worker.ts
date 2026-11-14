@@ -74,9 +74,11 @@ if (mode === 'write' || mode === 'wal-write') {
 } else {
   const workspace = store.workspace();
   assert.equal(store.getItem('A1').revision, 2);
-  assert.equal(workspace.changes.length, 1);
-  assert.equal(workspace.changes[0].requestId, requestId);
-  const saved = store.getChange(workspace.changes[0].id);
+  assert.equal(workspace.changePage.entries.length, 1);
+  assert.equal(workspace.changePage.nextCursor, null);
+  const saved = store.getChange(workspace.changePage.entries[0].id);
+  assert.equal(saved.change.requestId, requestId);
+  assert.equal('snapshot' in workspace.changePage.entries[0], false);
   assert.equal(saved.reviews.find((r) => r.itemId === 'T1')!.status, 'revise');
   assert.equal(saved.reviews.find((r) => r.itemId === 'T1')!.history.length, 1);
   assert.equal(saved.change.snapshot.target.revision, 1);

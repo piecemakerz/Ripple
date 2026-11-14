@@ -1,5 +1,30 @@
 # M0/M1 verification record
 
+## Bounded change loading — 2026-11-14
+
+`npm run verify`: **34 passed, 0 failed**, strict types, formatting, pinned skills, native Relate preflight and production build passed. `npm run doctor` passed. New disposable native/API tests exercise 55 snapshots without loading them into bootstrap, historical detail integrity, 52 equal-timestamp records across page boundaries, newer insert stability, query validation and response bounds. The process-restart worker now asserts snapshot-free summaries and separately restored detail. The first gate found a formatting-only mismatch; it passed after formatting.
+
+Production QA used **http://127.0.0.1:4321** and a separate `change-pages-qa-*` store outside OneDrive. The original live store was not opened or modified. The first change and two T1 review decisions were saved through UI; 54 additional synthetic A1 changes were added using only the QA server's API.
+
+| Check                         | Observed result                                                                                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Empty bootstrap and core flow | Zero saved changes, usable sample proposal; A1 preview/apply returned D1/D2/T1/T2 and excluded T3                                                                |
+| Pagination                    | 55 records shown as 25 + 25 + 5; Older disabled at the end; Newer and Refresh navigated correctly                                                                |
+| Selection and drafts          | Revision 2 stayed selected outside its page; review draft survived page navigation and list refresh                                                              |
+| List failure                  | Blocked summary GET; local error/Retry shown; selection retained; retry returned page 2                                                                          |
+| Historical entry              | Searching the first review's old reason opened original revision 2 and T1's latest decision, outside the current summary page                                    |
+| Detail failure                | Blocked that old detail GET; Reload retried the same change and preserved the draft instead of opening the newest change                                         |
+| Review failure                | Blocked review PUT; draft retained through Reload; successful retry created the second historical decision                                                       |
+| Evidence                      | Original T1→D1 quote at 49–138 and T2→D2 at 139–235 opened from preserved Engineering source v1                                                                  |
+| Narrow screen                 | Measured `innerWidth=390`, document scroll width 375; selector/actions wrapped; Change/Impact path/Review navigation, graph T2 selection and source modal usable |
+| Restart                       | Stopped only the verified QA owner, restarted its same store, reloaded; pages and old revision 2/T1 reason/two decisions restored                                |
+| Request trace                 | Final reload fetched `/api/workspace` and one `/api/changes/:id`, with no duplicate initial summary or bulk detail requests                                      |
+| Console and cleanup           | Final fresh load had no warnings/errors; intentional request failures expected; blocks and viewport override cleared                                             |
+
+Payload measurement used `Buffer.byteLength(JSON.stringify(value))` on the same 55-change fixture. The current workspace was **6,950 bytes**; its 25-entry `changePage` was **3,605 bytes**. For comparison, fetched all 55 saved details through the owner API, replaced `changePage` with the old `changes` array in the response object, and measured **459,491 bytes**. Reduction: **98.5%** for workspace JSON only. No HTTP compression, timing, engine-memory or real-document accuracy claim is made. The selected detail, sources and other bounded workspace entities still cost bytes. Native tests assert the 25-summary response stays below 5,000 bytes and excludes bodies/snapshots; no fragile time threshold was added.
+
+Captures: [desktop page 3 and original change](evidence/change-pages-desktop.jpg), [390px selected change outside page 1](evidence/change-pages-mobile.jpg). Manual connected-browser acceptance, not an automated E2E suite. The working tree is unpublished: `ci:status` returned success only for prior HEAD `44699f6`, explicitly reporting a dirty worktree.
+
 ## Item history acceptance — 2026-11-14
 
 Final `npm run verify`: **31 passed, 0 failed**, format, strict types, pinned skills, native Relate context and production build passed. `npm run doctor` passed. Both checkpoint and WAL tests now query restored item-filtered history. Four new tests cover empty/zero-impact records, saved membership, decision/replacement generations, search/validation, dates and cursor boundaries. Native tests use disposable databases.
