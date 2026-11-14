@@ -6,8 +6,9 @@
 2. [complete] Add an editor and readable relationship history, including original evidence.
 3. [complete] Verify native DB rollback/conflicts/restart, HTTP validation, full completion gate (27 tests) and browser desktop/390px flows.
 4. [complete] Record observed results, design decisions and remaining limits.
+5. [complete] Publish implementation commit `5884ce1` to `main` and confirm its Windows installation, verify and doctor CI passed. See STATUS.md for the run link.
 
-Next: real-document evaluation and broader history filtering; publication is separate from this local implementation. No AI extraction/provider decisions made.
+Next: real-document evaluation and broader history filtering. Implementation publication and CI are complete. No AI extraction/provider decisions made.
 
 ## Active M2 slice — 2026-11-14
 

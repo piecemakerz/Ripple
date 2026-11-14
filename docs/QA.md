@@ -21,7 +21,7 @@ Production browser acceptance used a separate `relations-qa-*` store at port 431
 | Restart                       | Stopped only QA process, restarted same store using final production bundle; two replacement generations and original saved review restored    |
 | Console and cleanup           | Final fresh load had no warnings/errors; intentional blocked request/no-op failures were expected; viewport and network overrides removed      |
 
-Captures: [relationship history](evidence/relationships-history.jpg), [prior source](evidence/relationships-prior-source.jpg), [mobile editor](evidence/relationships-mobile.jpg). These are synthetic examples, not real-user measurements. Browser acceptance is manual through the connected browser; native/API tests are automated. The existing green committed-HEAD CI does not cover this dirty worktree; no new publication was performed.
+Captures: [relationship history](evidence/relationships-history.jpg), [prior source](evidence/relationships-prior-source.jpg), [mobile editor](evidence/relationships-mobile.jpg). These are synthetic examples, not real-user measurements. Browser acceptance is manual through the connected browser; native/API tests are automated. Implementation commit `5884ce1` was published to `main` and passed its own [Windows CI](https://github.com/piecemakerz/Ripple/actions/runs/43567611564): clean installation, verify and doctor. The GitHub plugin confirmed every job step succeeded, and exact-HEAD status reported a clean worktree. Local verify and doctor also passed again before publication; application behavior did not change during publication, so prior browser evidence remains applicable.
 
 ## Manual M2 acceptance — 2026-11-14
 
