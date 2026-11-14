@@ -23,7 +23,13 @@ npm run dev
 
 Open **http://127.0.0.1:4317**. In the synthetic inventory example, A1 changes from real-time inventory to daily updates. Explore **D1/D2 directly and T1/T2 indirectly**; unrelated T3 is excluded. Select T1, inspect both dependency evidence links, apply the change, then save **Keep / Revise / Defer** with a reason. Restart the server to inspect persisted reviews. A review decision does not mean its implementation is complete.
 
-For a production build, stop the development server, then run `npm run build` and `npm start`. `npm run verify` checks formatting, strict types, 31 tests including real-database integration and the build. `npm run doctor` checks persistence across separate processes; `npm run reproduce` repeats installation and checks in a temporary copy.
+For a production build, stop the development server, then run `npm run build` and `npm start`. `npm run verify` checks formatting, strict types, 37 tests including real-database integration and the build. `npm run doctor` checks persistence across separate processes; `npm run reproduce` repeats installation and checks in a temporary copy.
+
+## Evaluate a real-document case
+
+Run `npm run evaluate` to import frozen public Ripple document excerpts into a fresh temporary native database and score expected impacts, paths, exact quotes and process-restart persistence. Run `npm run evaluate:demo` to build and inspect the same case at **http://127.0.0.1:4322**, in a new retained store outside the repository. Select **Synchronous database owner · proposed update**. Neither command opens your existing workspace.
+
+This is one AI-curated graph with three queries, a hypothetical migration and two synthetic candidate controls; it has not received human semantic review. It measures graph regression, not customer accuracy or extraction quality. [Inputs, expected results, commands and limitations](docs/EVALUATION.md).
 
 ## How it uses Relate
 
@@ -128,6 +134,7 @@ npm run ai
 npm run verify
 npm run doctor
 npm run reproduce
+npm run evaluate
 ```
 
 `verify`는 포맷 검사, strict TypeScript 검사, 실제 Relate를 사용하는 통합 테스트, Vite 프로덕션 빌드입니다. `doctor`는 임시 DB에 저장한 뒤 **쓰기 프로세스를 종료하고 별도 읽기 프로세스로** 영향·변경·검토·이력·롤백을 검증합니다. 사용자 DB는 열지 않습니다. `reproduce`는 임시 복사본에서 깨끗한 `npm ci`, 검증, doctor를 실행합니다. 코드 포맷은 `npm run format`으로 정리합니다.
@@ -157,7 +164,7 @@ npm run dev
 
 [해커톤 적합성 검증](docs/HACKATHON_AUDIT.md): M0/M1 기술 구현은 요건에 부합하며, 심사용 DB·데모·Devpost 제출 준비는 아직 남아 있습니다. 공개 GitHub 저장소에는 `relate-hackathon` Topic이 설정되어 있습니다.
 
-완료: M0 실제 DB 검증, M1 변경·영향·근거·검토 이력, 수동 M2 문서 입력, 확정 관계 수정·대체와 이력 보존. 미구현: AI 관계 추출, 관계 삭제/대체 없는 폐기, 사용자/조직, 외부 동기화, 배포·제출 패키지. 그래프 UI는 작은 데모 규모를 위한 계층 배치이며 대규모 그래프 편집기가 아닙니다. 경로는 최대 8단계·500개이며 제한에 닿으면 경고하고 변경 적용을 막습니다. 평가 결과는 합성 그래프의 회귀 테스트이며 실제 사용자 성과를 뜻하지 않습니다.
+완료: M0 실제 DB 검증, M1 변경·영향·근거·검토 이력, 수동 M2 문서 입력, 확정 관계 수정·대체와 이력 보존, 실제 프로젝트 문서 기반 평가 명령. 미구현: AI 관계 추출, 관계 삭제/대체 없는 폐기, 사용자/조직, 외부 동기화, 배포·제출 패키지. 그래프 UI는 작은 데모 규모를 위한 계층 배치이며 대규모 그래프 편집기가 아닙니다. 경로는 최대 8단계·500개이며 제한에 닿으면 경고하고 변경 적용을 막습니다. 평가는 합성 회귀 테스트와 실제 공개 문서에서 AI가 구성한 가상 변경 사례를 포함하며, 사람이 검증한 실제 사용자 성과를 뜻하지 않습니다.
 
 폰트와 아이콘도 로컬 번들로 제공합니다. 앱 실행 중 외부 AI·분석 서비스·CDN 요청은 없습니다.
 

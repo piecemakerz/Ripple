@@ -16,6 +16,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "doctor": "tsx scripts/doctor.ts",
+    "evaluate": "tsx scripts/evaluate.ts",
+    "evaluate:demo": "npm run build && tsx scripts/evaluate.ts --demo",
     "relate:context": "tsx scripts/relate-context.ts",
     "reproduce": "tsx scripts/reproduce.ts",
     "ai": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-astra.ps1",

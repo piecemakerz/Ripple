@@ -30,6 +30,7 @@ try {
     'server',
     'scripts',
     'tests',
+    'evaluation',
   ])
     copy(resolve(path), join(directory, path));
   console.log(`Clean checkout: ${directory}`);

@@ -1,5 +1,29 @@
 # M0/M1 verification record
 
+## Real-document evaluation — 2026-11-14
+
+`npm run evaluate`, `npm run verify` (**37 tests, 0 failures**, formatting/types/skills/native preflight/build), `npm run doctor` and clean-install `npm run reproduce` passed. The fixture is one graph curated from four real public project-document excerpts, with a hypothetical change and synthetic candidate controls. It has not received human semantic review. [EVALUATION](EVALUATION.md) records source provenance, independent gold paths, scoring denominators and interpretation limits.
+
+Automated evaluation imports through the same loopback HTTP routes as the app; native Relate supplies impacts. A writer process verifies three queries, apply retry, review retry and a second immutable source version, then exits before a reader process checks restoration. The main query returns exactly QUEUE/ATOMIC/READS/ROLLBACK, with four paths and four distinct valid edge quotes; the smaller query returns only ROLLBACK; the unrelated query returns none. Corrupted native response copies demonstrate scorer failures rather than inflating success metrics.
+
+Interactive production QA used `npm run evaluate:demo`, **http://127.0.0.1:4322**, and a new store under `%LOCALAPPDATA%/Ripple/ripple-evaluation-*`. The original live database was never opened by this task. The imported component coexists with the disconnected built-in sample.
+
+| Check                  | Observed result                                                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Real-document proposal | Selected Synchronous database owner; before text preserved, hypothetical after text explicitly labeled                              |
+| Preview/apply          | Two direct decisions and two indirect tasks; one applied change/four reviews                                                        |
+| Negative controls      | Local fonts, proposed/rejected candidates and built-in sample outside the ripple                                                    |
+| Graph/path selection   | Selected Verify rollback and restart; ROLLBACK → ATOMIC → OWNER path displayed                                                      |
+| Exact source           | Verification excerpt v1 highlighted the original quote at UTF-16 102–240                                                            |
+| Review/reload          | Revise reason persisted with one historical decision; implementation remained pending                                               |
+| Production restart     | Verified QA owner/DB, stopped only that process and restarted the same store; browser restored four saved impacts and the review    |
+| Desktop/narrow         | Desktop panels inspected; at 390×844, Change/Impact path/Review, graph and original-source dialog were usable; document width 375px |
+| Final console/cleanup  | No warnings/errors; temporary viewport and CDP metrics overrides removed; app/tab retained                                          |
+
+One post-restart selector timed out while the graph was hidden by the narrow default viewport. Fresh AX state identified the layout; an explicit desktop viewport resolved it. Initial desktop screenshots were cropped by zoom scaling. Final measured desktop dimensions were `innerWidth=1440`, document width 1430; a full-content capture using the browser's layout metrics showed all three panels. Only the final capture is retained. These tool failures were not application failures or passing checks.
+
+Captures: [desktop after restart](evidence/evaluation-desktop.jpg), [390px original-source dialog](evidence/evaluation-mobile-source.jpg). Manual connected-browser acceptance, not an automated browser suite or a user study. Production UI code did not change. Exact-HEAD CI passed only for prior commit `f59e0f9`, with a dirty worktree; this local implementation has not been published or validated by new-commit CI.
+
 ## Bounded change loading — 2026-11-14
 
 `npm run verify`: **34 passed, 0 failed**, strict types, formatting, pinned skills, native Relate preflight and production build passed. `npm run doctor` passed. New disposable native/API tests exercise 55 snapshots without loading them into bootstrap, historical detail integrity, 52 equal-timestamp records across page boundaries, newer insert stability, query validation and response bounds. The process-restart worker now asserts snapshot-free summaries and separately restored detail. The first gate found a formatting-only mismatch; it passed after formatting.

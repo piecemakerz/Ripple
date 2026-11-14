@@ -92,6 +92,16 @@ Relationships: DEPENDS_ON, OWNED_BY, EVIDENCED_BY, FROM_SOURCE, CHANGES, FOR_CHA
 
 ## Known limits and next design choices
 
+### Document-grounded evaluation
+
+`evaluation/async-owner.json` freezes MIT-licensed excerpts at a specific published Git commit, with original-file UTF-16 ranges and SHA-256. Expected paths and exclusions are explicitly curated, separately from the native traversal. The hypothetical migration, inferred atomicity dependency and synthetic proposed/rejected controls are disclosed; human semantic review is pending. This is one graph with three queries, not measured customer or extraction accuracy.
+
+`scripts/evaluation/` uses the ordinary loopback HTTP API for ingestion, candidate decisions, impact reads, application and reviews. It does not add schema, bypass input validation or install a second database implementation. The CLI allocates its own temporary store and ignores the live database configuration. Separate write/read processes verify reopening; an identity-only scratch manifest connects fixture keys to server-generated IDs. The JSON report includes the fixture hash and fails on item/path/evidence/limit mismatches; empty precision/recall denominators are null. Tests mutate native responses to ensure the scorer rejects broken evidence and incomplete results.
+
+`evaluate:demo` validates and checkpoints a new evaluation store, exits that owner, then starts the existing production server on the same store. The demo keeps its isolated directory for later inspection; normal evaluation cleans up only its freshly allocated temporary directory. The built-in sample remains disconnected. Application UI, production API/schema and model configuration are unchanged. See [evaluation](EVALUATION.md).
+
+### Remaining product limits
+
 - Store APIs are synchronous and can block the event loop on larger graphs. The depth/row cap is an output bound, not a strict query execution-time/memory bound. M2 should set domain ingestion limits before accepting arbitrary large input.
 - Built-in and manually created change proposals are selectable. Imported items can be both the changed item and impacted items.
 - Review updates use last-write-wins within the single-user app. Multi-tab conflicting review drafts are not revision-checked yet. Change requests are revision-checked.

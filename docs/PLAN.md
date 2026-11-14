@@ -1,5 +1,15 @@
 # Ripple execution plan
 
+## Real-document evaluation — 2026-11-14
+
+1. [complete] Freeze four public Ripple document excerpts and independently listed expected paths/exclusions for a hypothetical asynchronous-store migration; label all curation as not human-reviewed.
+2. [complete] Add `evaluate` and `evaluate:demo`, HTTP/native-Relate ingestion, strict scoring, separate-process restoration and corruption/omission regressions.
+3. [complete] Run verify (37 tests/build), doctor and clean-install reproduce; inspect preview/apply, paths/evidence, review persistence, production-owner restart and desktop/390px screens.
+4. [complete] Record provenance, score denominators, semantic-review limits, command instructions and CI scope in EVALUATION/QA/STATUS/ARCHITECTURE.
+5. [in progress] Publish the evaluated implementation to `main` and verify Windows CI for its exact commit; record the observed publication result.
+
+Next: human semantic review of the inferred ATOMIC → OWNER edge and a second independent public-document case. Large-workspace scan/traversal/detail measurements and a pending-review work queue remain separate slices. No AI-provider or submission-publication decision was made.
+
 ## Bounded change loading — 2026-11-14
 
 1. [complete] Replace full-snapshot workspace bootstrap with 25 change summaries and a validated cursor API; preserve existing records and on-demand detail.
@@ -8,7 +18,7 @@
 4. [complete] Record measurements, CI scope, design decisions and remaining limits.
 5. [complete] Publish implementation commit `599b715` to `main` and confirm its Windows installation, verify and doctor CI passed. See STATUS.md for the run link.
 
-Next: evaluate a shareable real-document case with explicit expected impacts and quotes. Before large-workspace claims, separately measure engine scan/traversal costs and single-change detail size.
+The subsequent real-document evaluation slice above now supplies one reproducible case with explicit expected impacts and quotes. Before large-workspace claims, separately measure engine scan/traversal costs and single-change detail size.
 
 ## Item history — 2026-11-14
 

@@ -1,0 +1,223 @@
+{
+  "id": "ripple-async-owner-v1",
+  "provenance": "Real public project documents; hypothetical migration, AI-curated graph and gold labels; not human-reviewed. Not a customer case or extraction benchmark.",
+  "sources": [
+    {
+      "key": "ownership",
+      "title": "Ripple ownership (document excerpt)",
+      "path": "docs/ARCHITECTURE.md",
+      "commit": "f59e0f9c9934e36f36e07d2f1fb070814d9b6d5a",
+      "license": "MIT",
+      "start": 1802,
+      "end": 2115,
+      "hash": "c18b58f2c9242ae1bffa3f5f9bb582f7c8fda94179a30a78794fbfa8ddf519f8",
+      "text": "3. **Single synchronous owner.** Each HTTP handler completes all database calls without `await`. A transaction cannot overlap another handler. An asynchronous store implementation must add an explicit queue covering reads as well as the entire write transaction. Scaling beyond local single-user is not supported."
+    },
+    {
+      "key": "atomicity",
+      "title": "Ripple atomicity (document excerpt)",
+      "path": "docs/ARCHITECTURE.md",
+      "commit": "f59e0f9c9934e36f36e07d2f1fb070814d9b6d5a",
+      "license": "MIT",
+      "start": 3090,
+      "end": 3439,
+      "hash": "4fb0f5bd020560ae8c0bd72f6cb2ec6b47c2d23bf82aabbc82986ae5aff491f7",
+      "text": "7. **Changes are atomic and idempotent.** UUID requestId + payload fingerprint detects reuse. Within one explicit transaction, lookup prior request, check revision, validate evidence, query the old graph, save Change and Review snapshots, then update body/revision. A failure rolls the whole write back. No automatic retry on a conflicting revision."
+    },
+    {
+      "key": "assets",
+      "title": "Ripple assets (document excerpt)",
+      "path": "docs/ARCHITECTURE.md",
+      "commit": "f59e0f9c9934e36f36e07d2f1fb070814d9b6d5a",
+      "license": "MIT",
+      "start": 4137,
+      "end": 4472,
+      "hash": "c40ef09a61e4ee8e3e547c078cd892f9cf51b460467d9a9b9afd887c972095c1",
+      "text": "10. **Local server and assets.** API and UI share one loopback origin. Host and Origin checks reject cross-site writes; JSON schema/body limits reject malformed input. No auth or multi-user deployment. Fonts are packaged through Fontsource, with no runtime Google Fonts request. Production uses the same API and compiled static assets."
+    },
+    {
+      "key": "verification",
+      "title": "Ripple verification (document excerpt)",
+      "path": ".agents/skills/ripple-verify/SKILL.md",
+      "commit": "f59e0f9c9934e36f36e07d2f1fb070814d9b6d5a",
+      "license": "MIT",
+      "start": 765,
+      "end": 1005,
+      "hash": "afe5803b403c98aa2207fd58ebc84b3ee62b8caea3e689b56f536f604d518ef9",
+      "text": "- For storage, transaction or engine changes, run `npm run doctor` as well. Use disposable databases. A failed write must preserve item revision, change/review records and evidence together; a successful restart must preserve them together."
+    }
+  ],
+  "items": [
+    {
+      "key": "OWNER",
+      "kind": "Assumption",
+      "title": "Synchronous database owner",
+      "body": "Each HTTP handler completes all database calls without `await`. A transaction cannot overlap another handler.",
+      "evidence": {
+        "source": "ownership",
+        "quote": "Each HTTP handler completes all database calls without `await`. A transaction cannot overlap another handler."
+      }
+    },
+    {
+      "key": "QUEUE",
+      "kind": "Decision",
+      "title": "Serialize database operations",
+      "body": "Keep database reads and writes within one serialized owner.",
+      "evidence": {
+        "source": "ownership",
+        "quote": "An asynchronous store implementation must add an explicit queue covering reads as well as the entire write transaction."
+      }
+    },
+    {
+      "key": "ATOMIC",
+      "kind": "Decision",
+      "title": "Atomic change transaction",
+      "body": "Snapshot paths, create reviews and update the item in one transaction.",
+      "evidence": {
+        "source": "atomicity",
+        "quote": "Within one explicit transaction, lookup prior request, check revision, validate evidence, query the old graph, save Change and Review snapshots, then update body/revision. A failure rolls the whole write back."
+      }
+    },
+    {
+      "key": "READS",
+      "kind": "Task",
+      "title": "Queue reads with writes",
+      "body": "Include read requests in the asynchronous store queue.",
+      "evidence": {
+        "source": "ownership",
+        "quote": "An asynchronous store implementation must add an explicit queue covering reads as well as the entire write transaction."
+      }
+    },
+    {
+      "key": "ROLLBACK",
+      "kind": "Task",
+      "title": "Verify rollback and restart",
+      "body": "Verify the entire change transaction rolls back and reopens consistently.",
+      "evidence": {
+        "source": "verification",
+        "quote": "A failed write must preserve item revision, change/review records and evidence together; a successful restart must preserve them together."
+      }
+    },
+    {
+      "key": "FONTS",
+      "kind": "Task",
+      "title": "Bundle local fonts",
+      "body": "Local database workbench fonts are packaged locally.",
+      "evidence": {
+        "source": "assets",
+        "quote": "Fonts are packaged through Fontsource, with no runtime Google Fonts request."
+      }
+    },
+    {
+      "key": "PROPOSED",
+      "kind": "Task",
+      "title": "Unconfirmed queue candidate",
+      "body": "Evaluation-only negative control; dependency has not been confirmed.",
+      "evidence": {
+        "source": "ownership",
+        "quote": "An asynchronous store implementation must add an explicit queue covering reads as well as the entire write transaction."
+      }
+    },
+    {
+      "key": "REJECTED",
+      "kind": "Task",
+      "title": "Rejected queue candidate",
+      "body": "Evaluation-only negative control; dependency was rejected.",
+      "evidence": {
+        "source": "ownership",
+        "quote": "An asynchronous store implementation must add an explicit queue covering reads as well as the entire write transaction."
+      }
+    }
+  ],
+  "relations": [
+    {
+      "to": "OWNER",
+      "status": "confirmed",
+      "evidence": {
+        "source": "ownership",
+        "quote": "An asynchronous store implementation must add an explicit queue covering reads as well as the entire write transaction."
+      },
+      "from": "QUEUE"
+    },
+    {
+      "to": "OWNER",
+      "status": "confirmed",
+      "evidence": {
+        "source": "atomicity",
+        "quote": "Within one explicit transaction, lookup prior request, check revision, validate evidence, query the old graph, save Change and Review snapshots, then update body/revision. A failure rolls the whole write back."
+      },
+      "from": "ATOMIC"
+    },
+    {
+      "to": "QUEUE",
+      "status": "confirmed",
+      "evidence": {
+        "source": "ownership",
+        "quote": "An asynchronous store implementation must add an explicit queue covering reads as well as the entire write transaction."
+      },
+      "from": "READS"
+    },
+    {
+      "to": "ATOMIC",
+      "status": "confirmed",
+      "evidence": {
+        "source": "verification",
+        "quote": "A failed write must preserve item revision, change/review records and evidence together; a successful restart must preserve them together."
+      },
+      "from": "ROLLBACK"
+    },
+    {
+      "to": "OWNER",
+      "status": "proposed",
+      "evidence": {
+        "source": "ownership",
+        "quote": "An asynchronous store implementation must add an explicit queue covering reads as well as the entire write transaction."
+      },
+      "from": "PROPOSED"
+    },
+    {
+      "to": "OWNER",
+      "status": "rejected",
+      "evidence": {
+        "source": "ownership",
+        "quote": "An asynchronous store implementation must add an explicit queue covering reads as well as the entire write transaction."
+      },
+      "from": "REJECTED"
+    }
+  ],
+  "queries": [
+    {
+      "target": "OWNER",
+      "paths": [
+        ["QUEUE", "OWNER"],
+        ["ATOMIC", "OWNER"],
+        ["READS", "QUEUE", "OWNER"],
+        ["ROLLBACK", "ATOMIC", "OWNER"]
+      ],
+      "excluded": ["FONTS", "PROPOSED", "REJECTED"]
+    },
+    {
+      "target": "ATOMIC",
+      "paths": [["ROLLBACK", "ATOMIC"]],
+      "excluded": ["OWNER", "QUEUE", "READS", "FONTS", "PROPOSED", "REJECTED"]
+    },
+    {
+      "target": "FONTS",
+      "paths": [],
+      "excluded": ["OWNER", "QUEUE", "ATOMIC", "READS", "ROLLBACK", "PROPOSED", "REJECTED"]
+    }
+  ],
+  "proposal": {
+    "target": "OWNER",
+    "after": "Hypothetical evaluation: use asynchronous database calls with an explicit queue covering reads and each entire write transaction.",
+    "evidence": {
+      "source": "ownership",
+      "quote": "An asynchronous store implementation must add an explicit queue covering reads as well as the entire write transaction."
+    }
+  },
+  "review": {
+    "item": "ROLLBACK",
+    "status": "revise",
+    "reason": "Evaluation decision: extend transaction rollback and restart checks before an asynchronous-store migration. Implementation remains pending."
+  }
+}
