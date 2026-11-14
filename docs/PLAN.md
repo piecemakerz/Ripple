@@ -5,8 +5,8 @@
 1. [complete] Replace full-snapshot workspace bootstrap with 25 change summaries and a validated cursor API; preserve existing records and on-demand detail.
 2. [complete] Add accessible saved-change paging, selected-change retention, error recovery and historical navigation.
 3. [complete] Verify native pagination/payload bounds, historical detail and restart; inspect desktop/390px production flows on a disposable store. `verify`: 34 tests/build; `doctor`: passed.
-4. [complete] Record measurements, CI scope, design decisions and remaining limits. Local implementation is verified; new changes are not published and have no new-commit CI result.
-5. [in progress] Publish the verified changes to `main` at the user's request and confirm the exact new commit's Windows CI result.
+4. [complete] Record measurements, CI scope, design decisions and remaining limits.
+5. [complete] Publish implementation commit `599b715` to `main` and confirm its Windows installation, verify and doctor CI passed. See STATUS.md for the run link.
 
 Next: evaluate a shareable real-document case with explicit expected impacts and quotes. Before large-workspace claims, separately measure engine scan/traversal costs and single-change detail size.
 
