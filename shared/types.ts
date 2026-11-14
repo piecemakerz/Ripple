@@ -100,12 +100,20 @@ export interface Candidate extends Dependency {
   fromRevision: number;
   toRevision: number;
 }
+export interface DependencyRecord extends Dependency {
+  revision: number;
+  supersedes?: string;
+  supersededBy?: string;
+  reason?: string;
+  createdAt?: string;
+}
 export interface Workspace {
   items: Item[];
   sources: SourceVersion[];
   proposals: Proposal[];
   changes: Change[];
   candidates: Candidate[];
+  dependencies: DependencyRecord[];
   database: { engine: string; version: string; path: string; storage: string };
   synthetic: boolean;
 }

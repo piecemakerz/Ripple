@@ -1,5 +1,12 @@
 import { z } from 'zod';
-import type { Candidate, Evidence, Item, Proposal, SourceVersion } from '../shared/types.js';
+import type {
+  Candidate,
+  DependencyRecord,
+  Evidence,
+  Item,
+  Proposal,
+  SourceVersion,
+} from '../shared/types.js';
 import type { RippleStore } from './store.js';
 import { randomUUID } from 'node:crypto';
 import { digest, validateEvidence } from './sample.js';
@@ -56,6 +63,10 @@ export const decisionInput = z
     status: z.enum(['confirmed', 'rejected']),
   })
   .strict();
+export const replacementInput = candidateInput.extend({
+  expectedRevision: z.number().int().positive(),
+  reason: z.string().trim().min(1).max(4000),
+});
 export const proposalInput = z
   .object({
     requestId,
@@ -260,6 +271,80 @@ export class Ingestion {
         { id, status: input.status, revision: candidate.revision + 1 },
       );
       return { ...candidate, status: input.status, revision: candidate.revision + 1 };
+    });
+  }
+  replace(id: string, raw: unknown): DependencyRecord {
+    const input = replacementInput.parse(raw);
+    return this.mutate(`replace:${id}`, input, () => {
+      const row = this.store.query(
+        'MATCH (a:Item)-[r:DEPENDS_ON {id:$id}]->(b:Item) RETURN r, a.id AS from, b.id AS to LIMIT 1',
+        { id },
+      ).rows[0];
+      if (!row) throw new AppError(404, 'DEPENDENCY_NOT_FOUND', 'Dependency not found.');
+      const old = properties<DependencyRecord>(row.r);
+      const revision = old.revision ?? 1; // Original sample edges predate candidate revisions.
+      if (old.status !== 'confirmed' || revision !== input.expectedRevision)
+        throw new AppError(
+          409,
+          'REVISION_CONFLICT',
+          'This relationship changed. Reload and reopen the editor.',
+        );
+      if (input.from === input.to)
+        throw new AppError(422, 'SELF_DEPENDENCY', 'Choose two different items.');
+      this.revision(input.from, input.fromRevision);
+      this.revision(input.to, input.toRevision);
+      if (this.store.query('MATCH ()-[r:DEPENDS_ON]->() RETURN r.id LIMIT 200').rows.length >= 200)
+        throw new AppError(
+          422,
+          'WORKSPACE_LIMIT',
+          'This workspace supports up to 200 dependency records, including history.',
+        );
+      if (
+        this.store.query(
+          "MATCH (:Item {id:$from})-[r:DEPENDS_ON]->(:Item {id:$to}) WHERE r.id <> $id AND r.status IN ['proposed', 'confirmed'] RETURN r LIMIT 1",
+          { id, from: input.from, to: input.to },
+        ).rows.length
+      )
+        throw new AppError(
+          409,
+          'DUPLICATE_DEPENDENCY',
+          'An active dependency already exists for these items.',
+        );
+      const original = this.store.getEvidence(old.evidenceId);
+      const e = input.evidence;
+      if (
+        row.from === input.from &&
+        row.to === input.to &&
+        original.sourceId === e.sourceId &&
+        original.start === e.start &&
+        original.end === e.end &&
+        original.quote === e.quote
+      )
+        throw new AppError(409, 'NO_CHANGE', 'Change the endpoints or select different evidence.');
+      const saved = this.saveEvidence(e);
+      const value = {
+        id: randomUUID(),
+        from: input.from,
+        to: input.to,
+        fromRevision: input.fromRevision,
+        toRevision: input.toRevision,
+        status: 'confirmed' as const,
+        revision: 1,
+        evidenceId: saved.id,
+        supersedes: id,
+        reason: input.reason,
+        createdAt: new Date().toISOString(),
+      };
+      // Preserve the old edge and evidence; only its lifecycle fields change.
+      this.store.query(
+        "MATCH ()-[r:DEPENDS_ON {id:$id}]->() SET r.status='superseded', r.revision=$revision, r.supersededBy=$next",
+        { id, revision: revision + 1, next: value.id },
+      );
+      this.store.query(
+        'MATCH (a:Item {id:$from}), (b:Item {id:$to}) CREATE (a)-[:DEPENDS_ON $props]->(b)',
+        { from: value.from, to: value.to, props: { ...value } },
+      );
+      return value;
     });
   }
   proposal(raw: unknown): Proposal {

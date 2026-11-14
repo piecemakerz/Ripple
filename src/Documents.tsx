@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { Evidence, ItemKind, Proposal, SourceVersion, Workspace } from '../shared/types.js';
 import { api } from './api.js';
 import { evidenceMatches } from '../shared/evidence-selection.js';
+import { Relationships } from './Relationships.js';
 
 export function Documents({
   workspace,
@@ -99,6 +100,7 @@ export function Documents({
           Only confirmed relationships affect impact analysis.
         </p>
       </div>
+      <Relationships workspace={workspace} onWorkspace={onWorkspace} onEvidence={onEvidence} />
       {error && (
         <div className="banner error" role="alert">
           {error} Your input is preserved.{' '}
@@ -362,55 +364,59 @@ export function Documents({
             Open the original evidence and check the direction before confirming. Decisions are
             retained.
           </p>
-          {!workspace.candidates.length && <p>No manual candidates yet.</p>}
-          {workspace.candidates.map((c) => (
-            <div className="candidate-row" key={c.id}>
-              <div>
-                <strong>
-                  {workspace.items.find((i) => i.id === c.from)?.title} →{' '}
-                  {workspace.items.find((i) => i.id === c.to)?.title}
-                </strong>
-                <p>
-                  {c.from} depends on {c.to} · <b>{c.status}</b>
-                </p>
+          {!workspace.candidates.some(
+            (c) => c.status === 'proposed' || c.status === 'rejected',
+          ) && <p>No pending or rejected candidates. Confirmed relationships are listed above.</p>}
+          {workspace.candidates
+            .filter((c) => c.status === 'proposed' || c.status === 'rejected')
+            .map((c) => (
+              <div className="candidate-row" key={c.id}>
+                <div>
+                  <strong>
+                    {workspace.items.find((i) => i.id === c.from)?.title} →{' '}
+                    {workspace.items.find((i) => i.id === c.to)?.title}
+                  </strong>
+                  <p>
+                    {c.from} depends on {c.to} · <b>{c.status}</b>
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    void onEvidence(c.evidenceId).catch((e: Error) => setError(e.message))
+                  }
+                >
+                  View original evidence
+                </button>
+                {c.status === 'proposed' && (
+                  <>
+                    <button
+                      onClick={() =>
+                        void run(
+                          `/api/candidates/${c.id}`,
+                          { expectedRevision: c.revision, status: 'confirmed' },
+                          undefined,
+                          'PUT',
+                        )
+                      }
+                    >
+                      Confirm dependency
+                    </button>
+                    <button
+                      onClick={() =>
+                        void run(
+                          `/api/candidates/${c.id}`,
+                          { expectedRevision: c.revision, status: 'rejected' },
+                          undefined,
+                          'PUT',
+                        )
+                      }
+                    >
+                      Reject candidate
+                    </button>
+                  </>
+                )}
               </div>
-              <button
-                onClick={() =>
-                  void onEvidence(c.evidenceId).catch((e: Error) => setError(e.message))
-                }
-              >
-                View original evidence
-              </button>
-              {c.status === 'proposed' && (
-                <>
-                  <button
-                    onClick={() =>
-                      void run(
-                        `/api/candidates/${c.id}`,
-                        { expectedRevision: c.revision, status: 'confirmed' },
-                        undefined,
-                        'PUT',
-                      )
-                    }
-                  >
-                    Confirm dependency
-                  </button>
-                  <button
-                    onClick={() =>
-                      void run(
-                        `/api/candidates/${c.id}`,
-                        { expectedRevision: c.revision, status: 'rejected' },
-                        undefined,
-                        'PUT',
-                      )
-                    }
-                  >
-                    Reject candidate
-                  </button>
-                </>
-              )}
-            </div>
-          ))}
+            ))}
         </section>
         <section className="document-card proposal-editor">
           <h3>5. Preview a change</h3>

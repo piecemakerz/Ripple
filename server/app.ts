@@ -50,6 +50,9 @@ export function createApp(store: RippleStore) {
   app.post('/api/items', (req, res) => res.status(201).json(ingestion.item(req.body)));
   app.post('/api/candidates', (req, res) => res.status(201).json(ingestion.candidate(req.body)));
   app.put('/api/candidates/:id', (req, res) => res.json(ingestion.decide(req.params.id, req.body)));
+  app.post('/api/dependencies/:id/replacements', (req, res) =>
+    res.status(201).json(ingestion.replace(req.params.id, req.body)),
+  );
   app.post('/api/proposals', (req, res) => res.status(201).json(ingestion.proposal(req.body)));
   app.post('/api/changes', (req, res) =>
     res.status(201).json(store.applyChange(changeInput.parse(req.body))),

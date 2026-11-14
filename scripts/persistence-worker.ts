@@ -59,6 +59,16 @@ if (mode === 'write' || mode === 'wal-write') {
     title: 'Restart source',
     text: 'A newer version.',
   });
+  ingestion.replace('R-T1-D1', {
+    requestId: '46c03eb5-7f01-48b0-a991-74d19d29a44e',
+    expectedRevision: 1,
+    from: 'T1',
+    to: 'D2',
+    fromRevision: 1,
+    toRevision: 1,
+    evidence,
+    reason: 'Persist the corrected prerequisite.',
+  });
   if (mode === 'write') store.checkpoint();
 } else {
   const workspace = store.workspace();
@@ -72,12 +82,42 @@ if (mode === 'write' || mode === 'wal-write') {
   assert.equal(saved.change.snapshot.impacts.length, 4);
   assert.equal(store.query("MATCH (i:Item {id:'rolled-back'}) RETURN i").rows.length, 0);
   assert.equal(ingestion.source(sourceRequest).text, sourceRequest.text);
-  assert.equal(workspace.candidates[0].status, 'rejected');
-  assert.equal(
-    store.getEvidence(workspace.candidates[0].evidenceId).source.text,
-    sourceRequest.text,
-  );
+  const rejected = workspace.candidates.find((c) => c.status === 'rejected')!;
+  assert.ok(rejected);
+  assert.equal(store.getEvidence(rejected.evidenceId).source.text, sourceRequest.text);
   assert.equal(workspace.sources.filter((s) => s.title === 'Restart source').length, 2);
+  const old = workspace.dependencies.find((d) => d.id === 'R-T1-D1')!;
+  const replacement = workspace.dependencies.find((d) => d.id === old.supersededBy)!;
+  assert.equal(old.status, 'superseded');
+  assert.equal(replacement.to, 'D2');
+  assert.equal(replacement.supersedes, old.id);
+  assert.equal(replacement.reason, 'Persist the corrected prerequisite.');
+  const restoredEvidence = store.getEvidence(replacement.evidenceId);
+  const repeated = ingestion.replace(old.id, {
+    requestId: '46c03eb5-7f01-48b0-a991-74d19d29a44e',
+    expectedRevision: 1,
+    from: 'T1',
+    to: 'D2',
+    fromRevision: 1,
+    toRevision: 1,
+    evidence: {
+      sourceId: restoredEvidence.sourceId,
+      start: restoredEvidence.start,
+      end: restoredEvidence.end,
+      quote: restoredEvidence.quote,
+    },
+    reason: 'Persist the corrected prerequisite.',
+  });
+  assert.equal(repeated.id, replacement.id);
+  assert.equal(
+    saved.change.snapshot.impacts.find((i) => i.item.id === 'T1')!.paths[0].nodes[1].id,
+    'D1',
+  );
+  assert.equal(
+    store.impact('A1').impacts.find((i) => i.item.id === 'T1')!.paths[0].nodes[1].id,
+    'D2',
+  );
+  assert.equal(store.getEvidence(old.evidenceId).id, 'E-T1-D1');
 }
 assert.deepEqual(
   store

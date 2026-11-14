@@ -1,5 +1,14 @@
 # Ripple execution plan
 
+## Confirmed relationship amendments — 2026-11-14
+
+1. [complete] Atomically supersede confirmed edges with revision checks, exact evidence and retry receipts; retain all historical paths and reviews.
+2. [complete] Add an editor and readable relationship history, including original evidence.
+3. [complete] Verify native DB rollback/conflicts/restart, HTTP validation, full completion gate (27 tests) and browser desktop/390px flows.
+4. [complete] Record observed results, design decisions and remaining limits.
+
+Next: real-document evaluation and broader history filtering; publication is separate from this local implementation. No AI extraction/provider decisions made.
+
 ## Active M2 slice — 2026-11-14
 
 Authorized: paste/upload text or Markdown, immutable source versions, manual items and dependency candidates with exact evidence, confirmation and existing impact/change/review integration. No AI extraction or hosting.
@@ -9,7 +18,7 @@ Authorized: paste/upload text or Markdown, immutable source versions, manual ite
 3. [complete] Test native DB/API rollback, conflicts, original evidence and restart; run verify (21 tests) and doctor.
 4. [complete] Inspect desktop and 390px browser flows on a disposable store; record results and limits.
 
-Next: real-document user evaluation, confirmed-relationship amendment UX, then optional AI extraction after provider/budget decisions. M2 publication is complete: implementation commit `5406668` is on `main`, and its Windows CI passed installation, verify and doctor. See STATUS.md for the run link.
+The subsequent confirmed-relationship amendment slice is complete above. Next: real-document evaluation, broader history UX and optional AI extraction after provider/budget decisions. M2 publication is complete: implementation commit `5406668` is on `main`, and its Windows CI passed installation, verify and doctor. See STATUS.md for the run link.
 
 Earlier authorized scope: Astra development setup + M0 + M1, and publication to `piecemakerz/Ripple` on GitHub. No hosted app deployment or paid extraction API.
 

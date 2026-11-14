@@ -1,5 +1,28 @@
 # M0/M1 verification record
 
+## Confirmed relationship amendments — 2026-11-14
+
+`npm run verify`: **27 passed, 0 failed**, strict types, format, skill integrity, native context and production build passed. `npm run doctor` passed; checkpoint and WAL tests restore replacement links/receipts, original evidence and saved review snapshots. Tests use disposable databases, never the live store.
+
+Production browser acceptance used a separate `relations-qa-*` store at port 4319 outside OneDrive. The original demo database was untouched.
+
+| Browser check                 | Observed result                                                                                                                                |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Preview/apply/review baseline | Four A1 impacts; applied change and saved T1 revise reason                                                                                     |
+| Endpoint replacement          | D1→A1 replaced by D1→T3 with a new source and reason; old edge retained                                                                        |
+| Repeated quote                | Explicit occurrence 2 at UTF-16 88–154; replacement evidence dialog highlighted it                                                             |
+| Evidence-only amendment       | Same endpoints, occurrence 1 at 21–87; relationship history grew to two                                                                        |
+| Current impact                | A1 now has D2/T2 only; D1/T1/T3 outside the current ripple                                                                                     |
+| Historical impact             | Saved change still has four impacts and T1→D1→A1 with original source quotes                                                                   |
+| Review persistence            | T1 reason and one review event preserved on reload and production process restart                                                              |
+| Failed replacement            | Blocked replacement endpoint deliberately; exact quote, occurrence, endpoints and reason preserved; retry succeeded after removing block       |
+| No-op failure                 | Final build refused unchanged endpoints/evidence, preserved draft, scrolled/focused the visible error                                          |
+| Narrow viewport               | 390×844 editor stacks fields; source wraps, occurrence selector usable; change/path/review navigation and selection work; no document overflow |
+| Restart                       | Stopped only QA process, restarted same store using final production bundle; two replacement generations and original saved review restored    |
+| Console and cleanup           | Final fresh load had no warnings/errors; intentional blocked request/no-op failures were expected; viewport and network overrides removed      |
+
+Captures: [relationship history](evidence/relationships-history.jpg), [prior source](evidence/relationships-prior-source.jpg), [mobile editor](evidence/relationships-mobile.jpg). These are synthetic examples, not real-user measurements. Browser acceptance is manual through the connected browser; native/API tests are automated. The existing green committed-HEAD CI does not cover this dirty worktree; no new publication was performed.
+
 ## Manual M2 acceptance — 2026-11-14
 
 The earlier M0/M1 record below remains historical evidence. This iteration uses a separate disposable native Relate store outside OneDrive at port 4318; the original demo store was untouched.

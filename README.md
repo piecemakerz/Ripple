@@ -23,7 +23,7 @@ npm run dev
 
 Open **http://127.0.0.1:4317**. In the synthetic inventory example, A1 changes from real-time inventory to daily updates. Explore **D1/D2 directly and T1/T2 indirectly**; unrelated T3 is excluded. Select T1, inspect both dependency evidence links, apply the change, then save **Keep / Revise / Defer** with a reason. Restart the server to inspect persisted reviews. A review decision does not mean its implementation is complete.
 
-For a production build, stop the development server, then run `npm run build` and `npm start`. `npm run verify` checks formatting, strict types, 21 tests including real-database integration and the build. `npm run doctor` checks persistence across separate processes; `npm run reproduce` repeats installation and checks in a temporary copy.
+For a production build, stop the development server, then run `npm run build` and `npm start`. `npm run verify` checks formatting, strict types, 27 tests including real-database integration and the build. `npm run doctor` checks persistence across separate processes; `npm run reproduce` repeats installation and checks in a temporary copy.
 
 ## How it uses Relate
 
@@ -33,7 +33,7 @@ For a production build, stop the development server, then run `npm run build` an
 - **Data location:** `%LOCALAPPDATA%/Ripple/demo-v1` by default on Windows, outside this repository and OneDrive. `RIPPLE_DB_PATH` overrides it. Only one backend process may open a database. The first start creates synthetic seed data; subsequent starts preserve it.
 - **Submission status:** the source is public with the `relate-hackathon` topic. A separate inspectable submission store and public demo/video are still pending. The active local database is excluded from Git.
 
-This release includes the M0/M1 sample workflow and manual M2 document ingestion. AI extraction and editing already-confirmed relationships are not implemented. See [the audit](docs/HACKATHON_AUDIT.md), [verification evidence](docs/QA.md) and [AI/tool-use disclosure](docs/AI_DISCLOSURE.md).
+This release includes the M0/M1 sample workflow, manual M2 document ingestion and confirmed relationship amendments. AI extraction is not implemented. See [the audit](docs/HACKATHON_AUDIT.md), [verification evidence](docs/QA.md) and [AI/tool-use disclosure](docs/AI_DISCLOSURE.md).
 
 ## Import your own context (manual M2)
 
@@ -43,7 +43,13 @@ This release includes the M0/M1 sample workflow and manual M2 document ingestion
 4. Choose **Dependent item → Prerequisite item** and save a relationship candidate. Inspect **View original evidence**, then confirm or reject it. Only confirmed relationships enter impact analysis.
 5. Select evidence for an update, choose **Item to change**, write its updated description and **Preview impact**. The existing workbench shows direct/indirect impacts and original evidence. Apply the change and record per-item reviews.
 
-Limits: 20,000 characters per source; upload size 80 KB; 50 saved source versions, 100 items, 200 dependency records and 100 proposals per workspace, including sample records. There is no AI extraction. Unsaved drafts survive panel navigation and failed requests, but not a full page reload. Source and candidate history is retained; confirmed relationships cannot yet be edited. A stale candidate/proposal must be recreated from current item revisions. Existing version-1 stores upgrade additively to schema 2 on startup.
+Limits: 20,000 characters per source; upload size 80 KB; 50 saved source versions, 100 items, 200 dependency records and 100 proposals per workspace, including sample records. There is no AI extraction. Unsaved drafts survive panel navigation and failed requests, but not a full page reload. Source, candidate and replacement history is retained. The dependency cap includes superseded generations. A stale candidate/proposal must be recreated from current item revisions. Existing version-1 stores upgrade additively to schema 2 on startup.
+
+## Edit or replace a confirmed relationship
+
+Open **Documents & relationships → Confirmed relationships**, then **Edit or replace**. Keep or change either endpoint, select the saved source and exact quote (choose its occurrence if repeated), and enter a reason. **Confirm replacement** immediately updates the confirmed graph. The previous edge and its original evidence stay in **Relationship history**, alongside the replacement and reason.
+
+Current impact previews use the replacement. Previously applied changes and their reviews keep their original paths and evidence. A stale editor must be reopened against current revisions. A replacement counts toward the 200 dependency-record limit; there is no deletion or retirement-only action.
 
 ## License and development tools
 
@@ -139,7 +145,7 @@ npm run dev
 
 [해커톤 적합성 검증](docs/HACKATHON_AUDIT.md): M0/M1 기술 구현은 요건에 부합하며, 심사용 DB·데모·Devpost 제출 준비는 아직 남아 있습니다. 공개 GitHub 저장소에는 `relate-hackathon` Topic이 설정되어 있습니다.
 
-완료: M0 실제 DB 검증, M1 변경 선택·영향·근거 화면, 초기 검토 저장과 이력. 미구현: 임의 문서 입력, AI 관계 추출, 관계 편집, 사용자/조직, 외부 동기화, 배포·제출 패키지. 그래프 UI는 작은 데모 규모를 위한 계층 배치이며 대규모 그래프 편집기가 아닙니다. 경로는 최대 8단계·500개이며 제한에 닿으면 경고하고 변경 적용을 막습니다. 평가 결과는 합성 그래프의 회귀 테스트이며 실제 사용자 성과를 뜻하지 않습니다.
+완료: M0 실제 DB 검증, M1 변경·영향·근거·검토 이력, 수동 M2 문서 입력, 확정 관계 수정·대체와 이력 보존. 미구현: AI 관계 추출, 관계 삭제/대체 없는 폐기, 사용자/조직, 외부 동기화, 배포·제출 패키지. 그래프 UI는 작은 데모 규모를 위한 계층 배치이며 대규모 그래프 편집기가 아닙니다. 경로는 최대 8단계·500개이며 제한에 닿으면 경고하고 변경 적용을 막습니다. 평가 결과는 합성 그래프의 회귀 테스트이며 실제 사용자 성과를 뜻하지 않습니다.
 
 폰트와 아이콘도 로컬 번들로 제공합니다. 앱 실행 중 외부 AI·분석 서비스·CDN 요청은 없습니다.
 

@@ -1,5 +1,19 @@
 # Current status
 
+## Confirmed relationship amendments — 2026-11-14 KST
+
+Implemented **Documents & relationships → Confirmed relationships → Edit or replace**. Edit the exact evidence or either endpoint, provide a reason and confirm. One transaction supersedes the original edge, creates a new confirmed edge/evidence and records the retry receipt. Relationship history exposes both generations, timestamps, reasons and original quotes. Saved item changes, path snapshots, review decisions and review events remain unchanged.
+
+- `npm run verify`: **27/27 passed**; formatting, strict types, pinned skill integrity, official Relate context and production build passed.
+- `npm run doctor`: passed. Both checkpoint and WAL restart tests now preserve replacement links, original evidence, historical reviews and idempotent replacement receipts.
+- New native/API coverage: evidence-only edits, both endpoint replacements, manual confirmed candidates, chains, cycle termination, new versus historical impacts, repeated Unicode/CRLF quotes, no-op rejection, duplicate/proposed pairs, stale relation/endpoint revisions, request reuse, missing IDs, strict input/origin validation, history-inclusive cap and injected failure after all writes before the receipt (complete rollback).
+- Browser production QA on **http://127.0.0.1:4319**, separate `relations-qa-*` store under `%LOCALAPPDATA%/Ripple`; original live store untouched. Applied A1 and saved a T1 review, replaced D1→A1 with D1→T3, selected repeated quote occurrence 2, then amended evidence to occurrence 1. Current A1 impact became D2/T2; saved A1 change retained D1/D2/T1/T2, original source and T1 review history. Reload and production-owner restart restored them. Desktop/390px editor, graph selection, panel navigation, prior/replacement source dialogs and deliberate network failure/draft retention/retry verified. No horizontal document overflow at 390px. Final reload console showed no warnings/errors. See [QA](QA.md).
+- Browser feedback initially sat above the scrolled editor; feedback now scrolls into view and receives focus. Final production no-op rejection confirmed this behavior. Browser selector deadlines were resolved by inspecting current state and using accessible roles; those failed attempts are not passing checks.
+- Initial focused test run: 4/5 passed, one fixture incorrectly included unknown fields in strict candidate input. Corrected the fixture; final gate above passed. The initial npm-exec invocation emitted flag warnings; final checks used repository scripts.
+- `npm run ci:status`: committed HEAD `adf18e5` passed [its existing CI](https://github.com/piecemakerz/Ripple/actions/runs/43564667302), with **workingTreeDirty: true**. That run does not cover these uncommitted amendments. No commit or publication performed in this task.
+
+Run with `npm run dev`, or `npm run build` then `npm start` after stopping any process owning the same DB/port. The QA production app remains available on port 4319. Limits: 200 dependency records including superseded history; no deletion/retirement without replacement; unsaved drafts do not survive reload; replacement confirmation immediately affects future impact queries and does not create an item-change review. Broader history filtering and real-document evaluation remain next work.
+
 ## Manual M2 slice — 2026-11-14 KST
 
 Implemented document paste/UTF-8 Markdown or text upload → immutable source versions → evidenced manual items → proposed dependency → confirm/reject → generic change proposal → existing impact, apply and review flow.
@@ -12,7 +26,7 @@ Implemented document paste/UTF-8 Markdown or text upload → immutable source ve
 - Published M2 implementation commit `5406668` to `main` on 2026-11-14 with a normal fast-forward push. [M2 Windows CI](https://github.com/piecemakerz/Ripple/actions/runs/43564558780) passed clean `npm ci`, `npm run verify` and `npm run doctor`; the connected GitHub plugin independently confirmed every job step succeeded. The initial exact-commit status query returned pending/no run; the repository runs API subsequently returned this successful push run with the matching full SHA. No live databases, credentials, machine-specific paths or build outputs were staged.
 - Developer checks initially used an incorrect npm-exec formatter argument shape (printed formatted text instead of writing); corrected by `npm run format`. A browser navigation before server startup returned connection-refused, then succeeded after startup. These attempts are not counted as passing checks.
 
-Next: user evaluation with real document examples; optional AI candidate extraction after provider/budget decisions; editing/superseding confirmed relationships and fuller history UX. Remaining limits: no AI extraction, no hosted demo, no offline drafts, no confirmed-edge editor, ingestion caps (50 source versions / 100 items / 200 dependency records / 100 proposals), and dense-graph traversal runtime is not strictly bounded. Submission assets remain separate M4 work.
+At the M2 handoff, next work included real-document evaluation, optional AI extraction, relationship amendments and fuller history UX. The amendments are now implemented above. Limits recorded at that handoff: no AI extraction, no hosted demo, no offline drafts, no confirmed-edge editor, ingestion caps (50 source versions / 100 items / 200 dependency records / 100 proposals), and dense-graph traversal runtime is not strictly bounded. Submission assets remain separate M4 work.
 
 ## Historical M0/M1 handoff
 
@@ -98,4 +112,4 @@ M0/M1's authorized implementation is complete. Next product slice: **M2: paste/u
 - GitHub plugin installation and account connection completed during setup. Its tools confirmed the `piecemakerz` identity, access to Ripple and successful CI inspection. Existing Git publication/public CI fallback also work. The already available browser tools and OpenAI Docs skill were retained.
 - Application behavior/UI and live data were unchanged. No browser regression or new Astra inference is claimed for this tooling setup.
 
-At the M0/M1 handoff, generic ingestion was still outside implementation; the manual M2 slice above now supplies it. AI extraction, editing confirmed relationships, collaboration, large graph layout, public sample DB export, hosted demo and submission assets remain outside implementation. No benchmark claims on real customer data.
+At the M0/M1 handoff, generic ingestion was still outside implementation; the manual M2 slice above now supplies it. Confirmed relationship amendments are now implemented above. AI extraction, collaboration, large graph layout, public sample DB export, hosted demo and submission assets remain outside implementation. No benchmark claims on real customer data.

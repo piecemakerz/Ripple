@@ -1,6 +1,6 @@
 # Architecture and decisions
 
-2026-11-14 KST · M0/M1 + manual M2 ingestion
+2026-11-14 KST · M0/M1 + manual M2 ingestion + confirmed relationship amendments
 
 ## Boundaries
 
@@ -40,7 +40,7 @@ Nodes: Item, Person, SourceVersion, Evidence, Proposal, Change, Review, ReviewEv
 
 - Sources are append-only. New documents get a server UUID and integer version 1; subsequent versions require the current version number. Sample documents with decimal versions cannot be used as import targets. Original text (including uploaded BOM/CRLF), SHA-256 and evidence slices remain immutable.
 - The UI accepts UTF-8 `.md`, `.markdown`, `.txt` files up to 80 KB or pasted text. Server validation caps each source at 20,000 UTF-16 code units, 50 source versions, 100 items, 200 dependency records and 100 proposals per workspace. JSON bodies are limited to 256 KB. Limits include sample data and rejected candidates. There is no deletion/reset UI in this slice.
-- Users create evidenced items, then proposed `DEPENDS_ON` edges. Candidate revision and both endpoint item revisions are recorded; confirmation revalidates those revisions and the evidence. Rejection remains possible for an outdated candidate. Decisions are terminal; an amended relationship requires rejecting the old candidate and creating a new one. The graph query still follows confirmed edges only.
+- Users create evidenced items, then proposed `DEPENDS_ON` edges. Candidate revision and both endpoint item revisions are recorded; confirmation revalidates those revisions and the evidence. Rejection remains possible for an outdated candidate. Candidate decisions are terminal. Proposed corrections require rejecting and recreating; confirmed corrections use the replacement operation below. The graph query still follows confirmed edges only.
 - Duplicate proposed/confirmed directed pairs and self-dependencies are refused. Cycles across different items remain supported by the existing bounded traversal. These limits do not guarantee bounded query runtime for dense graphs.
 - Each ingestion mutation validates input, checks a UUID request receipt and payload fingerprint, and atomically saves data/evidence plus a Mutation receipt. Identical retries return the original response; reuse with different input conflicts. Receipts preserve the manual candidate decision record. All Cypher values are bound.
 - Generic proposals preserve the item's expected revision and evidence. They open the existing change/impact/review UI. Applying still recomputes and snapshots current confirmed paths atomically. A stale proposal must be recreated; it cannot silently update a newer item.
@@ -49,6 +49,15 @@ Nodes: Item, Person, SourceVersion, Evidence, Proposal, Change, Review, ReviewEv
 - No AI extraction, external provider, paid call or collaboration was added. Manual confirmation asserts the user's semantic judgment; the server checks quote integrity, not whether the text logically proves the dependency.
 
 Relationships: DEPENDS_ON, OWNED_BY, EVIDENCED_BY, FROM_SOURCE, CHANGES, FOR_CHANGE, FOR_ITEM, FOR_REVIEW. DEPENDS_ON properties include ID/status/evidenceId/from/to. The authoritative direction is the actual graph edge; rendering derives endpoints from returned paths.
+
+## Confirmed relationship amendments
+
+- `POST /api/dependencies/:id/replacements` accepts a UUID request ID, expected relationship revision, replacement endpoints and their expected item revisions, exact evidence slice and a non-empty reason. It handles both evidence-only amendments and endpoint replacements. Self-links, duplicate active directed pairs, unchanged endpoints/evidence, inactive relationships and stale revisions are refused.
+- The existing synchronous transaction owner and Mutation receipt mechanism atomically append new evidence and a confirmed edge, mark the old edge superseded, advance its revision and persist the result. The old edge retains its endpoint/evidence properties. New edges carry `supersedes`, `reason`, `createdAt`; old edges gain `supersededBy`. Retry checks precede revision/state checks, so retries return their original receipt even after later replacements.
+- Schema remains 2: these are additive relationship properties with no new node type/constraint. Old sample edges expose revision 1 when the property is absent; their first replacement persists revision 2. Existing manual candidates retain their revisions. Workspace dependencies derive endpoints from the actual graph, while candidates contains only original manual proposals and their lifecycle states.
+- No Change, Review, ReviewEvent, SourceVersion or existing Evidence is rewritten. Existing change snapshots remain historical; future impact queries traverse only current confirmed edges. Relationship confirmation is a graph correction and does not increment item revisions or create implementation reviews. A future item change recomputes its impact atomically as before.
+- The editor captures endpoint revisions on opening; a workspace refresh does not silently rebase its draft. Conflicts ask users to reopen against current revisions. Identical retries within the page reuse the request ID, including after a lost response/workspace-refresh failure. Drafts remain in memory across panel switches/failures; reloading loses unsaved input. Evidence choice preserves UTF-16 offsets, CRLF and explicit repeated occurrences.
+- The 200-record cap includes all superseded generations; history is never pruned to make room. There is no retirement-only action, restore button, history search or automatic semantic evidence verifier. To correct a replacement again, create another generation and provide its reason.
 
 | Method | Route                                  | Purpose                                                                     |
 | ------ | -------------------------------------- | --------------------------------------------------------------------------- |

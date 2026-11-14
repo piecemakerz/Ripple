@@ -1519,6 +1519,32 @@ mark {
 }
 
 /* Keep secondary instructions readable on the warm background. */
+.relationships {
+  margin-bottom: 24px;
+}
+.relationships .candidate-row > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.relationship-editor {
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid #b5cba2;
+  border-radius: 8px;
+  background: #f7faef;
+}
+.relationship-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.relationship-history {
+  margin-top: 20px;
+}
+.relationship-history summary {
+  cursor: pointer;
+  font-weight: 600;
+}
 .graph-canvas {
   width: calc(100% - 20px);
 }

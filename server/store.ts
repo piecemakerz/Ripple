@@ -11,6 +11,7 @@ import { randomUUID } from 'node:crypto';
 import type {
   Change,
   Candidate,
+  DependencyRecord,
   ChangeDetail,
   Evidence,
   EvidenceDetail,
@@ -178,8 +179,16 @@ export class RippleStore {
         this.decodeChange(r.c),
       ),
       candidates: this.query(
-        'MATCH ()-[r:DEPENDS_ON]->() WHERE r.revision IS NOT NULL RETURN r ORDER BY r.id LIMIT 200',
+        'MATCH ()-[r:DEPENDS_ON]->() WHERE r.fromRevision IS NOT NULL AND r.supersedes IS NULL RETURN r ORDER BY r.id LIMIT 200',
       ).rows.map((r) => props<Candidate>(r.r)),
+      dependencies: this.query(
+        'MATCH (a:Item)-[r:DEPENDS_ON]->(b:Item) RETURN r, a.id AS from, b.id AS to ORDER BY r.id LIMIT 200',
+      ).rows.map((r) => ({
+        ...props<DependencyRecord>(r.r),
+        from: r.from as string,
+        to: r.to as string,
+        revision: props<DependencyRecord>(r.r).revision ?? 1,
+      })),
       database: {
         engine: 'Relate',
         version: '1.0.1',
