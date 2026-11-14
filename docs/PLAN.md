@@ -5,9 +5,9 @@
 1. [complete] Freeze four attributed SemVer 2.0.0 excerpts, nine items and six confirmed edges, with explicit paths/exclusions and disclosed hypothetical release decisions.
 2. [complete] Run both cases separately or as a suite without changing the first fixture; test multi-path deduplication, alternate-path omissions and case/hash isolation through HTTP/native Relate and separate processes.
 3. [complete] Pass verify (41 tests/build), doctor and clean-install reproduce; inspect preview/apply, evidence, reviews, restart and measured desktop/390px screens. Record attribution, results and limits.
-4. [in progress] Publish the second evaluation case to `main` and confirm the exact implementation commit's Windows CI, then record publication evidence.
+4. [complete] Publish implementation commit `74a3a38` to `main` and confirm its Windows installation, verify and doctor CI passed. See STATUS.md for the exact run and publication evidence.
 
-Next: human semantic review of both gold graphs (especially ATOMIC → OWNER and MAJOR → DEPRECATE), then a scoped manual-workflow comparison. Current implementation is local and uncommitted; prior HEAD's green CI does not cover it. Scalability, extraction and submission assets remain separate work.
+Next: human semantic review of both gold graphs (especially ATOMIC → OWNER and MAJOR → DEPRECATE), then a scoped manual-workflow comparison. The second case implementation is published and its exact-commit CI passed. Scalability, extraction and submission assets remain separate work.
 
 ## Real-document evaluation — 2026-11-14
 

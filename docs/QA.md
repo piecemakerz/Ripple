@@ -23,7 +23,7 @@ Screenshots: [desktop after restart](evidence/semver-evaluation-desktop.jpg), [3
 
 The initial `npm run evaluate:demo -- --case ...` attempt failed because this PowerShell/npm environment stripped the option; dedicated npm aliases fixed the executable instructions. One review-history role locator timed out; fresh DOM inspection and exact text opened the control. Existing browser zoom scaled/cropped early captures; final dimensions were measured and explicit capture bounds restored complete screenshots. These failed attempts are not passing evidence. A documentation patch context mismatch was corrected before formatting; no test failure was concealed.
 
-CI currently covers only previous HEAD `5ed66d1`, with a dirty worktree. This second case has local verification/reproduction evidence and has not been committed or published.
+At local handoff, CI covered only previous HEAD `5ed66d1` with a dirty worktree. After user-authorized publication, implementation commit `74a3a38` passed its own [Windows CI](https://github.com/piecemakerz/Ripple/actions/runs/43595733273): clean `npm ci`, `npm run verify` and `npm run doctor`. The GitHub plugin confirmed every job step; the run's full SHA matched the implementation and `ci:status` reported success with a clean worktree after push. All 19 intended files were published after staged-file personal-path/credential/artifact and diff checks. No evaluator/application code changed during publication, so the local 41-test/reproduction and browser evidence above remain applicable. The initial pending/no-run result was followed through to success, not counted as passing.
 
 ## Real-document evaluation — 2026-11-14
 
