@@ -1,5 +1,18 @@
 # Verification record
 
+## Approved candidate publication — 2026-11-26 KST
+
+D21/X21. [Draft PR #1](https://github.com/piecemakerz/Ripple/pull/1) is open and draft; main remains `e7d28a7`. Candidate `b577290613ad72f31cac1f16974065c17e773625` passed [Verify Ripple](https://github.com/piecemakerz/Ripple/actions/runs/45768805050). The annotated tag and [public prerelease](https://github.com/piecemakerz/Ripple/releases/tag/v0.1.0-hackathon.20261126) stay on that commit, independently of later publication-documentation commits.
+
+- Approved source and artifact preparation hashes matched before publication. Tagged export correspondence: 502 exact files, five line-ending-only differences, six publication-document edits, one new record, zero unexpected differences. No runtime/test/fixture behavior changed.
+- GitHub digest/size checks passed for the ZIP, MP4, release manifest, public video description and checksum file. All five files were downloaded again **without authentication: HTTP 200, exact SHA-256 match**. The video container header is MP4 and the bytes match the previously fully decoded/visually checked 110s video. Hosted playback was not separately measured.
+- Actual signed-out browser displayed the release title, Pre-release badge and `b577290`; no login was needed to read the published page. Full hashes, public links and source correspondence are in [the publication record](PUBLICATION_2026-11-26.md). Private API logs/local manifests remain ignored runtime evidence.
+- Tool limitations: signed-out UI could not publish; the plugin has no release-write/upload operation. Existing Git Credential Manager authentication with the official REST API completed the authorized release, without printing or storing credentials. Initial staged whitespace check identified trailing whitespace in unchanged upstream `public/fonts/Pretendard-OFL.txt`; preserving original license bytes and checking all other paths passed. Neither attempt is described as an app failure or a successful browser upload.
+
+Existing local and clean-package 91/91/doctor/native/UI/media evidence below applies to the published candidate. No independent-human outcome, main merge or Devpost submission was performed.
+
+Publication follow-up changed 12 Markdown files only. `npm run format:check` and `git diff --check` passed; all 418 local Markdown targets in those documents resolved. The release tag and artifacts stay fixed while the draft PR carries these publication records. Its latest-commit CI is visible in the PR checks and is verified after pushing.
+
 ## Review protection, source freshness and real Ripple case — 2026-11-26 KST
 
 Scope: D20/X20 and the user's choice of Ripple's actual change. Native Relate 1.0.1, Windows x64, Node 22.17.1. Isolated stores outside OneDrive; one owner per store. No independent human participants or extra agents. [Report](HACKATHON_IMPROVEMENTS_2026-11-26.md), [case](RIPPLE_CHANGE_CASE.md).

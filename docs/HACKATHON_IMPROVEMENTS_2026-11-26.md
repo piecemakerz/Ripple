@@ -2,6 +2,8 @@
 
 2026-11-26 KST. 사용자는 개선을 요청하고 효용 사례로 Ripple 자체 변경을 선택했다. [앞선 비판적 검토](HACKATHON_CRITICAL_REVIEW_2026-11-26.md)의 관측을 보존하고 이번 수정·재검증을 연결한다. **저장 안전성과 원문 갱신 안내를 고쳤고, 실제 변경 사례와 새 전달물을 준비했다. 수상 충분성이나 사용자 효용은 아직 입증되지 않았다.**
 
+**같은 날 공개 후속:** 사용자 승인 뒤 [초안 PR #1](https://github.com/piecemakerz/Ripple/pull/1)과 [ZIP·영상 prerelease](https://github.com/piecemakerz/Ripple/releases/tag/v0.1.0-hackathon.20261126)를 게시했다. 후보 `b577290`의 CI와 첨부 5개 비인증 다운로드/hash가 통과했다. R1의 최신 후보 공개·접근 공백은 해소됐고 main은 검토를 위해 이전 버전을 유지한다. 아래 표의 로컬 준비 판정은 게시 전 기록이다. R4의 hosted 재생·낯선 시청자 이해는 여전히 별도다. [공개 증거](PUBLICATION_2026-11-26.md).
+
 ## 지적별 조치
 
 | 지적                           | 이번 조치                                                                                   | 현재 판정                                                                            |

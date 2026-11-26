@@ -92,3 +92,16 @@
 D20/X20은 R5/R6 수정, 사용자 선택의 Ripple 실제 변경 사례와 새 110초 영상을 추가했다. 이전 SemVer 후보는 보존한다. 새 후보의 정확한 ZIP·영상·원문 manifest 해시는 ignored `.runtime/improvements-delivery/DELIVERY_MANIFEST.json`에 기록한다. 이 디렉터리는 자동 공개·백업되지 않으며 실제 제출본 표를 대신하지 않는다. 공개 main은 e7d28a7이고 현재 변경은 미커밋이다.
 
 독립 사용자 수는 0명, 수동 준비 시간은 미계측, 자동 준비 한 실행은 21 writes/160ms다. 첫 판단이 영상 16초에 보인다는 개발 관측과 낯선 심사자의 이해는 별개다. [개선 보고서](../HACKATHON_IMPROVEMENTS_2026-11-26.md)에 후속 판단을 연결하고, 실제 제출 시 공개 커밋·로그아웃 접근·접수 증거로 위 표를 채운다.
+
+## 2026-11-26 공개 후보 고정 — Devpost 제출본 아님
+
+D21/X21과 사용자 명시 승인으로 **15:38 KST**에 [공개 prerelease](https://github.com/piecemakerz/Ripple/releases/tag/v0.1.0-hackathon.20261126)를 게시했다. 고정 tag `v0.1.0-hackathon.20261126`의 대상은 **b577290613ad72f31cac1f16974065c17e773625**이며 [해당 커밋 CI](https://github.com/piecemakerz/Ripple/actions/runs/45768805050)가 통과했다. [초안 PR #1](https://github.com/piecemakerz/Ripple/pull/1)은 공개 검토용이며 이후 공개 결과 문서만 추가할 수 있다. main은 `e7d28a7`로 유지한다.
+
+| 공개 파일                              | SHA-256                                                            |
+| -------------------------------------- | ------------------------------------------------------------------ |
+| `ripple-judge-improved-2026-11-26.zip` | `6aa49c97532c319dcdea1aa86dda659eaa6d52bb9b58a81e9f2b8a6018035d4e` |
+| `ripple-demo-improved-110s.mp4`        | `92b9687f0e6949bfb3ecf2596de19de3b0dc03336ab80f54b587d5755a18dde9` |
+
+두 파일과 release manifest·공개 영상 설명·checksum의 **첨부 5개 전부** 인증 없이 다운로드해 HTTP 200과 업로드 원본 hash 일치를 확인했다. 로그아웃 브라우저에서 공개 릴리스·대상 커밋을 확인했다. MP4는 검증된 로컬 영상과 같지만 hosted 재생은 따로 관측하지 않았다. 원래 ZIP의 과거 준비 metadata와 영상 end card는 보존하며 [공개 대응 기록](../PUBLICATION_2026-11-26.md)이 이후 상태를 설명한다.
+
+이는 공개 후보의 보존·접근 증거다. Devpost 접수증, 실제 제출 버전, 참가자 자격 사실, 심사 결과, 독립 인간 효용 결과는 추가되지 않았다. 위 실제 제출본 표를 완료 처리하지 않는다.

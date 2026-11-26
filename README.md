@@ -7,6 +7,8 @@
 
 Ripple is a local change-impact workbench. Follow a changed assumption to the decisions and tasks that depend on it, inspect the original evidence, and record a review decision. Built for the [Relate by Neo4j Hackathon](https://relate.devpost.com/).
 
+**Verified candidate:** [ZIP, 110-second video and checksums](https://github.com/piecemakerz/Ripple/releases/tag/v0.1.0-hackathon.20261126) · [Draft PR #1](https://github.com/piecemakerz/Ripple/pull/1) · [Successful candidate CI](https://github.com/piecemakerz/Ripple/actions/runs/45768805050). Use the candidate branch below; main remains the earlier version while the PR is a draft. Public downloads were verified without signing in. This release is not a Devpost submission.
+
 ![Ripple follows an actual API change to its judge-store package](docs/evidence/improvements-2026-11-26/07-final-case-map.jpg)
 
 ## Quick start
@@ -81,7 +83,7 @@ The two earlier cases use separately sourced documents with three queries each, 
 - **Why this mode:** a local single-user application needs durable evidence and review history without a separate database service. WAL and Parquet checkpoints survive process restarts.
 - **Graph:** items, source versions, evidence, changes and reviews. `downstream -[:DEPENDS_ON]-> upstream`; parameterized Cypher traverses confirmed dependencies. Paths and original evidence are snapshotted atomically before a change.
 - **Data location:** `%LOCALAPPDATA%/Ripple/demo-v1` by default on Windows, outside this repository and OneDrive. `RIPPLE_DB_PATH` overrides it. Only one backend process may open a database. The first start creates synthetic seed data; subsequent starts preserve it.
-- **Submission status:** the repository is public with the required `relate` topic and both `relate-neo4j-hackathon` and `relate-hackathon`. The latest implementation, a reproducible source/native-store bundle and a 110-second captioned screen presentation are local candidates. Publishing those matching versions, checking public playback and submitting the Devpost entry remain pending. The active local database is excluded from Git. See the [submission readiness record](docs/HACKATHON_SUBMISSION.md).
+- **Submission status:** the repository is public with the required `relate` topic and both `relate-neo4j-hackathon` and `relate-hackathon`. The current candidate branch, draft PR and matching source/native-store ZIP plus 110-second video are [published](docs/PUBLICATION_2026-11-26.md), with successful candidate CI and anonymous download/hash checks. Submission-compatible video playback and the Devpost entry remain pending. The active local database is excluded from Git. See the [submission readiness record](docs/HACKATHON_SUBMISSION.md).
 
 This release includes the M0/M1 sample workflow, manual M2 document ingestion, confirmed relationship amendments and searchable item history. AI extraction is not implemented. See [the audit](docs/HACKATHON_AUDIT.md), [verification evidence](docs/QA.md) and [AI/tool-use disclosure](docs/AI_DISCLOSURE.md).
 

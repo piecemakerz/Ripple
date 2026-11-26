@@ -1,6 +1,6 @@
 # Ripple hackathon submission working draft
 
-Updated 2026-11-26 KST after the [critical review](HACKATHON_CRITICAL_REVIEW_2026-11-26.md) and [improvements](HACKATHON_IMPROVEMENTS_2026-11-26.md). Local draft, not submitted. Public main still points to `e7d28a7`; publish matching current source, video and store before asking judges to reproduce this version.
+Updated 2026-11-26 KST after the [critical review](HACKATHON_CRITICAL_REVIEW_2026-11-26.md), [improvements](HACKATHON_IMPROVEMENTS_2026-11-26.md) and approved [publication](PUBLICATION_2026-11-26.md). Devpost draft, not submitted. The current source is on [candidate branch / draft PR #1](https://github.com/piecemakerz/Ripple/pull/1); the [public prerelease](https://github.com/piecemakerz/Ripple/releases/tag/v0.1.0-hackathon.20261126) contains the matching ZIP, video and checksums. The tag stays on verified commit `b577290`; main remains `e7d28a7`.
 
 The [overview](https://relate.devpost.com/), [Official Rules](https://relate.devpost.com/rules) and [schedule](https://relate.devpost.com/details/dates) were checked November 26. The November 24 update gives connected context 30, functionality 25, usefulness 20, documentation/reproducibility 15, creativity 10. Deadline: **2026-12-12 11:00 KST** (December 11, 18:00 PST). These are weights, not predicted scores. The overview permits extensions while Rules §3 requires a new project; retain development history and disclose reused work.
 
@@ -44,7 +44,7 @@ The main case quotes Ripple's own MIT source. Supporting SemVer excerpts are by 
 
 ## Judge quick start
 
-Use the matching prepared source package until this version is published. Requires Node 22.12+; validated with 22.17.1 on Windows x64.
+Use the [public candidate branch](https://github.com/piecemakerz/Ripple/tree/codex/hackathon-verified-20261126) or the release ZIP's `app/` directory. Requires Node 22.12+; validated with 22.17.1 on Windows x64.
 
 ```powershell
 npm ci
@@ -71,7 +71,7 @@ Reload the saved change/item URL. Only one backend may own a store. `npm run eva
 
 ## Judge package
 
-`npm run judge:prepare:ripple` generates current source in `app/`, a closed native store in `snapshot/db/`, exact hashes, inspection output and a recipient README. The source manifest records the baseline commit and `workingTreeDirty: true`.
+`npm run judge:prepare:ripple` generates current source in `app/`, a closed native store in `snapshot/db/`, exact hashes, inspection output and a recipient README. Each generated source manifest records its actual preparation commit and dirty state. The unchanged published ZIP retains its earlier preparation commit and `workingTreeDirty: true`; the release's `RELEASE_MANIFEST.json` maps those approved bytes to the tagged public candidate.
 
 From the bundle's `app/` directory:
 
@@ -86,7 +86,7 @@ Inspection hashes and copies the closed snapshot, then reads it in a separate na
 
 ## Current video
 
-`.runtime/improvements-delivery/ripple-demo-improved-110s.mp4`: **110.0s, 1280×1080, 24fps H.264**, English captions, silent. Ten edited scenes include **8.19s of continuous actual interaction** at original speed. The whole video is not continuous recording. Full decode and every scene's representative frame, opening and first saved decision were checked.
+[Download the published 110-second video](https://github.com/piecemakerz/Ripple/releases/download/v0.1.0-hackathon.20261126/ripple-demo-improved-110s.mp4): **110.0s, 1280×1080, 24fps H.264**, English captions, silent. Ten edited scenes include **8.19s of continuous actual interaction** at original speed. The whole video is not continuous recording. Full local decode and every scene's representative frame, opening and first saved decision were checked. Anonymous download returned HTTP 200 and the identical SHA-256; hosted browser playback has not been separately observed.
 
 | Time       | Content                                                      |
 | ---------- | ------------------------------------------------------------ |
@@ -101,17 +101,17 @@ Inspection hashes and copies the closed snapshot, then reads it in a separate na
 | 86.2–98.2s | Preparation and unmeasured manual/user costs                 |
 | 98.2–110s  | Commands, AI/MIT disclosure and local-candidate status       |
 
-`VIDEO_DESCRIPTION.txt` includes disclosures and the source link. The previous SemVer video remains preserved. Upload the matching source/video/store and verify playback without signing in. Local files and loopback addresses are not public demos.
+The release's `VIDEO_DESCRIPTION_PUBLIC.txt` includes disclosures and public source links. The previous SemVer video remains preserved. The approved video's local-candidate end card is historical; the release notes identify the published version without changing its bytes. A submission-compatible hosted video link and logged-out playback still need verification before Devpost submission. Loopback addresses remain local only.
 
 ## Submission status
 
 | Requirement                    | State                                                                                          |
 | ------------------------------ | ---------------------------------------------------------------------------------------------- |
-| Public current source/topics   | Existing repository/topics checked; current publication and exact new-commit CI outstanding    |
+| Public current source/topics   | Candidate branch and draft PR published; tagged candidate CI passed; topics checked            |
 | Meaningful Relate/reproduction | Native tests, three cases and package available; final evidence in STATUS/QA                   |
-| Video within two minutes       | Improved local candidate checked; upload and logged-out playback outstanding                   |
+| Video within two minutes       | 110s MP4 published; anonymous download/hash passed; submission-compatible playback outstanding |
 | Description/disclosure         | Updated to real Ripple case and manual/AI provenance                                           |
 | Participant/submission facts   | Eligibility, team, reused-work declarations and Devpost review/submission need the participant |
 | User effectiveness             | No independent participants or preparation-inclusive time-saving result                        |
 
-Public publication and final submission were not performed by this local task. Freeze the actual submitted commit, artifact hashes, public URLs and receipt in [RETROSPECTIVE](learning/RETROSPECTIVE.md) when those steps happen.
+Public candidate publication is complete; final Devpost submission remains separate. [RETROSPECTIVE](learning/RETROSPECTIVE.md) records the public candidate, without treating it as the submitted version. Freeze the actual submitted commit, artifact hashes, public URLs and receipt when submission happens.

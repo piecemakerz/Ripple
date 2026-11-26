@@ -2,9 +2,11 @@
 
 ## Publish the approved verified candidate — 2026-11-26
 
-1. [in progress] Recheck approved hashes and create `codex/hackathon-verified-20261126` from public main. Commit the verified source and publication records; preserve unrelated files and runtime artifacts.
-2. [pending] Push and open a draft PR; wait for the exact committed HEAD's Verify Ripple workflow. Keep main unmerged.
-3. [pending] Publish `v0.1.0-hackathon.20261126` as a public prerelease with the approved ZIP/video, then verify anonymous access and artifact hashes. Record actual URLs/results; Devpost submission remains separate.
+1. [complete] Approved artifact hashes and all 513 source-file hashes rechecked; candidate published as `b577290` on `codex/hackathon-verified-20261126`. Executable inputs preserved.
+2. [complete] [Draft PR #1](https://github.com/piecemakerz/Ripple/pull/1) opened; exact candidate commit passed Verify Ripple. Main remains unmerged.
+3. [complete] [Public prerelease](https://github.com/piecemakerz/Ripple/releases/tag/v0.1.0-hackathon.20261126) contains the approved ZIP/video and three supporting files. All five anonymous downloads returned 200 with matching hashes. [Publication evidence](PUBLICATION_2026-11-26.md) records the fixed tag, source correspondence and remaining submission limits.
+
+Next: participant facts, a submission-compatible video link with observed playback, and actual Devpost review/submission. Independent-user efficacy remains unmeasured. No final submission or main merge is inferred from this completed publication.
 
 ## Implement critical-review improvements — 2026-11-26
 

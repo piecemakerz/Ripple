@@ -2,7 +2,11 @@
 
 ## Approved public delivery — 2026-11-26 KST
 
-The participant explicitly authorized a new public branch, draft PR and release attachments. All approved artifact hashes and 513 source-file hashes matched before publication edits. `codex/hackathon-verified-20261126` is being published from main `e7d28a7`; D21/X21 and [the publication record](PUBLICATION_2026-11-26.md) track exact commit/CI/asset evidence. The original ZIP/video bytes remain unchanged. Main merge and Devpost submission are outside this action. Completion is recorded after the remote operations succeed; previous local-candidate statements below describe the earlier preparation state.
+**Published.** [Draft PR #1](https://github.com/piecemakerz/Ripple/pull/1) exposes `codex/hackathon-verified-20261126`; [prerelease v0.1.0-hackathon.20261126](https://github.com/piecemakerz/Ripple/releases/tag/v0.1.0-hackathon.20261126) is fixed to `b577290613ad72f31cac1f16974065c17e773625`. Its [exact-commit Verify Ripple run](https://github.com/piecemakerz/Ripple/actions/runs/45768805050) passed before publication. Main remains `e7d28a7`, unmerged. Later PR documentation commits record publication without moving the release tag.
+
+All five release attachments passed GitHub digest/size checks and fresh anonymous HTTP 200 downloads with matching SHA-256. The signed-out browser showed the public prerelease and correct commit. The approved 19,800,646-byte ZIP and 2,525,048-byte video are unchanged. Tagged source export: 502/513 byte-identical files, five line-ending-only differences, six publication-document updates and one new record; no unexpected changes. D21/X21 and [publication evidence](PUBLICATION_2026-11-26.md) contain the public URLs, full hashes and limitations. Existing 91/91 worktree/clean-package, doctor, native and actual UI evidence remains applicable; this publication added no application behavior.
+
+Next: participant facts, submission-compatible video playback and Devpost submission; none is inferred from a GitHub release. Independent-user efficacy remains unmeasured. Prior local-candidate and uncommitted statements below describe the earlier preparation state.
 
 ## Critical-review improvements implemented — 2026-11-26 KST
 

@@ -6,6 +6,12 @@
 - 새 커밋에서 Verify Ripple 성공을 기다린다. PR은 draft로 유지하고 main을 병합하지 않는다. 릴리스는 공개 prerelease이며 승인된 ZIP/영상 및 해시·설명을 첨부한다.
 - 인증 없는 릴리스/파일 접근, 다운로드 hash, 실제 영상 응답을 확인한다. 상태 문서·공개 URL·커밋과 릴리스 대상 대응을 기록하되 Devpost 접수나 독립 인간 검증으로 세지 않는다.
 
+### X21 관측 결과 — 2026-11-26
+
+- **자동/개발 관측:** 후보 커밋 `b577290`의 [Verify Ripple 성공](https://github.com/piecemakerz/Ripple/actions/runs/45768805050), PR #1 draft/open, 공개 prerelease와 올바른 tag/commit 확인. GitHub 업로드 digest/size 및 첨부 5개 전체의 비인증 HTTP 200/SHA-256 일치. 로그아웃 브라우저에서 공개 제목·Pre-release·커밋 표시를 읽었다.
+- **대응:** 승인된 513 source files와 tagged `git archive`를 비교해 502개 동일, 5개 줄바꿈만 변경, 6개 공개 문서 갱신, 새 공개 기록 1개. 예기치 않은 변경 0개. ZIP/영상은 승인 시 바이트 유지. [상세 증거와 해시](../PUBLICATION_2026-11-26.md), [QA](../QA.md).
+- **한계·실패:** 브라우저는 로그아웃 상태였고 plugin은 release upload를 지원하지 않아 기존 인증의 공식 REST 경로로 게시했다. 원본 upstream 라이선스 공백은 보존했다. MP4 응답/해시는 확인했지만 hosted 브라우저 재생이나 Devpost 접수는 확인하지 않았다. 독립 인간 피드백 0명; 이 관측을 효용 측정으로 세지 않는다.
+
 ## X20 저장 안전성·원문 갱신·Ripple 자체 사례 — 2026-11-26
 
 - **계획:** D20. 같은 revision을 읽은 두 클라이언트 중 오래된 저장은 409여야 하며 현재 결정·이력은 보존돼야 한다. 동일 request 재시도는 중복 이력을 만들지 않고, 수정된 요청 재사용은 거절해야 한다. 중간 실패·재시작·기존 저장소도 검사한다.
