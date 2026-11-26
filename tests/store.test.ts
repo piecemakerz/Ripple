@@ -97,9 +97,24 @@ test('atomic changes, idempotent retries, revision conflicts and independent sec
   );
   assert.throws(() => change(s), isError('REVISION_CONFLICT'));
   assert.throws(() => change(s, { expectedRevision: 2 }), isError('NO_CHANGE'));
-  s.saveReview(first.change.id, 'T1', 'revise', 'Show last updated time.');
-  s.saveReview(first.change.id, 'T1', 'revise', 'Show last updated time.');
-  s.saveReview(first.change.id, 'T1', 'defer', 'Waiting for product confirmation.');
+  s.saveReview(first.change.id, 'T1', {
+    requestId: crypto.randomUUID(),
+    expectedRevision: s.getChange(first.change.id).reviews.find((r) => r.itemId === 'T1')!.revision,
+    status: 'revise',
+    reason: 'Show last updated time.',
+  });
+  s.saveReview(first.change.id, 'T1', {
+    requestId: crypto.randomUUID(),
+    expectedRevision: s.getChange(first.change.id).reviews.find((r) => r.itemId === 'T1')!.revision,
+    status: 'revise',
+    reason: 'Show last updated time.',
+  });
+  s.saveReview(first.change.id, 'T1', {
+    requestId: crypto.randomUUID(),
+    expectedRevision: s.getChange(first.change.id).reviews.find((r) => r.itemId === 'T1')!.revision,
+    status: 'defer',
+    reason: 'Waiting for product confirmation.',
+  });
   const reviewed = s.getChange(first.change.id).reviews.find((r) => r.itemId === 'T1')!;
   assert.equal(reviewed.history.length, 2);
   const second = change(s, { expectedRevision: 2, after: 'A confirmed follow-up change.' });

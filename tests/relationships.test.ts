@@ -45,12 +45,13 @@ test('replacement changes native impact while preserving exact original evidence
     after: proposal.after,
     evidenceId: proposal.evidenceId,
   });
-  const before = store.saveReview(
-    applied.change.id,
-    'T1',
-    'revise',
-    'Keep the original review rationale.',
-  );
+  const before = store.saveReview(applied.change.id, 'T1', {
+    requestId: crypto.randomUUID(),
+    expectedRevision: store.getChange(applied.change.id).reviews.find((r) => r.itemId === 'T1')!
+      .revision,
+    status: 'revise',
+    reason: 'Keep the original review rationale.',
+  });
   const original = store.getEvidence('E-D1-A1');
   const saved = ingest.replace('R-D1-A1', input);
   assert.deepEqual(ingest.replace('R-D1-A1', input), saved);

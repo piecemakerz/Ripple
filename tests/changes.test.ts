@@ -30,7 +30,13 @@ test('workspace and change pages stay small across 55 real snapshots and load hi
   for (let i = 0; i < 55; i++) saved.push(apply(store));
   const first = saved[0];
   const original = first.change.snapshot;
-  store.saveReview(first.change.id, 'T1', 'revise', 'Preserve this original change context.');
+  store.saveReview(first.change.id, 'T1', {
+    requestId: crypto.randomUUID(),
+    expectedRevision: store.getChange(first.change.id).reviews.find((r) => r.itemId === 'T1')!
+      .revision,
+    status: 'revise',
+    reason: 'Preserve this original change context.',
+  });
   const workspace = store.workspace();
   assert.equal(workspace.changePage.entries.length, 25);
   assert.ok(workspace.changePage.nextCursor);

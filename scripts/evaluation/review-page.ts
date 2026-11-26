@@ -27,7 +27,7 @@ export function reviewPage(packet: ReviewPacket, review: SemanticReview, error?:
     else progress += ' · No human-attested acceptance';
   }
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ripple · Semantic review</title>
-<style>${reviewStyles}</style></head><body><a class="skip" href="#worksheet">Skip to worksheet</a><main><header><p class="kind">Ripple / Evaluation</p><h1>Check the evidence.<br>Record your judgment.</h1><p>Check the scenario, items, dependency direction and complete expected impact sets against the frozen sources. Every judgment starts pending.</p><nav aria-label="Evaluation cases">${caseNames.map((name) => `<a href="/case/${name}"${name === packet.caseName ? ' aria-current="page"' : ''}>${name === 'async-owner' ? 'Database ownership' : 'SemVer deprecation'}</a>`).join('')}</nav></header>
+<style>${reviewStyles}</style></head><body><a class="skip" href="#worksheet">Skip to worksheet</a><main><header><p class="kind">Ripple / Evaluation</p><h1>Check the evidence.<br>Record your judgment.</h1><p>Check the scenario, items, dependency direction and complete expected impact sets against the frozen sources. Every judgment starts pending.</p><nav aria-label="Evaluation cases">${caseNames.map((name) => `<a href="/case/${name}"${name === packet.caseName ? ' aria-current="page"' : ''}>${name === 'async-owner' ? 'Database ownership' : name === 'semver-deprecation' ? 'SemVer deprecation' : 'Ripple review API'}</a>`).join('')}</nav></header>
 <h2>${e(packet.fixture.id)}</h2><p>${e(packet.fixture.provenance)}</p><p>Arrow direction: <strong>downstream → upstream</strong>. Acceptance concerns this hypothetical scenario. It does not certify customer accuracy or implementation completion.</p>
 <p class="hash">Fixture SHA-256: ${e(packet.fixtureHash)}<br>Checklist SHA-256: ${e(packet.checklistSha256)}</p><p class="status" role="status">${e(progress)} · Saved revision ${review.revision}</p>
 ${error ? `<div class="error" role="alert"><strong>Not saved.</strong> ${e(error)}</div>` : ''}
@@ -49,9 +49,12 @@ ${packet.subjects
 <section id="sources" class="anchor"><h2>Frozen sources</h2><p>Exact excerpts are unchanged. Quote offsets use JavaScript UTF-16 code units, end-exclusive. Source links let a reviewer inspect omitted context; this tool does not fetch or authenticate remote originals.</p>${packet.fixture.sources
     .map((source) => {
       const url =
-        source.url ?? `https://github.com/piecemakerz/Ripple/blob/${source.commit}/${source.path}`;
+        source.url ??
+        (source.commit
+          ? `https://github.com/piecemakerz/Ripple/blob/${source.commit}/${source.path}`
+          : '');
       const safeUrl = /^https:\/\//i.test(url) ? url : '';
-      return `<details class="source anchor" id="source-${e(source.key)}"><summary>${e(source.title)}</summary><p>${e(source.attribution ?? 'Ripple contributors')} · ${e(source.license)}${source.license === 'CC-BY-3.0' ? ' · <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">License</a>' : ''} · Unmodified excerpt</p><p>${safeUrl ? `<a href="${e(safeUrl)}" target="_blank" rel="noreferrer">Pinned original: ${e(source.path)}</a>` : e(source.path)} · Original UTF-16 [${source.start}, ${source.end})</p><p class="hash">Commit ${e(source.commit)}<br>Excerpt SHA-256 ${e(source.hash)}</p><div class="source-text">${e(source.text)}</div></details>`;
+      return `<details class="source anchor" id="source-${e(source.key)}"><summary>${e(source.title)}</summary><p>${e(source.attribution ?? 'Ripple contributors')} · ${e(source.license)}${source.license === 'CC-BY-3.0' ? ' · <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">License</a>' : ''} · Unmodified excerpt</p><p>${safeUrl ? `<a href="${e(safeUrl)}" target="_blank" rel="noreferrer">Pinned original: ${e(source.path)}</a>` : e(source.path)} · Original UTF-16 [${source.start}, ${source.end})</p><p class="hash">${source.commit ? `Commit ${e(source.commit)}` : 'Working-tree snapshot (uncommitted at capture)'}<br>Excerpt SHA-256 ${e(source.hash)}</p><div class="source-text">${e(source.text)}</div></details>`;
     })
     .join(
       '',

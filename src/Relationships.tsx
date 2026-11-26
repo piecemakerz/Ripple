@@ -1,3 +1,6 @@
+import { SampleSource } from './SampleContent.js';
+import { itemTitle, sourceTitle } from './sample-content.js';
+import { useI18n } from './i18n.js';
 import { useEffect, useRef, useState } from 'react';
 import type { DependencyRecord, EvidenceDetail, Item, Workspace } from '../shared/types.js';
 import { evidenceMatches } from '../shared/evidence-selection.js';
@@ -7,12 +10,21 @@ export function Relationships({
   workspace,
   onWorkspace,
   onEvidence,
+  onDirtyChange,
+  readingOnly = false,
 }: {
   workspace: Workspace;
   onWorkspace: (value: Workspace) => void;
   onEvidence: (id: string) => Promise<void>;
+  onDirtyChange: (dirty: boolean) => void;
+  readingOnly?: boolean;
 }) {
-  const [editing, setEditing] = useState<{ edge: DependencyRecord; items: Item[] }>();
+  const { t, locale, language } = useI18n();
+  const [editing, setEditing] = useState<{
+    edge: DependencyRecord;
+    items: Item[];
+    evidence: EvidenceDetail;
+  }>();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [sourceId, setSourceId] = useState('');
@@ -22,6 +34,18 @@ export function Relationships({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const dirty =
+    !!editing &&
+    (from !== editing.edge.from ||
+      to !== editing.edge.to ||
+      sourceId !== editing.evidence.sourceId ||
+      quote !== editing.evidence.quote ||
+      occurrence !== editing.evidence.start ||
+      !!reason);
+  useEffect(() => {
+    onDirtyChange(dirty);
+    return () => onDirtyChange(false);
+  }, [dirty, onDirtyChange]);
   const requests = useRef(new Map<string, string>());
   const editor = useRef<HTMLDivElement>(null);
   const feedback = useRef<HTMLDivElement>(null);
@@ -35,16 +59,20 @@ export function Relationships({
   const matches = source ? evidenceMatches(source.text, quote) : [];
   const match = matches.length === 1 ? matches[0] : matches.find((m) => m.start === occurrence);
   const name = (id: string) =>
-    `${id} · ${workspace.items.find((i) => i.id === id)?.title ?? 'Unknown item'}`;
+    itemTitle(
+      workspace.items.find((i) => i.id === id),
+      language,
+    ) || id;
   const history = workspace.dependencies.filter((d) => d.status === 'superseded');
 
   async function open(edge: DependencyRecord) {
+    if (dirty && !window.confirm(t('Discard the unsaved relationship edit?'))) return;
     setBusy(true);
     setError('');
     setNotice('');
     try {
       const original = await api<EvidenceDetail>(`/api/evidence/${edge.evidenceId}`);
-      setEditing({ edge, items: workspace.items });
+      setEditing({ edge, items: workspace.items, evidence: original });
       setFrom(edge.from);
       setTo(edge.to);
       setSourceId(original.sourceId);
@@ -95,16 +123,17 @@ export function Relationships({
     }
   }
   return (
-    <section className="document-card relationships" aria-label="Confirmed relationships">
-      <h3>Confirmed relationships</h3>
-      <p>
-        Edit the evidence or replace either endpoint. The old relationship stays in history; the
-        replacement is confirmed immediately.
+    <section className="document-card relationships" aria-label={t('Confirmed relationships')}>
+      <h2>{t('Confirmed relationships')}</h2>
+      <p hidden={readingOnly}>
+        {t(
+          'Edit the evidence or replace either endpoint. The old relationship stays in history; the replacement is confirmed immediately.',
+        )}
       </p>
       <div ref={feedback} tabIndex={-1}>
         {error && (
           <div className="banner error" role="alert">
-            {error} Your draft is preserved.
+            {t('{0} Your draft is preserved.', [t(error)])}
             <button
               disabled={busy}
               onClick={async () => {
@@ -119,29 +148,36 @@ export function Relationships({
                 }
               }}
             >
-              Refresh relationships
+              {t('Refresh relationships')}
             </button>
           </div>
         )}
         {notice && (
           <p className="banner success" role="status">
-            {notice}
+            {t(notice)}
           </p>
         )}
       </div>
       <fieldset disabled={busy} className="document-controls">
-        <legend className="sr-only">Relationship editor and history</legend>
+        <legend className="sr-only">{t('Relationship editor and history')}</legend>
         {workspace.dependencies
           .filter((d) => d.status === 'confirmed')
           .map((d) => (
-            <div className="candidate-row" key={d.id}>
+            <div
+              className="candidate-row"
+              key={d.id}
+              id={d.from === 'D1' && d.to === 'A1' ? 'sample-relationship' : undefined}
+              tabIndex={-1}
+            >
               <div>
                 <strong>
                   {name(d.from)} → {name(d.to)}
                 </strong>
                 <p>
-                  Confirmed · revision {d.revision}
-                  {d.supersedes ? ' · replacement' : ''}
+                  {t('Confirmed · revision {0} {1}', [
+                    d.revision,
+                    d.supersedes ? t(' · replacement') : '',
+                  ])}
                 </p>
               </div>
               <button
@@ -149,31 +185,32 @@ export function Relationships({
                   void onEvidence(d.evidenceId).catch((e: Error) => setError(e.message))
                 }
               >
-                View original evidence
+                {t('View original evidence')}
               </button>
-              <button onClick={() => void open(d)}>
-                Edit or replace {d.from} → {d.to}
+              <button hidden={readingOnly} onClick={() => void open(d)}>
+                {t('Edit or replace {0} → {1}', [d.from, d.to])}
               </button>
             </div>
           ))}
         {editing && (
           <div
+            hidden={readingOnly}
             ref={editor}
             tabIndex={-1}
-            className="relationship-editor"
-            aria-label="Edit confirmed relationship"
+            className="relationship-editor document-action-panel"
+            aria-label={t('Edit confirmed relationship')}
           >
-            <h4>
-              Edit {editing.edge.from} → {editing.edge.to}
-            </h4>
+            <h3>{t('Edit {0} → {1}', [editing.edge.from, editing.edge.to])}</h3>
             <p>
-              Original: {name(editing.edge.from)} depends on {name(editing.edge.to)}. Choose new
-              evidence below, or keep the original quote when replacing endpoints.
+              {t(
+                'Original: {0} depends on {1}. Choose new evidence below, or keep the original quote when replacing endpoints.',
+                [name(editing.edge.from), name(editing.edge.to)],
+              )}
             </p>
             <div className="document-grid">
               <div>
                 <label>
-                  Replacement dependent
+                  {t('Replacement dependent')}
                   <select value={from} onChange={(e) => setFrom(e.target.value)}>
                     {editing.items.map((i) => (
                       <option key={i.id} value={i.id}>
@@ -182,9 +219,9 @@ export function Relationships({
                     ))}
                   </select>
                 </label>
-                <p className="direction-label">↓ depends on</p>
+                <p className="direction-label">{t('↓ depends on')}</p>
                 <label>
-                  Replacement prerequisite
+                  {t('Replacement prerequisite')}
                   <select value={to} onChange={(e) => setTo(e.target.value)}>
                     {editing.items.map((i) => (
                       <option key={i.id} value={i.id}>
@@ -194,7 +231,7 @@ export function Relationships({
                   </select>
                 </label>
                 <label>
-                  Reason for replacement
+                  {t('Reason for replacement')}
                   <textarea
                     rows={3}
                     value={reason}
@@ -205,7 +242,7 @@ export function Relationships({
               </div>
               <div>
                 <label>
-                  Replacement source version
+                  {t('Replacement source version')}
                   <select
                     value={sourceId}
                     onChange={(e) => {
@@ -216,26 +253,20 @@ export function Relationships({
                   >
                     {workspace.sources.map((s) => (
                       <option key={s.id} value={s.id}>
-                        {s.title} · v{s.version}
+                        {t('{0} · v{1}', [sourceTitle(s, language), s.version])}
                       </option>
                     ))}
                   </select>
                 </label>
-                {source && (
-                  <pre
-                    className="preserved-source"
-                    tabIndex={0}
-                    aria-label="Replacement original text"
-                  >
-                    {source.text}
-                  </pre>
-                )}
+                {source && <SampleSource key={source.id} source={source} />}
                 <label>
-                  Replacement evidence quote
+                  {t('Replacement evidence quote')}
                   <textarea
                     rows={3}
                     value={quote}
                     maxLength={10000}
+                    aria-invalid={!!quote && matches.length === 0}
+                    aria-describedby="replacement-match-status"
                     onChange={(e) => {
                       setQuote(e.target.value);
                       setOccurrence(-1);
@@ -244,36 +275,42 @@ export function Relationships({
                 </label>
                 {matches.length > 1 && (
                   <label>
-                    Replacement quote occurrence
+                    {t('Replacement quote occurrence')}
                     <select
                       value={occurrence}
                       onChange={(e) => setOccurrence(Number(e.target.value))}
                     >
-                      <option value={-1}>Choose the intended occurrence</option>
+                      <option value={-1}>{t('Choose the intended occurrence')}</option>
                       {matches.slice(0, 100).map((m, i) => (
                         <option key={m.start} value={m.start}>
-                          Occurrence {i + 1} · characters {m.start}–{m.end}
+                          {t('Occurrence {0} · characters {1}–{2}', [i + 1, m.start, m.end])}
                         </option>
                       ))}
                     </select>
                   </label>
                 )}
-                <p className="helper" role="status">
+                <p className="helper" role="status" id="replacement-match-status">
                   {match
-                    ? `Exact match · characters ${match.start}–${match.end}`
-                    : 'Select an exact quote and its occurrence.'}
+                    ? t('Exact match · characters {0}–{1}', [match.start, match.end])
+                    : quote && matches.length === 0
+                      ? t(
+                          'This text is not in the saved original. Copy an exact passage, including punctuation and spaces; a translation or paraphrase will not match.',
+                        )
+                      : matches.length > 1
+                        ? t(
+                            'This passage appears more than once. Choose the intended occurrence above.',
+                          )
+                        : t('Select an exact quote and its occurrence.')}
                   {matches.length > 100
-                    ? ' First 100 occurrences shown; use a longer quote to narrow the match.'
+                    ? t(' First 100 occurrences shown; use a longer quote to narrow the match.')
                     : ''}
                 </p>
               </div>
             </div>
             <p>
-              After saving:{' '}
-              <b>
-                {from} depends on {to}
-              </b>
-              . Check the direction and evidence before confirming.
+              {t('After saving:')}
+              <b>{t('{0} depends on {1}', [from, to])}</b>
+              {t('. Check the direction and evidence before confirming.')}
             </p>
             <div className="relationship-actions">
               <button
@@ -281,15 +318,15 @@ export function Relationships({
                 disabled={!match || !quote.trim() || !reason.trim() || from === to}
                 onClick={() => void save()}
               >
-                Confirm replacement
+                {t('Confirm replacement')}
               </button>
-              <button onClick={() => setEditing(undefined)}>Cancel edit</button>
+              <button onClick={() => setEditing(undefined)}>{t('Cancel edit')}</button>
             </div>
           </div>
         )}
         <details className="relationship-history">
-          <summary>Relationship history ({history.length})</summary>
-          {!history.length && <p>No replacements yet.</p>}
+          <summary>{t('Relationship history ({0})', [history.length])}</summary>
+          {!history.length && <p>{t('No replacements yet.')}</p>}
           {history.map((d) => {
             const next = workspace.dependencies.find((r) => r.id === d.supersededBy);
             return (
@@ -298,14 +335,15 @@ export function Relationships({
                   <strong>
                     {name(d.from)} → {name(d.to)}
                   </strong>
-                  <p>Superseded · {d.id}</p>
+                  <p>{t('Superseded · {0}', [d.id])}</p>
                   {next && (
                     <>
                       <p>
-                        Replaced by {name(next.from)} → {name(next.to)} · {next.id}
+                        {t('Replaced by')}
+                        {name(next.from)} → {name(next.to)} · {next.id}
                       </p>
                       <p>
-                        {next.createdAt && new Date(next.createdAt).toLocaleString('en-US')} ·{' '}
+                        {next.createdAt && new Date(next.createdAt).toLocaleString(locale)} ·{' '}
                         {next.reason}
                       </p>
                     </>
@@ -316,7 +354,7 @@ export function Relationships({
                     void onEvidence(d.evidenceId).catch((e: Error) => setError(e.message))
                   }
                 >
-                  View prior evidence
+                  {t('View prior evidence')}
                 </button>
                 {next && (
                   <button
@@ -324,7 +362,7 @@ export function Relationships({
                       void onEvidence(next.evidenceId).catch((e: Error) => setError(e.message))
                     }
                   >
-                    View replacement evidence
+                    {t('View replacement evidence')}
                   </button>
                 )}
               </article>

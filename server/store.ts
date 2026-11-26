@@ -21,6 +21,7 @@ import type {
   Item,
   Review,
   ReviewEvent,
+  ReviewWrite,
   SourceVersion,
   Workspace,
 } from '../shared/types.js';
@@ -35,6 +36,7 @@ import {
 } from './sample.js';
 import { AppError } from './errors.js';
 import { readChanges } from './changes.js';
+import { newerSourceVersion } from '../shared/source-freshness.js';
 
 export const MAX_DEPTH = 8;
 export const MAX_PATHS = 500;
@@ -165,7 +167,11 @@ export class RippleStore {
         'The evidence does not match its original source.',
       );
     }
-    return { ...e, source };
+    const versions = this.query('MATCH (s:SourceVersion {documentId:$id}) RETURN s LIMIT 51', {
+      id: source.documentId,
+    }).rows.map((r) => props<SourceVersion>(r.s));
+    const newerSource = newerSourceVersion(source, versions);
+    return { ...e, source, ...(newerSource ? { newerSource } : {}) };
   }
   workspace(): Workspace {
     return {
@@ -194,7 +200,9 @@ export class RippleStore {
         path: this.path,
         storage: 'Directory · WAL + Parquet checkpoint',
       },
-      synthetic: !this.query('MATCH (m:Mutation) RETURN m.id LIMIT 1').rows.length,
+      synthetic: !this.query(
+        "MATCH (m:Mutation) WHERE m.operation IS NULL OR m.operation <> 'review' RETURN m.id LIMIT 1",
+      ).rows.length,
     };
   }
   impact(id: string): ImpactResult {
@@ -294,7 +302,8 @@ export class RippleStore {
         'MATCH (h:ReviewEvent)-[:FOR_REVIEW]->(r:Review {id:$id}) RETURN h ORDER BY h.createdAt DESC',
         { id: review.id },
       ).rows.map((h) => props<ReviewEvent>(h.h));
-      return { ...review, history };
+      // Legacy stores have no revision property. Each immutable event is one saved revision.
+      return { ...review, revision: review.revision ?? history.length, history };
     });
     return { change: this.decodeChange(row.c), reviews };
   }
@@ -362,6 +371,7 @@ export class RippleStore {
           changeId: id,
           itemId: impact.item.id,
           status: 'pending',
+          revision: 0,
           reason: '',
           updatedAt: createdAt,
           snapshot: JSON.stringify(impact.paths),
@@ -383,29 +393,55 @@ export class RippleStore {
       return this.getChange(id);
     });
   }
-  saveReview(
-    changeId: string,
-    itemId: string,
-    status: Exclude<Review['status'], 'pending'>,
-    reason: string,
-  ): ChangeDetail {
+  saveReview(changeId: string, itemId: string, input: ReviewWrite): ChangeDetail {
     return this.transaction(() => {
+      const fingerprint = digest(JSON.stringify({ operation: 'review', changeId, itemId, input }));
+      const previous = this.query('MATCH (m:Mutation {id:$id}) RETURN m LIMIT 1', {
+        id: input.requestId,
+      }).rows[0];
+      if (previous) {
+        if (props<{ fingerprint: string }>(previous.m).fingerprint !== fingerprint)
+          throw new AppError(
+            409,
+            'REQUEST_REUSED',
+            'This request was already used with different input.',
+          );
+        // Return the latest state without replaying the write, even after another decision.
+        return this.getChange(changeId);
+      }
       const detail = this.getChange(changeId);
       const review = detail.reviews.find((r) => r.itemId === itemId);
       if (!review)
         throw new AppError(404, 'REVIEW_NOT_FOUND', 'This item is not in the change review.');
-      if (review.status === status && review.reason === reason) return detail;
+      if (review.revision !== input.expectedRevision)
+        throw new AppError(
+          409,
+          'REVIEW_CONFLICT',
+          'This decision changed in another window. Compare the latest decision before saving again.',
+        );
       const createdAt = new Date().toISOString();
-      this.query(
-        'MATCH (r:Review {id:$id}) SET r.status=$status, r.reason=$reason, r.updatedAt=$time CREATE (h:ReviewEvent $event)-[:FOR_REVIEW]->(r)',
-        {
-          id: review.id,
-          status,
-          reason,
-          time: createdAt,
-          event: { id: randomUUID(), status, reason, createdAt },
+      const { status, reason } = input;
+      if (review.status !== status || review.reason !== reason) {
+        this.query(
+          'MATCH (r:Review {id:$id}) SET r.status=$status, r.reason=$reason, r.updatedAt=$time, r.revision=$revision CREATE (h:ReviewEvent $event)-[:FOR_REVIEW]->(r)',
+          {
+            id: review.id,
+            status,
+            reason,
+            time: createdAt,
+            revision: review.revision + 1,
+            event: { id: randomUUID(), status, reason, createdAt },
+          },
+        );
+      }
+      this.query('CREATE (:Mutation $props)', {
+        props: {
+          id: input.requestId,
+          operation: 'review',
+          fingerprint,
+          result: JSON.stringify({ changeId }),
         },
-      );
+      });
       return this.getChange(changeId);
     });
   }

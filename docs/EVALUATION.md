@@ -1,8 +1,10 @@
 # Real-document evaluation
 
-There are now **two separately sourced curated graphs**, each with three queries. `async-owner` uses Ripple documents; [`semver-deprecation`](EVALUATION_SEMVER.md) uses the external Semantic Versioning 2.0.0 specification. Independence refers to source and scenario, **not independent annotation or human validation**. Both scenarios and gold labels are AI-curated. No customer or extraction accuracy is measured.
+**2026-11-26 update:** the user-selected [actual Ripple API change](RIPPLE_CHANGE_CASE.md) adds a third case, `ripple-review-contract`. Six working-tree excerpts have null commit provenance, hashes and UTF-16 ranges; four manually confirmed connections yield four targets/four paths and exclude LANGUAGE. `npm run evaluate:ripple` runs its write/reopen check; `npm run evaluate:ripple:demo` opens a fresh store on 4326. `npm run evaluate` now runs **all three cases** and the semantic worksheet has **51 subjects**. The earlier two fixtures, source provenance and observations below remain unchanged. This addition is developer-authored, not automatically extracted or independently human-validated. It records preparation counts/automatic duration without claiming human time saved.
 
-`npm run evaluate` runs both cases sequentially in separate temporary stores and returns `{ ok, caseCount, cases }`. Select one with `npm run evaluate:owner` or `npm run evaluate:semver`; its report retains `{ ok, caseName, phases, ... }`. Phase report schema version is 2, separate from database schema. Scores stay per query rather than pooling repeated items into an independent-sample accuracy metric. Reopening rejects a manifest for a different case or fixture hash before opening the store. All evaluation inputs are local; no network or API key is needed after installation.
+The **two original separately sourced graphs** each have three queries. `async-owner` uses Ripple documents; [`semver-deprecation`](EVALUATION_SEMVER.md) uses the external Semantic Versioning 2.0.0 specification. Independence refers to source/scenario, **not independent annotation or human validation**. Their scenarios and gold labels are AI-curated; no customer or extraction accuracy is measured.
+
+`npm run evaluate` runs all three cases sequentially in separate temporary stores and returns `{ ok, caseCount, cases }`. Select one with `npm run evaluate:owner`, `npm run evaluate:semver` or `npm run evaluate:ripple`; its report retains `{ ok, caseName, phases, ... }`. Phase report schema version is 2, separate from database schema. Scores stay per query, not pooled into independent-sample accuracy. Reopening rejects a different case/fixture hash before opening the store. All inputs are local; no network or API key is needed after installation.
 
 `npm run evaluate:semver:demo` opens the new case at port **4323**. The original demo command and port **4322** remain unchanged. Details below describe the first case; see [the second case](EVALUATION_SEMVER.md) for its sources, paths, scores and screen flow.
 
@@ -10,7 +12,7 @@ The first case uses frozen excerpts from Ripple's own published project document
 
 ## Run it
 
-Human semantic adjudication now has a local worksheet: `npm run evaluate:review` opens both cases at port 4324, with versioned review artifacts and a strict checker. See [semantic review and manual-comparison protocol](SEMANTIC_REVIEW.md). The worksheet is available; actual human judgments and comparison measurements remain pending.
+`npm run evaluate:review` opens all three cases at port 4324, with versioned review artifacts and a strict checker. See [semantic review and manual-comparison protocol](SEMANTIC_REVIEW.md). Actual independent human judgments and comparison measurements remain pending.
 
 ```powershell
 npm ci

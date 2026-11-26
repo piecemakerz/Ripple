@@ -2,7 +2,7 @@
 
 ## Goal and context
 
-Build a local single-user change-impact workbench using real Relate. Speak Korean with the user; keep product UI English. Read `docs/STATUS.md`, `docs/PLAN.md`, and `docs/ARCHITECTURE.md` at the start of substantive work. The original requirements are in `docs/RIPPLE_HANDOFF.md`.
+Build a local single-user change-impact workbench using real Relate. Speak Korean with the user. Product UI defaults to English and supports Korean through the persistent language selector; keep both message catalogs complete and preserve original source/user text in either language. Read `docs/STATUS.md`, `docs/PLAN.md`, and `docs/ARCHITECTURE.md` at the start of substantive work. The original requirements are in `docs/RIPPLE_HANDOFF.md`.
 
 ## AI-driven development
 
@@ -11,6 +11,15 @@ Build a local single-user change-impact workbench using real Relate. Speak Korea
 - Continue routine, reversible work within the user's scope without repeated permission questions. Ask only for material missing product decisions or external/destructive actions not already authorized.
 - Keep a short execution plan in `docs/PLAN.md`; maintain decisions and known limits in `docs/ARCHITECTURE.md`, and verified commands/results/next task in `docs/STATUS.md`. Record failures honestly; never turn an attempted check into a passed check.
 - Do not launch additional agents or paid AI API calls unless requested. The app's sample mode needs no model API key.
+
+## Hackathon learning records
+
+- Read `docs/learning/README.md` and relevant decision/experiment entries at the start of substantive work. The user wants reusable learning across this and future hackathons.
+- Before material product, scope, technology, schedule or submission choices, add a concise dated rationale summary to `docs/learning/DECISIONS.md`: evidence, actual alternatives, expected outcome, costs, uncertainty and reconsideration criteria. Distinguish user decisions, delegated AI choices and proposals.
+- Record planned validation and observed outcomes in `docs/learning/EXPERIMENTS.md`; link detailed STATUS/QA evidence rather than duplicating logs. Keep observed facts, hypotheses, automated checks and independent human feedback separate.
+- Preserve prior predictions and decisions. Append dated outcomes, corrections and reversals; label retrospective reconstruction and never invent missing reasoning, confidence or effort measurements.
+- Before submission, freeze the actual submitted version and evidence using `docs/learning/RETROSPECTIVE.md`. After results, compare the evidence before drawing causal conclusions or adopting lessons; award outcome alone does not establish decision quality.
+- Use `docs/learning/TEMPLATE.md` when the user starts another hackathon. This repository does not automatically collect other chats/projects or publish/back up records. Keep private evidence, credentials and personal information out of public records.
 
 ## Invariants
 
@@ -40,7 +49,7 @@ Build a local single-user change-impact workbench using real Relate. Speak Korea
 
 ## Project skills and tools
 
-- Skills are installed in `.agents/skills`. Load only the skill relevant to the task: `relate` for graph/API work, `vercel-react-best-practices` for React state/rendering/performance, `web-design-guidelines` for UI/accessibility review, and `ripple-verify` for consequential changes and failed checks.
+- Skills are installed in `.agents/skills`. Load only the skill relevant to the task: `relate` for graph/API work, `frontend-design` for visual direction and UI composition, `vercel-react-best-practices` for React state/rendering/performance, `web-design-guidelines` for UI/accessibility review, and `ripple-verify` for consequential changes and failed checks. For design work, keep Ripple's source → impact → review flow and real-data states central; follow the brief in `docs/PLAN.md` and decisions in `docs/ARCHITECTURE.md`.
 - This is a Vite client and Express API. Apply relevant React rules; Next.js/RSC-specific advice does not justify a framework migration or dependency addition. Read individual rule files as needed rather than the entire compiled guide. Review the task's changed UI files when that scope is already clear.
 - `npm run ai:doctor` verifies the pinned skill snapshots and their agreement with the installed Relate package. Update external skills deliberately from reviewed revisions; do not silently refresh them. See `docs/AI_TOOLING.md` for provenance and tool availability.
 - Prefer the GitHub plugin when it is confirmed connected. `npm run ci:status` is the available token-free fallback for this public repo's exact committed HEAD; it separately reports a dirty worktree. Browser verification uses the existing connected browser tools and `docs/QA.md`.

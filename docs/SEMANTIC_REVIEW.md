@@ -1,6 +1,8 @@
 # Semantic review of evaluation cases
 
-The automated evaluator proves that the native graph returns the curated expectations. It cannot prove those expectations make semantic sense. Both frozen graphs remain **AI-curated and not human-reviewed** until a person assesses them. This worksheet records that assessment separately, without editing the gold fixtures or opening an application database.
+The automated evaluator proves that the native graph returns curated expectations. It cannot prove those expectations make semantic sense. All three graphs remain **AI-curated and not independently human-reviewed**. This worksheet records assessment separately, without editing fixtures or opening an app database. The November 26 [Ripple case](RIPPLE_CHANGE_CASE.md) adds 12 subjects; the historical 39-subject assessment below does not cover it.
+
+**Hackathon priority update — 2026-11-14:** the user delegated direction to the hackathon criteria. A separate [AI semantic assessment](HACKATHON_SEMANTIC_ASSESSMENT.md) now records reasoned acceptance of all 39 subjects, with automated provenance and no human attestation. The default human worksheet is still pending. Proceed with the [demonstration and submission preparation](HACKATHON_SUBMISSION.md); human review remains necessary before claiming human validation or running the human comparison below.
 
 ## Run the worksheet
 
@@ -10,7 +12,7 @@ npm run evaluate:review
 
 Open **http://127.0.0.1:4324**. The command needs neither a build nor an API key. It serves local HTML/CSS with native forms and no client scripts. Use `REVIEW_PORT` for a different loopback port. The default artifact directory is `%LOCALAPPDATA%/Ripple/semantic-reviews` (the platform local-share directory otherwise). `RIPPLE_REVIEW_PATH` selects a separate review directory; `RIPPLE_DB_PATH`, `.env` and the application `PORT` are ignored.
 
-There are **18 subjects for database ownership** and **21 for SemVer deprecation**: one scenario, every item, every relationship including proposed/rejected controls, and all three query path/exclusion sets. Sources retain their attribution, pinned links, exact excerpts, SHA-256 and original/excerpt UTF-16 ranges. The first fixture has no structured basis labels; the worksheet explicitly identifies its documented ATOMIC inference and synthetic controls without modifying that fixture. Other unlabeled relationships remain labeled as such.
+There are **51 subjects: 18 ownership, 21 SemVer, 12 Ripple review contract**. Each case includes its scenario, items, relationships and query expectations. Public sources retain attribution, pinned links, excerpts, SHA-256 and original/excerpt UTF-16 ranges. Ripple sources explicitly show an uncommitted working-tree snapshot instead of fabricated commit links. The first fixture's ATOMIC inference and synthetic controls remain disclosed; unlabeled relationships stay labeled as such.
 
 1. Read the hypothetical change and frozen sources. Expand a source at the bottom to inspect its full excerpt; follow its pinned original if more context is needed.
 2. Enter your name or alias and select **Human** only if you are personally reviewing. Automated checks select **Automated / QA**.
@@ -40,7 +42,7 @@ The checker validates strict fields, case ID, exact fixture bytes, checklist con
 
 `identityVerified` is always false. Self-attestation is not authentication, proof of expertise or independent annotation. A person who authored or saw the gold labels is not a blind independent annotator. An automated record can be complete and accepted without becoming human-attested. An accepted record for one case says nothing about the other. Do not treat an older accepted snapshot as the latest decision when a later snapshot exists.
 
-The existing `npm run evaluate` remains a graph regression gate; it does not silently start requiring private human artifacts in CI. The two fixture files stay unchanged. If review reveals an error, preserve the original fixture and review snapshots, introduce a new version with an explained correction, then rerun native evaluation and human adjudication against the new hashes.
+The existing `npm run evaluate` remains a graph regression gate without requiring private human artifacts in CI. The two earlier fixtures stay unchanged; Ripple is an additional case. If review reveals an error, preserve originals and review snapshots, introduce an explained version and rerun native evaluation and human adjudication against the new hashes.
 
 ## Next: bounded manual-workflow comparison
 

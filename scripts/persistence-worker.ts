@@ -8,6 +8,12 @@ if (!path || !['write', 'read', 'wal-write', 'wal-read'].includes(mode))
   throw new Error('Usage: persistence-worker.ts <mode> <isolated-db-path>');
 const store = new RippleStore(path);
 const requestId = '96c03eb5-7f01-48b0-a991-74d19d29a44e';
+const reviewRequest = {
+  requestId: '76c03eb5-7f01-48b0-a991-74d19d29a44e',
+  expectedRevision: 0,
+  status: 'revise' as const,
+  reason: 'Use a daily snapshot badge with its last update time.',
+};
 const ingestion = new Ingestion(store);
 const sourceRequest = {
   requestId: '06c03eb5-7f01-48b0-a991-74d19d29a44e',
@@ -24,12 +30,7 @@ if (mode === 'write' || mode === 'wal-write') {
     after: proposal.after,
     evidenceId: proposal.evidenceId,
   });
-  store.saveReview(
-    saved.change.id,
-    'T1',
-    'revise',
-    'Use a daily snapshot badge with its last update time.',
-  );
+  store.saveReview(saved.change.id, 'T1', reviewRequest);
   store.conn.begin();
   store.query("CREATE (:Item {id:'rolled-back'})");
   store.conn.rollback();
@@ -81,6 +82,8 @@ if (mode === 'write' || mode === 'wal-write') {
   assert.equal('snapshot' in workspace.changePage.entries[0], false);
   assert.equal(saved.reviews.find((r) => r.itemId === 'T1')!.status, 'revise');
   assert.equal(saved.reviews.find((r) => r.itemId === 'T1')!.history.length, 1);
+  assert.equal(saved.reviews.find((r) => r.itemId === 'T1')!.revision, 1);
+  assert.deepEqual(store.saveReview(saved.change.id, 'T1', reviewRequest), saved);
   assert.equal(saved.change.snapshot.target.revision, 1);
   assert.equal(saved.change.snapshot.impacts.length, 4);
   assert.equal(store.query("MATCH (i:Item {id:'rolled-back'}) RETURN i").rows.length, 0);
