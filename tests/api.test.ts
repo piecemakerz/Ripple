@@ -49,11 +49,37 @@ test('HTTP flow uses Relate, validates writes, rejects stale revisions and cross
       400,
     );
     assert.equal(
-      (await send(reviewPath, { status: 'revise', reason: 'Show daily snapshot time.' }, 'PUT'))
-        .status,
+      (
+        await send(
+          reviewPath,
+          {
+            requestId: randomUUID(),
+            expectedRevision: 0,
+            status: 'revise',
+            reason: 'Show daily snapshot time.',
+          },
+          'PUT',
+        )
+      ).status,
       200,
     );
     const reread = await (await fetch(base + `/api/changes/${saved.change.id}`)).json();
+    const stale = await send(
+      reviewPath,
+      {
+        requestId: randomUUID(),
+        expectedRevision: 0,
+        status: 'keep',
+        reason: 'An old tab still thinks the review is pending.',
+      },
+      'PUT',
+    );
+    assert.equal(stale.status, 409);
+    assert.equal((await stale.json()).code, 'REVIEW_CONFLICT');
+    assert.equal(
+      (await send(reviewPath, { status: 'keep', reason: 'Legacy unguarded write' }, 'PUT')).status,
+      400,
+    );
     assert.equal(
       reread.reviews.find((r: { itemId: string }) => r.itemId === 'T1').history.length,
       1,

@@ -6,14 +6,33 @@ import type { IdentityMap } from './score.js';
 
 export interface PreparedCase extends IdentityMap {
   proposal: Proposal;
+  preparation?: {
+    elapsedMs: number;
+    writeRequests: number;
+    sources: number;
+    items: number;
+    relations: number;
+    note: string;
+  };
 }
 export async function prepareCase(
   api: EvaluationApi,
   fixture: EvaluationCase = evaluationCase,
 ): Promise<PreparedCase> {
+  const started = performance.now();
+  let writeRequests = 0;
+  const request: EvaluationApi['request'] = async <T>(
+    path: string,
+    method = 'GET',
+    body?: unknown,
+  ): Promise<T> => {
+    const value = await api.request<T>(path, method, body);
+    if (method !== 'GET') writeRequests++;
+    return value;
+  };
   const ids: IdentityMap = { items: {}, sources: {} };
   for (const source of fixture.sources) {
-    const saved = await api.request<SourceVersion>('/api/sources', 'POST', {
+    const saved = await request<SourceVersion>('/api/sources', 'POST', {
       requestId: randomUUID(),
       expectedVersion: 0,
       title: source.title,
@@ -32,7 +51,7 @@ export async function prepareCase(
     };
   };
   for (const item of fixture.items) {
-    const saved = await api.request<Item>('/api/items', 'POST', {
+    const saved = await request<Item>('/api/items', 'POST', {
       requestId: randomUUID(),
       kind: item.kind,
       title: item.title,
@@ -43,7 +62,7 @@ export async function prepareCase(
     ids.items[item.key] = saved.id;
   }
   for (const relation of fixture.relations) {
-    const saved = await api.request<Candidate>('/api/candidates', 'POST', {
+    const saved = await request<Candidate>('/api/candidates', 'POST', {
       requestId: randomUUID(),
       from: ids.items[relation.from],
       to: ids.items[relation.to],
@@ -52,18 +71,29 @@ export async function prepareCase(
       evidence: evidence(relation.evidence),
     });
     if (relation.status !== 'proposed')
-      await api.request(`/api/candidates/${saved.id}`, 'PUT', {
+      await request(`/api/candidates/${saved.id}`, 'PUT', {
         requestId: randomUUID(),
         expectedRevision: saved.revision,
         status: relation.status,
       });
   }
-  const proposal = await api.request<Proposal>('/api/proposals', 'POST', {
+  const proposal = await request<Proposal>('/api/proposals', 'POST', {
     requestId: randomUUID(),
     itemId: ids.items[fixture.proposal.target],
     expectedRevision: 1,
     after: fixture.proposal.after,
     evidence: evidence(fixture.proposal.evidence),
   });
-  return { ...ids, proposal };
+  return {
+    ...ids,
+    proposal,
+    preparation: {
+      elapsedMs: Math.round(performance.now() - started),
+      writeRequests,
+      sources: fixture.sources.length,
+      items: fixture.items.length,
+      relations: fixture.relations.length,
+      note: 'Automated import of manually curated context; excludes source reading, graph authoring and human review. Not a time-saving measurement.',
+    },
+  };
 }

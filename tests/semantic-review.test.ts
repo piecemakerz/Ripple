@@ -18,7 +18,7 @@ import { readReview, saveReview } from '../scripts/evaluation/review-files.js';
 import { reviewPage } from '../scripts/evaluation/review-page.js';
 import { createReviewApp } from '../scripts/evaluation/review-server.js';
 
-test('semantic checklist covers both complete fixtures and preserves exact quotes, inference and attribution', () => {
+test('semantic checklist covers complete fixtures and preserves exact quotes, provenance and attribution', () => {
   let total = 0;
   for (const name of caseNames) {
     const packet = reviewPacket(name);
@@ -35,9 +35,13 @@ test('semantic checklist covers both complete fixtures and preserves exact quote
     const page = reviewPage(packet, emptyReview(packet));
     for (const source of fixture.sources) {
       assert.ok(page.includes(source.hash));
-      assert.ok(page.includes(source.commit));
+      if (source.commit) assert.ok(page.includes(source.commit));
+      else {
+        assert.match(page, /Working-tree snapshot/);
+        assert.doesNotMatch(page, /blob\/null\//);
+      }
     }
-    assert.match(page, /Priority review: curator inference/);
+    if (name !== 'ripple-review-contract') assert.match(page, /Priority review: curator inference/);
     if (name === 'semver-deprecation') {
       assert.match(page, /CORE_RESET → MAJOR → MINOR → DEPRECATE/);
       assert.match(page, /Tom Preston-Werner/);
@@ -45,7 +49,7 @@ test('semantic checklist covers both complete fixtures and preserves exact quote
     }
     assert.equal(summarizeReview(emptyReview(packet), packet).humanAttestedAcceptance, false);
   }
-  assert.equal(total, 39);
+  assert.equal(total, 51);
 });
 
 test('review integrity rejects stale/cross-case identity, missing/duplicate subjects and unjustified answers', () => {

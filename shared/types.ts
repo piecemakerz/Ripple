@@ -24,6 +24,7 @@ export interface Evidence {
 }
 export interface EvidenceDetail extends Evidence {
   source: SourceVersion;
+  newerSource?: SourceVersion;
 }
 export type RelationStatus = 'proposed' | 'confirmed' | 'rejected' | 'superseded';
 export interface Dependency {
@@ -81,7 +82,14 @@ export interface Review {
   status: ReviewStatus;
   reason: string;
   updatedAt: string;
+  revision: number;
   history: ReviewEvent[];
+}
+export interface ReviewWrite {
+  requestId: string;
+  expectedRevision: number;
+  status: Exclude<ReviewStatus, 'pending'>;
+  reason: string;
 }
 export interface ChangeDetail {
   change: Change;

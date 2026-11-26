@@ -18,6 +18,8 @@ export const changeInput = z
   .strict();
 const reviewInput = z
   .object({
+    requestId: z.uuid(),
+    expectedRevision: z.number().int().nonnegative().safe(),
     status: z.enum(['keep', 'revise', 'defer']),
     reason: z.string().trim().min(1, 'Add a reason for your decision.').max(4000),
   })
@@ -63,7 +65,7 @@ export function createApp(store: RippleStore) {
   );
   app.put('/api/changes/:changeId/reviews/:itemId', (req, res) => {
     const input = reviewInput.parse(req.body);
-    res.json(store.saveReview(req.params.changeId, req.params.itemId, input.status, input.reason));
+    res.json(store.saveReview(req.params.changeId, req.params.itemId, input));
   });
   app.use('/api', (_req, res) => res.status(404).json({ error: 'API route not found.' }));
   const errors: ErrorRequestHandler = (error: unknown, _req, res, _next) => {

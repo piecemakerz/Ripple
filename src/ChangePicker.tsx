@@ -1,13 +1,24 @@
+import { itemTitle, proposalTitle } from './sample-content.js';
+import { localeFor, translate, type Language } from './i18n-core.js';
+import { useI18n } from './i18n.js';
 import { useEffect, useState } from 'react';
-import type { ChangePage, ChangeSummary, Proposal } from '../shared/types.js';
+import type { ChangePage, ChangeSummary, Item, Proposal } from '../shared/types.js';
 import { api } from './api.js';
 
-const label = (change: ChangeSummary) =>
-  `${change.itemId} · revision ${change.afterRevision} · ${new Date(change.createdAt).toLocaleString()}`;
+const label = (change: ChangeSummary, items: Item[], language: Language) =>
+  translate('{0} — revision {1}, {2}', language, [
+    itemTitle(
+      items.find((item) => item.id === change.itemId),
+      language,
+    ) || change.itemId,
+    change.afterRevision,
+    new Date(change.createdAt).toLocaleString(localeFor(language)),
+  ]);
 
 export function ChangePicker({
   initialPage,
   proposals,
+  items,
   selection,
   selectedChange,
   disabled,
@@ -15,11 +26,13 @@ export function ChangePicker({
 }: {
   initialPage: ChangePage;
   proposals: Proposal[];
+  items: Item[];
   selection: string;
   selectedChange: ChangeSummary | undefined;
   disabled: boolean;
   onSelect: (value: string) => void;
 }) {
+  const { t, language } = useI18n();
   const [cursors, setCursors] = useState<(string | null)[]>([null]);
   const [retry, setRetry] = useState(0);
   const [result, setResult] = useState<{ cursor: string | null; page: ChangePage }>({
@@ -28,6 +41,7 @@ export function ChangePicker({
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPaging, setShowPaging] = useState(false);
   const cursor = cursors.at(-1)!;
   const page = result.cursor === cursor ? result.page : undefined;
   useEffect(() => {
@@ -58,77 +72,96 @@ export function ChangePicker({
     <div className="change-picker">
       <div className="change-picker-field">
         <label className="field-label" htmlFor="change-select">
-          CHANGE TO EXPLORE
+          {t('Change to explore')}
         </label>
         <select
           id="change-select"
+          name="change"
           value={selection}
           disabled={disabled}
           onChange={(e) => onSelect(e.target.value)}
         >
-          <optgroup label="Proposed updates">
+          <optgroup label={t('Proposed updates')}>
             {proposals.map((p) => (
               <option key={p.id} value={`proposal:${p.id}`}>
-                {p.title} · proposed update
+                {t('{0} · proposed update', [proposalTitle(p, language)])}
               </option>
             ))}
           </optgroup>
           {outsidePage && (
             <option value={selection}>
-              {selectedChange ? label(selectedChange) : 'Saved change'} · selected
+              {t('{0} · selected', [
+                selectedChange ? label(selectedChange, items, language) : t('Saved change'),
+              ])}
             </option>
           )}
-          <optgroup label={`Saved changes · page ${cursors.length}`}>
+          <optgroup label={t('Saved changes · page {0}', [cursors.length])}>
             {entries.map((c) => (
               <option key={c.id} value={c.id}>
-                {label(c)}
+                {label(c, items, language)}
               </option>
             ))}
           </optgroup>
         </select>
-        <p className="helper" role="status">
-          {loading
-            ? 'Loading saved changes…'
-            : page
-              ? `${entries.length} saved changes on page ${cursors.length}.`
-              : 'Change list unavailable.'}{' '}
-          Browse pages without changing your selection. Use History to search.
-        </p>
       </div>
-      <div className="change-picker-actions" aria-label="Saved change pages">
+      <div className={`change-picker-navigation ${showPaging ? 'expanded' : ''}`}>
         <button
-          disabled={disabled || loading || cursors.length === 1}
-          onClick={() => {
-            setCursors((v) => v.slice(0, -1));
-            setRetry((v) => v + 1);
-          }}
+          className="change-picker-toggle"
+          aria-expanded={showPaging}
+          aria-controls="change-pages"
+          onClick={() => setShowPaging((value) => !value)}
         >
-          Newer changes
+          {t('Saved change pages')}
+          <span>{showPaging ? t('Hide') : t('Show')}</span>
         </button>
-        <button
-          disabled={disabled || loading || !!error || !page?.nextCursor}
-          onClick={() => {
-            setCursors((v) => [...v, page!.nextCursor]);
-            setRetry((v) => v + 1);
-          }}
-        >
-          Older changes
-        </button>
-        <button
-          disabled={disabled || loading}
-          onClick={() => {
-            setCursors([null]);
-            setRetry((v) => v + 1);
-          }}
-        >
-          Refresh changes
-        </button>
+        <div id="change-pages" className="change-picker-paging">
+          <p className="helper" role="status">
+            {loading
+              ? t('Loading saved changes…')
+              : page
+                ? t('{0} saved {1} on page {2}.', [
+                    entries.length,
+                    entries.length === 1 ? t('change') : t('changes'),
+                    cursors.length,
+                  ])
+                : t('Change list unavailable.')}
+          </p>
+          <div className="change-picker-actions" aria-label={t('Saved change pages')}>
+            <button
+              disabled={disabled || loading || cursors.length === 1}
+              onClick={() => {
+                setCursors((v) => v.slice(0, -1));
+                setRetry((v) => v + 1);
+              }}
+            >
+              {t('Newer changes')}
+            </button>
+            <button
+              disabled={disabled || loading || !!error || !page?.nextCursor}
+              onClick={() => {
+                setCursors((v) => [...v, page!.nextCursor]);
+                setRetry((v) => v + 1);
+              }}
+            >
+              {t('Older changes')}
+            </button>
+            <button
+              disabled={disabled || loading}
+              onClick={() => {
+                setCursors([null]);
+                setRetry((v) => v + 1);
+              }}
+            >
+              {t('Refresh changes')}
+            </button>
+          </div>
+        </div>
       </div>
       {error && (
         <div className="banner error" role="alert">
-          <span>Could not load saved changes. {error}</span>
+          <span>{t('Could not load saved changes. {0}', [t(error)])}</span>
           <button disabled={disabled || loading} onClick={() => setRetry((v) => v + 1)}>
-            Retry change list
+            {t('Retry change list')}
           </button>
         </div>
       )}

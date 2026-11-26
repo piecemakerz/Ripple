@@ -17,10 +17,9 @@ export function reviewPacket(caseName: CaseName) {
     {
       id: 'scenario',
       kind: 'scenario',
-      title: `Hypothetical change to ${fixture.proposal.target}`,
+      title: `${caseName === 'ripple-review-contract' ? 'Developer change' : 'Hypothetical change'} to ${fixture.proposal.target}`,
       description: fixture.proposal.after,
-      prompt:
-        'Is this a coherent hypothetical scenario? Impact means a dependent plan needs review, not that implementation must change. The sources do not describe a real customer migration.',
+      prompt: `${fixture.provenance} Impact means a dependent plan needs review, not that implementation must change. Check whether the scenario and links are justified by the preserved sources.`,
       evidence: fixture.proposal.evidence,
     },
     ...fixture.items.map((item): ReviewSubject => ({

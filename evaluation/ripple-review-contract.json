@@ -1,0 +1,205 @@
+{
+  "id": "ripple-review-contract-v1",
+  "provenance": "Developer-authored case of the actual 2026-11-26 Ripple review API change, using pre-change source excerpts. Relations and review decisions are AI-curated, not automatic code analysis or independent human validation. Null commit means an uncommitted working-tree excerpt; its SHA-256 is authoritative. No claim of newly discovered work or user time savings.",
+  "sources": [
+    {
+      "key": "CONTRACT",
+      "path": "server/app.ts",
+      "title": "Review API before revision protection",
+      "commit": null,
+      "license": "MIT",
+      "start": 574,
+      "end": 759,
+      "hash": "18da4568ceb312c5b1ed4292056df5cc1570889422619f338c03918fe1b3877c",
+      "text": "const reviewInput = z\n  .object({\n    status: z.enum(['keep', 'revise', 'defer']),\n    reason: z.string().trim().min(1, 'Add a reason for your decision.').max(4000),\n  })\n  .strict();\n\n"
+    },
+    {
+      "key": "UI",
+      "path": "src/App.tsx",
+      "title": "Browser review save before revision protection",
+      "commit": null,
+      "license": "MIT",
+      "start": 12676,
+      "end": 13533,
+      "hash": "f186ed28c380e8ebf51d2eeae23a57a38ba12acaa49330e91f104cf74d79def2",
+      "text": "  async function saveReview() {\n    if (\n      !detail ||\n      !selected ||\n      busy ||\n      loading ||\n      !draft.status ||\n      !reviewDraftState(draft, review).canSave\n    )\n      return;\n    setBusy(true);\n    setError('');\n    setNotice('');\n    setReviewFailure(undefined);\n    try {\n      const saved = await api<ChangeDetail>(\n        `/api/changes/${detail.change.id}/reviews/${selected.item.id}`,\n        { method: 'PUT', body: JSON.stringify(draft) },\n      );\n      setDetail(saved);\n      setDrafts((entries) => {\n        const next = { ...entries };\n        delete next[draftKey];\n        return next;\n      });\n      setNotice({ item: selected.item, status: draft.status });\n      return saved;\n    } catch (e) {\n      setReviewFailure({ key: draftKey, message: (e as Error).message });\n    } finally {\n      setBusy(false);\n    }\n  }\n"
+    },
+    {
+      "key": "WORKER",
+      "path": "scripts/evaluation/worker.ts",
+      "title": "Evaluation worker creates and retries a review",
+      "commit": null,
+      "license": "MIT",
+      "start": 2924,
+      "end": 3253,
+      "hash": "2ff08bcf8f88a95eaa7b72fcbba73108ba55bb3309311d75d98c127301438b65",
+      "text": "      const reviewPath = `/api/changes/${saved.change.id}/reviews/${prepared.items[fixture.review.item]}`;\n      const reviewInput = { status: fixture.review.status, reason: fixture.review.reason };\n      await api.request<Review>(reviewPath, 'PUT', reviewInput);\n      await api.request<Review>(reviewPath, 'PUT', reviewInput);\n"
+    },
+    {
+      "key": "BUNDLE",
+      "path": "scripts/judge-bundle.ts",
+      "title": "Judge bundle depends on the evaluation writer",
+      "commit": null,
+      "license": "MIT",
+      "start": 4007,
+      "end": 4496,
+      "hash": "0549444daa1efe16e5ee427dff65d52abe3facc211e0fb58490eb86f89f1d89b",
+      "text": "export function prepareJudgeSnapshot(base: string) {\n  mkdirSync(base, { recursive: true });\n  const directory = mkdtempSync(join(base, 'ripple-judge-'));\n  const writer = mkdtempSync(join(tmpdir(), 'ripple-evaluation-'));\n  try {\n    const validation = runPhase('write', writer, judgeCase);\n    // runPhase is synchronous: the only writer has exited before copying native files.\n    copyTree(writer, join(directory, 'snapshot'));\n    const { fixture, fixtureHash } = loadCase(judgeCase);\n"
+    },
+    {
+      "key": "RUNNER",
+      "path": "scripts/evaluation/run.ts",
+      "title": "runPhase starts the evaluation worker",
+      "commit": null,
+      "license": "MIT",
+      "start": 317,
+      "end": 1054,
+      "hash": "e1b188dc89fddde20698b931de247d3f2801804ae8d3780b57a566190da9417d",
+      "text": "export function runPhase(\n  mode: 'write' | 'read' | 'prepare',\n  directory: string,\n  caseName: CaseName = 'async-owner',\n) {\n  loadCase(caseName);\n  const child = spawnSync(\n    process.execPath,\n    [\n      '--import',\n      'tsx',\n      fileURLToPath(new URL('./worker.ts', import.meta.url)),\n      mode,\n      directory,\n      caseName,\n    ],\n    {\n      encoding: 'utf8',\n      timeout: 30000,\n    },\n  );\n  if (child.status !== 0)\n    throw new Error(\n      child.stderr || child.stdout || child.error?.message || 'Evaluation worker failed',\n    );\n  return JSON.parse(child.stdout.trim()) as {\n    ok: boolean;\n    phase: string;\n    case: string;\n    fixtureSha256: string;\n    scores: ReturnType<typeof scoreImpact>[];\n  };\n}\n"
+    },
+    {
+      "key": "LANGUAGE",
+      "path": "src/i18n-core.ts",
+      "title": "Language preference is independent of review writes",
+      "commit": null,
+      "license": "MIT",
+      "start": 455,
+      "end": 601,
+      "hash": "49940d2ce71efa5553498197d400ed6d0ba02a957bc0d763076730d5cab5b4ea",
+      "text": "export const languageStorageKey = 'ripple:language:v1';\nexport const localeFor = (language: Language) => (language === 'ko' ? 'ko-KR' : 'en-US');\n"
+    }
+  ],
+  "items": [
+    {
+      "key": "API",
+      "kind": "Assumption",
+      "title": "Review writes accept status and reason",
+      "body": "A valid status and reason are enough to save a review.",
+      "evidence": {
+        "source": "CONTRACT",
+        "quote": "const reviewInput = z\n  .object({\n    status: z.enum(['keep', 'revise', 'defer']),\n    reason: z.string().trim().min(1, 'Add a reason for your decision.').max(4000),\n  })\n  .strict();\n\n"
+      }
+    },
+    {
+      "key": "UI_SAVE",
+      "kind": "Task",
+      "title": "Update browser save payload",
+      "body": "Send the review revision that was read and a stable retry request ID.",
+      "evidence": {
+        "source": "UI",
+        "quote": "{ method: 'PUT', body: JSON.stringify(draft) }"
+      }
+    },
+    {
+      "key": "RECOVERY",
+      "kind": "Task",
+      "title": "Preserve drafts during conflict recovery",
+      "body": "Keep the local draft, show the latest decision, and require comparison before retrying.",
+      "evidence": {
+        "source": "UI",
+        "quote": "setReviewFailure({ key: draftKey, message: (e as Error).message });"
+      }
+    },
+    {
+      "key": "WORKER",
+      "kind": "Task",
+      "title": "Update both evaluation review writes",
+      "body": "The worker sends the same review twice. Both calls must use one request ID and the original revision.",
+      "evidence": {
+        "source": "WORKER",
+        "quote": "      const reviewPath = `/api/changes/${saved.change.id}/reviews/${prepared.items[fixture.review.item]}`;\n      const reviewInput = { status: fixture.review.status, reason: fixture.review.reason };\n      await api.request<Review>(reviewPath, 'PUT', reviewInput);\n      await api.request<Review>(reviewPath, 'PUT', reviewInput);\n"
+      }
+    },
+    {
+      "key": "BUNDLE",
+      "kind": "Task",
+      "title": "Rebuild the judge store after the API change",
+      "body": "A safe browser save is insufficient: judge preparation runs the evaluation writer before copying its store.",
+      "evidence": {
+        "source": "BUNDLE",
+        "quote": "export function prepareJudgeSnapshot(base: string) {\n  mkdirSync(base, { recursive: true });\n  const directory = mkdtempSync(join(base, 'ripple-judge-'));\n  const writer = mkdtempSync(join(tmpdir(), 'ripple-evaluation-'));\n  try {\n    const validation = runPhase('write', writer, judgeCase);\n    // runPhase is synchronous: the only writer has exited before copying native files.\n    copyTree(writer, join(directory, 'snapshot'));\n    const { fixture, fixtureHash } = loadCase(judgeCase);\n"
+      }
+    },
+    {
+      "key": "LANGUAGE",
+      "kind": "Task",
+      "title": "Keep the language preference",
+      "body": "English/Korean preference storage does not depend on the review request contract.",
+      "evidence": {
+        "source": "LANGUAGE",
+        "quote": "export const languageStorageKey = 'ripple:language:v1';\nexport const localeFor = (language: Language) => (language === 'ko' ? 'ko-KR' : 'en-US');\n"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "from": "UI_SAVE",
+      "to": "API",
+      "status": "confirmed",
+      "basis": "direct",
+      "evidence": {
+        "source": "UI",
+        "quote": "{ method: 'PUT', body: JSON.stringify(draft) }"
+      },
+      "rationale": "This browser request is a direct caller of the review API."
+    },
+    {
+      "from": "RECOVERY",
+      "to": "UI_SAVE",
+      "status": "confirmed",
+      "basis": "direct",
+      "evidence": {
+        "source": "UI",
+        "quote": "setReviewFailure({ key: draftKey, message: (e as Error).message });"
+      },
+      "rationale": "The save catch branch handles failed requests from this same browser operation."
+    },
+    {
+      "from": "WORKER",
+      "to": "API",
+      "status": "confirmed",
+      "basis": "direct",
+      "evidence": {
+        "source": "WORKER",
+        "quote": "      const reviewPath = `/api/changes/${saved.change.id}/reviews/${prepared.items[fixture.review.item]}`;\n      const reviewInput = { status: fixture.review.status, reason: fixture.review.reason };\n      await api.request<Review>(reviewPath, 'PUT', reviewInput);\n      await api.request<Review>(reviewPath, 'PUT', reviewInput);\n"
+      },
+      "rationale": "The worker calls the review route twice with one payload."
+    },
+    {
+      "from": "BUNDLE",
+      "to": "WORKER",
+      "status": "confirmed",
+      "basis": "direct",
+      "evidence": {
+        "source": "BUNDLE",
+        "quote": "export function prepareJudgeSnapshot(base: string) {\n  mkdirSync(base, { recursive: true });\n  const directory = mkdtempSync(join(base, 'ripple-judge-'));\n  const writer = mkdtempSync(join(tmpdir(), 'ripple-evaluation-'));\n  try {\n    const validation = runPhase('write', writer, judgeCase);\n    // runPhase is synchronous: the only writer has exited before copying native files.\n    copyTree(writer, join(directory, 'snapshot'));\n    const { fixture, fixtureHash } = loadCase(judgeCase);\n"
+      },
+      "rationale": "prepareJudgeSnapshot calls runPhase(write); the separately preserved RUNNER excerpt shows that runPhase launches worker.ts."
+    }
+  ],
+  "queries": [
+    {
+      "target": "API",
+      "paths": [
+        ["UI_SAVE", "API"],
+        ["RECOVERY", "UI_SAVE", "API"],
+        ["WORKER", "API"],
+        ["BUNDLE", "WORKER", "API"]
+      ],
+      "excluded": ["LANGUAGE"]
+    }
+  ],
+  "proposal": {
+    "target": "API",
+    "after": "Require expectedRevision and requestId on every review save. Reject stale writes and preserve one event for an identical retry.",
+    "evidence": {
+      "source": "CONTRACT",
+      "quote": "const reviewInput = z\n  .object({\n    status: z.enum(['keep', 'revise', 'defer']),\n    reason: z.string().trim().min(1, 'Add a reason for your decision.').max(4000),\n  })\n  .strict();\n\n"
+    }
+  },
+  "review": {
+    "item": "BUNDLE",
+    "status": "defer",
+    "reason": "Rebuild the judge store after updating the evaluation worker payload. Verify both retry calls and reopen the packaged native store before publishing."
+  }
+}

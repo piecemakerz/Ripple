@@ -11,7 +11,10 @@ const schema = z.object({
       key: z.string(),
       title: z.string(),
       path: z.string(),
-      commit: z.string().regex(/^[a-f0-9]{40}$/),
+      commit: z
+        .string()
+        .regex(/^[a-f0-9]{40}$/)
+        .nullable(),
       license: z.enum(['MIT', 'CC-BY-3.0']),
       url: z.url().optional(),
       attribution: z.string().min(1).optional(),
@@ -121,7 +124,7 @@ export function validateCase(input: unknown): EvaluationCase {
     throw new Error('Proposal needs a gold query containing the review item');
   return value;
 }
-export const caseNames = ['async-owner', 'semver-deprecation'] as const;
+export const caseNames = ['async-owner', 'semver-deprecation', 'ripple-review-contract'] as const;
 export type CaseName = (typeof caseNames)[number];
 export function loadCase(name: string = 'async-owner') {
   if (!caseNames.includes(name as CaseName)) throw new Error(`Unknown evaluation case: ${name}`);

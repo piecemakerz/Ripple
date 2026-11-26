@@ -111,7 +111,13 @@ test('manual candidate confirmation connects to native impact, snapshots and per
     evidenceId: p.evidenceId,
   });
   assert.equal(change.reviews.length, 5);
-  store.saveReview(change.change.id, item.id, 'revise', 'Adapt the imported badge.');
+  store.saveReview(change.change.id, item.id, {
+    requestId: crypto.randomUUID(),
+    expectedRevision: store.getChange(change.change.id).reviews.find((r) => r.itemId === item.id)!
+      .revision,
+    status: 'revise',
+    reason: 'Adapt the imported badge.',
+  });
   assert.equal(
     store.getChange(change.change.id).reviews.find((r) => r.itemId === item.id)!.history.length,
     1,
@@ -177,8 +183,13 @@ test('an entirely imported assumption and task can run the existing change/revie
   );
   assert.equal(store.getItem(root.id).revision, 2);
   assert.equal(
-    store.saveReview(saved.change.id, task.id, 'defer', 'Check the imported assumption.').reviews[0]
-      .status,
+    store.saveReview(saved.change.id, task.id, {
+      requestId: crypto.randomUUID(),
+      expectedRevision: store.getChange(saved.change.id).reviews.find((r) => r.itemId === task.id)!
+        .revision,
+      status: 'defer',
+      reason: 'Check the imported assumption.',
+    }).reviews[0].status,
     'defer',
   );
 });

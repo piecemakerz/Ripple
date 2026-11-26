@@ -72,7 +72,12 @@ try {
       assert.deepEqual(await api.request('/api/changes', 'POST', input), saved);
       assert.equal(saved.reviews.length, new Set(proposalQuery.paths.map((p) => p[0])).size);
       const reviewPath = `/api/changes/${saved.change.id}/reviews/${prepared.items[fixture.review.item]}`;
-      const reviewInput = { status: fixture.review.status, reason: fixture.review.reason };
+      const reviewInput = {
+        requestId: randomUUID(),
+        expectedRevision: 0,
+        status: fixture.review.status,
+        reason: fixture.review.reason,
+      };
       await api.request<Review>(reviewPath, 'PUT', reviewInput);
       await api.request<Review>(reviewPath, 'PUT', reviewInput);
       const workspace = await api.request<Workspace>('/api/workspace');

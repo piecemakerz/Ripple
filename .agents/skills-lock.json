@@ -28,6 +28,15 @@
       "license": "MIT",
       "sha256": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474",
       "files": 1
+    },
+    {
+      "name": "frontend-design",
+      "repo": "anthropics/skills",
+      "ref": "41bbe19d1a1a7eaab5e7bb9050a417e5c6cffc8f",
+      "path": "skills/frontend-design",
+      "license": "Apache-2.0",
+      "sha256": "7e9c2af00fd5b3144f49ce6fb1b16037b392ab9c2f049423b0b6114d99381ba2",
+      "files": 2
     }
   ]
 }

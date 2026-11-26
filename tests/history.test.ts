@@ -18,10 +18,34 @@ function setup() {
     after: proposal.after,
     evidenceId: proposal.evidenceId,
   });
-  store.saveReview(first.change.id, 'T1', 'revise', 'Show daily freshness 😀');
-  store.saveReview(first.change.id, 'T1', 'defer', 'Await supplier confirmation');
-  store.saveReview(first.change.id, 'T1', 'defer', 'Await supplier confirmation');
-  store.saveReview(first.change.id, 'T2', 'keep', 'Still valid');
+  store.saveReview(first.change.id, 'T1', {
+    requestId: crypto.randomUUID(),
+    expectedRevision: store.getChange(first.change.id).reviews.find((r) => r.itemId === 'T1')!
+      .revision,
+    status: 'revise',
+    reason: 'Show daily freshness 😀',
+  });
+  store.saveReview(first.change.id, 'T1', {
+    requestId: crypto.randomUUID(),
+    expectedRevision: store.getChange(first.change.id).reviews.find((r) => r.itemId === 'T1')!
+      .revision,
+    status: 'defer',
+    reason: 'Await supplier confirmation',
+  });
+  store.saveReview(first.change.id, 'T1', {
+    requestId: crypto.randomUUID(),
+    expectedRevision: store.getChange(first.change.id).reviews.find((r) => r.itemId === 'T1')!
+      .revision,
+    status: 'defer',
+    reason: 'Await supplier confirmation',
+  });
+  store.saveReview(first.change.id, 'T2', {
+    requestId: crypto.randomUUID(),
+    expectedRevision: store.getChange(first.change.id).reviews.find((r) => r.itemId === 'T2')!
+      .revision,
+    status: 'keep',
+    reason: 'Still valid',
+  });
   const ingest = new Ingestion(store);
   const e = store.getEvidence('E-D1-A1');
   const evidence = { sourceId: e.sourceId, start: e.start, end: e.end, quote: e.quote };
@@ -161,7 +185,12 @@ test('cursor pages are complete and deterministic at equal timestamps; filters p
   const firstPage = readHistory(store, { limit: 2 });
   const restBefore = readHistory(store, { cursor: firstPage.nextCursor! }).entries;
   const changeId = store.workspace().changePage.entries[0].id;
-  store.saveReview(changeId, 'D2', 'revise', 'New event after paging began');
+  store.saveReview(changeId, 'D2', {
+    requestId: crypto.randomUUID(),
+    expectedRevision: store.getChange(changeId).reviews.find((r) => r.itemId === 'D2')!.revision,
+    status: 'revise',
+    reason: 'New event after paging began',
+  });
   store.query('MATCH (h:ReviewEvent) WHERE h.reason=$reason SET h.createdAt=$time', {
     reason: 'New event after paging began',
     time: '2026-11-15T00:00:00.000Z',
